@@ -17,20 +17,23 @@ if (!is_logged_in() and $_POST['formname'] == "loginform") {
     }
 }
 
-if (!is_logged_in()) {
-    ?>
-
+?>
 <html>
     <head>
-        <link href="css/base.css" rel="stylesheet" type="text/css" />
         <link href="jquery/css/ui-lightness/jquery-ui-1.10.4.min.css" rel="stylesheet" type="text/css" />
         <link href="jtable/themes/metro/lightgray/jtable.css" rel="stylesheet" type="text/css" />
+        <link href="css/base.css" rel="stylesheet" type="text/css" />
         <script src="jquery/js/jquery-1.10.2.js" type="text/javascript"></script>
         <script src="jquery/js/jquery-ui-1.10.4.min.js" type="text/javascript"></script>
         <script src="jtable/jquery.jtable.min.js" type="text/javascript"></script>
     </head>
+
+<?
+if (!is_logged_in()) {
+    ?>
 <body onload="document.getElementById('username').focus()">
-  <div>
+<div class="loginblock">
+  <div class="logo">
     <img src="https://www.tuxis.nl/wp-content/uploads/2012/01/header.png" alt="Logo" />
   </div>
   <div class="login">
@@ -41,20 +44,22 @@ if (!is_logged_in()) {
     <form action="index.php" method="post">
         <table>
             <tr>
-                <td>Gebruikersnaam:</td>
+                <td class="label">Gebruikersnaam:</td>
                 <td><input id="username" type="text" name="username"/></td>
             </tr>
             <tr>
-                <td>Wachtwoord:</td>
+                <td class="label">Wachtwoord:</td>
                 <td><input type="password" name="password"/></td>
             </tr>
             <tr>
-                <td colspan="2"><input type="submit" name="submit" value="Inloggen"/></td>
+				<td></td>
+                <td><input type="submit" name="submit" value="Inloggen"/></td>
             </tr>
         </table>
         <input type="hidden" name="formname" value="loginform"/>
     </form>
   </div>
+ </div>
 </body>
 </html>
 
@@ -83,15 +88,6 @@ if (isset($templatelist)) {
 }
 
 ?>
-<html>
-    <head>
-        <link href="css/base.css" rel="stylesheet" type="text/css" />
-        <link href="jquery/css/ui-lightness/jquery-ui-1.10.4.min.css" rel="stylesheet" type="text/css" />
-        <link href="jtable/themes/metro/lightgray/jtable.css" rel="stylesheet" type="text/css" />
-        <script src="jquery/js/jquery-1.10.2.js" type="text/javascript"></script>
-        <script src="jquery/js/jquery-ui-1.10.4.min.js" type="text/javascript"></script>
-        <script src="jtable/jquery.jtable.min.js" type="text/javascript"></script>
-    </head>
     <body>
         <div id="wrap">
             <div id="menu" class="jtable-main-container">
@@ -216,7 +212,7 @@ if (isset($templatelist)) {
                             edit: false,
                             create: false,
                             display: function(zone) {
-                                var $img = $('<img src="jtable/themes/metro/list.png" title="Records" />');
+                                var $img = $('<img class="list" src="jtable/themes/metro/list.png" title="Records" />');
                                 $img.click(function() {
                                     $('#MasterZones').jtable('openChildTable',
                                     $img.closest('tr'), {
@@ -323,7 +319,7 @@ if (isset($templatelist)) {
                             edit: false,
                             create: false,
                             display: function(zone) {
-                                var $img = $('<img src="jtable/themes/metro/list.png" title="Records" />');
+                                var $img = $('<img class="list" src="jtable/themes/metro/list.png" title="Records" />');
                                 $img.click(function() {
                                     $('#MasterZones').jtable('openChildTable',
                                     $img.closest('tr'), {

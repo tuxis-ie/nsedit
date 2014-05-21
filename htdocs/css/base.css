@@ -7,7 +7,6 @@ body, html {
 
 #wrap {
 }
-
 #menu {
     width: 10%;
     float: left;
@@ -17,10 +16,103 @@ body, html {
     font-size: 14px;
     line-height: 1.3;
 }
-
 .tables {
     float: right;
     width: 89%;
     min-width: 500px;
     margin-bottom: 5px;
+}
+.loginblock {
+    box-shadow: 0 0 7px -2px #D3D3D3;
+    display: block;
+    margin: 0 auto;
+    padding: 30px;
+    width: 450px;
+}
+.logo {
+    margin: 0 0 30px;
+}
+input {
+    border: 1px solid #D3D3D3;
+    box-shadow: 0 -2px 3px -2px #D3D3D3 inset;
+    padding: 7px;
+}
+input[type="submit"] {
+    background: none repeat scroll 0 0 #000000;
+    border: medium none;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 8px;
+}
+.label {
+    display: block;
+    margin: 0 10px 0 0;
+}
+#menu ul li {
+    list-style: none outside none;
+}
+#menu ul li a {
+    color: #000000;
+    font-weight: bold;
+    text-decoration: none;
+}
+#menu ul li a:hover {
+    text-shadow: 1px 1px 1px #D3D3D3;
+}
+#MasterZones {
+    margin: 0 0 50px;
+}
+img.list {
+    cursor: pointer;
+}
+
+/* overrides jtable.css */
+div.jtable-main-container > div.jtable-title {
+    background-color: #FFFFFF;
+    padding-left: 0px;
+}
+div.jtable-main-container > table.jtable > thead {
+    background-color: #ABABAB;
+}
+div.jtable-main-container > div.jtable-title div.jtable-title-text {
+    color: #000000;
+    font-weight: bold;
+}
+div.jtable-main-container div.jtable-title div.jtable-toolbar {
+    margin-right: 0px;
+}
+div.jtable-main-container > div.jtable-title div.jtable-toolbar span.jtable-toolbar-item {
+    background-color: #000000;
+    border-radius: 8px 8px 0 0;
+    color: #FFFFFF;
+    padding: 6px;
+}
+td .jtable-main-container {
+    box-shadow: 0 0 10px -2px #D3D3D3;
+    margin: 0 30px 40px;
+}
+
+div.jtable-main-container > div.jtable-bottom-panel {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: medium none;
+    color: #000000;
+    padding: 5px 0 0;
+}
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number, div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-space, div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-first, div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-last, div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-previous, div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-next, div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active {
+    background-color: #000000;
+    color: #FFFFFF;
+    margin: 1px;
+    padding: 5px 9px;
+	cursor: pointer;
+}
+select {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid #F5F5F5;
+    cursor: pointer;
+    padding: 6px;
+}
+div.jtable-main-container > table.jtable > tbody > tr.jtable-data-row > td {
+    cursor: default;
+    padding: 8px;
 }
