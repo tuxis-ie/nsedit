@@ -38,7 +38,7 @@ $defaults['defaulttype'] = ucfirst(strtolower($defaults['defaulttype']));
 if (!file_exists($authdb)) {
     is_dir(dirname($authdb)) || mkdir(dirname($authdb));
     $db = new SQLite3($authdb, SQLITE3_OPEN_CREATE|SQLITE3_OPEN_READWRITE);
-    $createsql = file_get_contents('scheme.sql');
+    $createsql = file_get_contents('includes/scheme.sql');
     $db->exec($createsql);
     $salt = bin2hex(openssl_random_pseudo_bytes(16));
     $db->exec("INSERT INTO users (emailaddress, password, isadmin) VALUES ('admin', '".crypt("admin", '$6$'.$salt)."', 1)");

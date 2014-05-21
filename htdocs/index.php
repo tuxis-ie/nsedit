@@ -34,7 +34,7 @@ if (!is_logged_in()) {
 <body onload="document.getElementById('username').focus()">
 <div class="loginblock">
   <div class="logo">
-    <img src="https://www.tuxis.nl/wp-content/uploads/2012/01/header.png" alt="Logo" />
+    <img src="https://www.tuxis.nl/uploads/images/nsedit.png" alt="Logo" />
   </div>
   <div class="login">
     <? if (isset($errormsg)) {
