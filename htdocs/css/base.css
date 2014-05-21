@@ -1,0 +1,26 @@
+body, html {
+    margin:5px;
+    padding:0;
+    color:#000;
+    background:#ffffff;
+}
+
+#wrap {
+}
+
+#menu {
+    width: 10%;
+    float: left;
+    border: 1px solid #DDD;
+    font-family: 'Segoe UI Semilight','Open Sans',Verdana,Arial,Helvetica,sans-serif;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 1.3;
+}
+
+.tables {
+    float: right;
+    width: 89%;
+    min-width: 500px;
+    margin-bottom: 5px;
+}
