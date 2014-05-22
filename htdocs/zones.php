@@ -44,13 +44,14 @@ function _do_curl($method, $opts = null, $type = 'post') {
 function _create_record($name, $records, $input, $zoneurl) {
     global $defaults;
 
+    $content = ($input['type'] == "TXT") ? '"'.$input['content'].'"' : $input['content'];
     array_push($records, array(
         'disabled' => false,
         'type' => $input['type'],
         'name' => $name,
         'ttl'  => $input['ttl'] ? $input['ttl'] : $defaults['ttl'],
         'priority'  => $input['priority'] ? $input['priority'] : $defaults['priority'],
-        'content'   => $input['content']));
+        'content'   => $content));
 
     $patch = array();
     $patch['rrsets'] = array();
