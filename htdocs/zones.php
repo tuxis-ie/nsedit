@@ -45,6 +45,16 @@ function _create_record($name, $records, $input, $zoneurl) {
     global $defaults;
 
     $content = ($input['type'] == "TXT") ? '"'.$input['content'].'"' : $input['content'];
+
+    if (is_ascii($content) === FALSE or is_ascii($input['name']) === FALSE) {
+        _jtable_respond(null, 'error', "Please only use ASCII-characters in your fields");
+    }
+
+    if (preg_match('/^TXT$/', $input['type'])) {
+        $content = addslashes($input['content']);
+        $content = '"'.$content.'"';
+    }
+
     array_push($records, array(
         'disabled' => false,
         'type' => $input['type'],
@@ -64,6 +74,14 @@ function _create_record($name, $records, $input, $zoneurl) {
     _do_curl($zoneurl, $patch, 'patch');
 
     return $records;
+}
+
+/* This function is taken from:
+http://pageconfig.com/post/how-to-validate-ascii-text-in-php and got fixed by
+#powerdns */
+
+function is_ascii( $string = '' ) {
+    return ( bool ) ! preg_match( '/[\\x00-\\x08\\x0b\\x0c\\x0e-\\x1f\\x80-\\xff]/' , $string );
 }
 
 function getrecords_by_name_type($zoneurl, $name, $type) {
