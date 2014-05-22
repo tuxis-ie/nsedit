@@ -35,7 +35,7 @@ function _do_curl($method, $opts = null, $type = 'post') {
     $return = curl_exec($ch); 
     $json = json_decode($return, 1);
     if (isset($json['error'])) {
-        _jtable_respond(null, 'error', print_r($json,1));
+        _jtable_respond(null, 'error', 'API Responds: '.$json['error']);
     } else {
         return $return;
     }
