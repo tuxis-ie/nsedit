@@ -202,12 +202,11 @@ if ($action == "list" or $action== "listslaves") {
     _do_curl("/servers/:serverid:/zones/".$_POST['id'], array(), 'delete');
     _jtable_respond(null, 'delete');
 } elseif ($action == "createrecord" or $action == "editrecord") {
+    $name = (!preg_match("/\.".$_POST['domain']."\.?$/", $_POST['name'])) ? $_POST['name'].'.'.$_POST['domain'] : $_POST['name'];
+    $name = preg_replace("/\.$/", "", $name);
+    $records = array();
     if ($action == "createrecord") {
-        $name = $_POST['name'].'.'.$_POST['domain'];
         $records = getrecords_by_name_type($_GET['zoneurl'], $name, $_POST['type']);
-    } elseif ($action == "editrecord") {
-        $name = $_POST['name'];
-        $records = array();
     }
 
     $records =_create_record($name, $records, $_POST, $_GET['zoneurl']);
