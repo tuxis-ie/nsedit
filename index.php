@@ -20,11 +20,12 @@ if (!is_logged_in() and $_POST['formname'] == "loginform") {
 ?>
 <html>
     <head>
-        <link href="jquery-ui/css/smoothness/jquery-ui-1.10.4.min.css" rel="stylesheet" type="text/css" />
+        <link href="jquery-ui/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css" />
         <link href="jtable/themes/metro/lightgray/jtable.css" rel="stylesheet" type="text/css" />
         <link href="css/base.css" rel="stylesheet" type="text/css" />
-        <script src="jquery-ui/js/jquery-1.10.2.js" type="text/javascript"></script>
-        <script src="jquery-ui/js/jquery-ui-1.10.4.min.js" type="text/javascript"></script>
+        <script src="jquery-ui/jquery-1.10.2.js" type="text/javascript"></script>
+	    <script src="jquery-ui/ui/jquery.ui.core.js" type="text/javascript"></script>
+	    <script src="jquery-ui/ui/jquery.ui.dialog.js" type="text/javascript"></script>
         <script src="jtable/jquery.jtable.min.js" type="text/javascript"></script>
     </head>
 
