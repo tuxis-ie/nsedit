@@ -1,0 +1,6 @@
+[submodule "jquery-ui"]
+	path = jquery-ui
+	url = https://github.com/jquery/jquery-ui.git
+[submodule "jtable"]
+	path = jtable
+	url = https://github.com/hikalkan/jtable.git
