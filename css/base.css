@@ -116,3 +116,12 @@ div.jtable-main-container > table.jtable > tbody > tr.jtable-data-row > td {
     cursor: default;
     padding: 8px;
 }
+div.jtable-main-container > table.jtable {
+    border: 1px solid #DDD;
+}
+div.jtable-main-container > table.jtable > tbody > tr > td {
+    border-bottom: 0px;
+}
+div.jtable-main-container > table.jtable > tbody > tr.jtable-child-row > td {
+    border: medium none;
+}
