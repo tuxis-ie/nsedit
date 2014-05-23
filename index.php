@@ -9,7 +9,7 @@ if (isset($_GET['logout']) or isset($_POST['logout'])) {
     header("Location: index.php");
 }
 
-if (!is_logged_in() and $_POST['formname'] == "loginform") {
+if (!is_logged_in() and isset($_POST['formname']) && $_POST['formname'] == "loginform") {
     if (try_login() === TRUE) {
         set_logged_in($_POST['username']);
     } else {
