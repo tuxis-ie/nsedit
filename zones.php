@@ -58,7 +58,9 @@ function _create_record($name, $records, $input, $zoneurl) {
     }
 
     if (preg_match('/^TXT$/', $input['type'])) {
-        $content = addslashes($input['content']);
+        $content = stripslashes($input['content']);
+        $content = preg_replace('/(^"|"$)/', '', $content);
+        $content = addslashes($content);
         $content = '"'.$content.'"';
     }
 
@@ -217,7 +219,6 @@ if ($action == "list" or $action== "listslaves") {
     foreach ($rows['records'] as $idx => $record) {
         $rows['records'][$idx]['id'] = json_encode($record);
         $rows['records'][$idx]['name'] = htmlspecialchars($record['name']);
-        $rows['records'][$idx]['content'] = htmlspecialchars($record['content']);
         if ($record['type'] == 'SOA') { array_push($soa, $rows['records'][$idx]); }
         elseif ($record['type'] == 'NS') { array_push($ns, $rows['records'][$idx]); }
         elseif ($record['type'] == 'MX') { array_push($mx, $rows['records'][$idx]); }
@@ -241,9 +242,7 @@ if ($action == "list" or $action== "listslaves") {
     }
 
     $records =_create_record($name, $records, $_POST, $_GET['zoneurl']);
-    $ret = $records[sizeof($records)-1];
-    $ret['content'] = htmlspecialchars($ret['content']);
-    _jtable_respond($ret, 'single');
+    _jtable_respond($records[sizeof($records)-1], 'single');
 } elseif ($action == "deleterecord") {
     $todel = json_decode($_POST['id'], 1);
     $records = getrecords_by_name_type($_GET['zoneurl'], $todel['name'], $todel['type']);

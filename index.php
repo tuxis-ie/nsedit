@@ -124,6 +124,22 @@ if (isset($templatelist)) {
 	<? } ?>
 </div>
 <script type="text/javascript">
+var entityMap = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': '&quot;',
+    "'": '&#39;',
+    "/": '&#x2F;'
+};
+
+function escapeHtml(string) {
+    return String(string).replace(/[&<>"'\/]/g, function (s) {
+        return entityMap[s];
+    });
+};
+
+
 $(document).ready(function () {
 	<? if (is_adminuser()) { ?>
 	$('#Users').hide();
@@ -241,7 +257,10 @@ $(document).ready(function () {
 										title: 'Prio'
 									},
 									content: {
-										title: 'Content'
+										title: 'Content',
+                                        display: function (data) {
+                                            return escapeHtml(data.value);
+                                        }
 									},
 									ttl: {
 										title: 'TTL'
@@ -388,6 +407,9 @@ $(document).ready(function () {
 									content: {
 										title: 'Content',
 										create: true
+                                        display: function (data) {
+                                            return escapeHtml(data.value);
+                                        }
 									},
 									ttl: {
 										title: 'TTL',
