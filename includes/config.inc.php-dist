@@ -23,6 +23,7 @@ $templates[] = array(
 );
 */
 
+$defaults['soa_edit_api'] = 'INCEPTION-INCREMENT';
 $defaults['defaulttype'] = 'Master';                    # Choose between 'Native' or 'Master'
 $defaults['primaryns']   = 'unconfigured.primaryns';    # The value of the first NS-record
 $defaults['secondaryns'] = 'unconfigured.secondaryns';  # The value of the second NS-record

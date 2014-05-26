@@ -177,6 +177,7 @@ if ($action == "list" or $action== "listslaves") {
             } else {
                 _jtable_respond(null, 'error', "Not enough data: ".print_r($_POST, 1));
             }
+            $vars['soa_edit_api'] = $defaults['SOA-EDIT'];
         }
         $vars['name'] = $_POST['name'];
         $vars['kind'] = $_POST['kind'];
