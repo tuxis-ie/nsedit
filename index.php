@@ -406,7 +406,7 @@ $(document).ready(function () {
 									},
 									content: {
 										title: 'Content',
-										create: true
+										create: true,
                                         display: function (data) {
                                             return escapeHtml(data.value);
                                         }
