@@ -42,7 +42,7 @@ function _do_curl($method, $opts = null, $type = 'post') {
 }
 
 function _valid_label($name) {
-    return ( bool ) ! preg_match( '/^[a-z0-9_/.-]+$/i' , $name );
+    return ( bool ) preg_match( "/^[-.a-z0-9_\/]+$/i" , $name );
 }
 
 function _create_record($name, $records, $input, $zoneurl) {
