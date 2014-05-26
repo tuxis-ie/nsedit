@@ -192,7 +192,7 @@ if ($action == "list" or $action== "listslaves") {
         }
         $vars = $_POST;
         $vars['serial'] = 0;
-        $vars['records'] = [];
+        $vars['records'] = array();
         _jtable_respond($vars, 'single');
     } else {
         _jtable_respond(null, 'error', "Not enough data: ".print_r($_POST, 1));
