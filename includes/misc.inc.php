@@ -21,6 +21,7 @@ function get_all_users() {
     $r = $db->query('SELECT id, emailaddress, isadmin FROM users');
     $ret = array();
     while ($row = $r->fetchArray()) {
+        $row['emailaddress'] = htmlspecialchars($row['emailaddress']);
         array_push($ret, $row);
     }
 

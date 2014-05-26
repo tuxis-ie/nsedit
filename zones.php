@@ -41,11 +41,18 @@ function _do_curl($method, $opts = null, $type = 'post') {
     }
 }
 
+function _valid_label($name) {
+    return ( bool ) ! preg_match( '/^[a-z0-9_/.-]+$/i' , $name );
+}
+
 function _create_record($name, $records, $input, $zoneurl) {
     global $defaults;
 
     $content = ($input['type'] == "TXT") ? '"'.$input['content'].'"' : $input['content'];
 
+    if (_valid_label($input['name']) === FALSE) {
+        _jtable_respond(null, 'error', "Please only use [a-z0-9_/.-]");
+    }
     if (is_ascii($content) === FALSE or is_ascii($input['name']) === FALSE) {
         _jtable_respond(null, 'error', "Please only use ASCII-characters in your fields");
     }
@@ -143,6 +150,7 @@ if ($action == "list" or $action== "listslaves") {
         if (check_owner($zone['name']) === FALSE)
             continue;
 
+        $zone['name'] = htmlspecialchars($zone['name']);
         $zone['owner'] = get_zone_owner($zone['name']);
         if ($action == "listslaves" and $zone['kind'] == "Slave") {
             array_push($return, $zone);
@@ -153,6 +161,9 @@ if ($action == "list" or $action== "listslaves") {
     usort($return, "zonesort");
     _jtable_respond($return);
 } elseif ($action == "create") {
+    if (_valid_label($_POST['name']) === FALSE) {
+        _jtable_respond(null, 'error', "Please only use [a-z0-9_/.-]");
+    }
     if ($_POST['kind'] != null and $_POST['name'] != null) {
         $nameservers = array();
         if ($_POST['kind'] != "Slave") {
@@ -205,6 +216,7 @@ if ($action == "list" or $action== "listslaves") {
     $any = array();
     foreach ($rows['records'] as $idx => $record) {
         $rows['records'][$idx]['id'] = json_encode($record);
+        $record['name'] = htmlspecialchars($record['name']);
         if ($record['type'] == 'SOA') { array_push($soa, $rows['records'][$idx]); }
         elseif ($record['type'] == 'NS') { array_push($ns, $rows['records'][$idx]); }
         elseif ($record['type'] == 'MX') { array_push($mx, $rows['records'][$idx]); }
