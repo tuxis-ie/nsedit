@@ -237,6 +237,7 @@ if ($action == "list" or $action== "listslaves") {
 } elseif ($action == "createrecord" or $action == "editrecord") {
     $name = (!preg_match("/\.".$_POST['domain']."\.?$/", $_POST['name'])) ? $_POST['name'].'.'.$_POST['domain'] : $_POST['name'];
     $name = preg_replace("/\.$/", "", $name);
+    $name = preg_replace("/^\./", "", $name);
     $records = array();
     if ($action == "createrecord") {
         $records = getrecords_by_name_type($_GET['zoneurl'], $name, $_POST['type']);
