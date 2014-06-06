@@ -354,7 +354,7 @@ $(document).ready(function () {
                 edit: false,
                 create: false,
                 display: function (zone) {
-                    var $img = $('<img class="list" src="jtable/lib/themes/metro/list.png" title="Records" />');
+                    var $img = $('<img class="list" src="img/list.png" title="Records" />');
                     $img.click(function () {
                         $('#MasterZones').jtable('openChildTable',
                             $img.closest('tr'), {
