@@ -20,6 +20,7 @@ if (!is_logged_in() and isset($_POST['formname']) && $_POST['formname'] == "logi
 ?>
 <html>
 <head>
+    <title>NSEdit!</title>
     <link href="jquery-ui/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css"/>
     <link href="jtable/lib/themes/metro/blue/jtable.min.css" rel="stylesheet" type="text/css"/>
     <link href="css/base.css" rel="stylesheet" type="text/css"/>
@@ -237,7 +238,7 @@ $(document).ready(function () {
                 edit: false,
                 create: false,
                 display: function (zone) {
-                    var $img = $('<img class="list" src="jtable/lib/themes/metro/list.png" title="Records" />');
+                    var $img = $('<img class="list" src="img/list.png" title="Records" />');
                     $img.click(function () {
                         $('#MasterZones').jtable('openChildTable',
                             $img.closest('tr'), {
