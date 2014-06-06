@@ -127,6 +127,22 @@ function get_zone_owner($zone) {
     return 'admin';
 }
 
+function get_zone_keys($zone) {
+    $ret = array();
+    foreach (json_decode(_do_curl("/servers/:serverid:/zones/".$zone."/cryptokeys"), 1) as $key) {
+        if (!isset($key['active']))
+            continue;
+
+        if (isset($key['dses'])) {
+            $key['dstxt'] = join("\n", $key['dses']);
+        }
+        unset($key['dses']);
+        $ret[] = $key;
+    }
+
+    return $ret;
+}
+
 function check_owner($zone) {
     if (is_adminuser() === TRUE) {
         return TRUE ;
@@ -157,6 +173,9 @@ if ($action == "list" or $action== "listslaves") {
         if ($action == "listslaves" and $zone['kind'] == "Slave") {
             array_push($return, $zone);
         } elseif ($action == "list" and $zone['kind'] != "Slave") {
+            if ($zone['dnssec'] === TRUE) {
+                $zone['keyinfo'] = get_zone_keys($zone);
+            }
             array_push($return, $zone);
         }
     }

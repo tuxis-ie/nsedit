@@ -302,6 +302,12 @@ $(document).ready(function () {
             name: {
                 title: 'Domain'
             },
+            dnssec: {
+                title: 'DNSSEC',
+                display: function (zone) {
+                    console.log(zone);
+                }
+            },
             <? if (is_adminuser()) { ?>
             owner: {
                 title: 'Owner',
