@@ -307,6 +307,7 @@ $(document).ready(function () {
             },
             dnssec: {
                 title: 'DNSSEC',
+                create: false,
                 display: function (zone) {
             if (zone.record.dnssec == true) {
                 var $img = $('<img class="list" src="img/lock.png" title="DNSSec Info" />');
