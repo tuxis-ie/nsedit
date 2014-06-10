@@ -133,10 +133,12 @@ function get_zone_keys($zone) {
         if (!isset($key['active']))
             continue;
 
-        if (isset($key['dses'])) {
-            $key['dstxt'] = join("\n", $key['dses']);
+        if (isset($key['ds'])) {
+            foreach ($key['ds'] as $ds) {
+                $key['dstxt'] .= $zone.' IN DS '.$ds."\n";
+            }
         }
-        unset($key['dses']);
+        unset($key['ds']);
         $ret[] = $key;
     }
 
@@ -173,8 +175,8 @@ if ($action == "list" or $action== "listslaves") {
         if ($action == "listslaves" and $zone['kind'] == "Slave") {
             array_push($return, $zone);
         } elseif ($action == "list" and $zone['kind'] != "Slave") {
-            if ($zone['dnssec'] === TRUE) {
-                $zone['keyinfo'] = get_zone_keys($zone);
+            if ($zone['dnssec'] == true) {
+                $zone['keyinfo'] = get_zone_keys($zone['name']);
             }
             array_push($return, $zone);
         }

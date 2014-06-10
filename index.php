@@ -100,6 +100,8 @@ if (isset($templatelist)) {
 ?>
 <body>
 <div id="wrap">
+    <div id="dnssecinfo">
+    </div>
     <div id="menu" class="jtable-main-container">
         <div class="jtable-title">
             <div class="jtable-title-text">
@@ -306,7 +308,30 @@ $(document).ready(function () {
             dnssec: {
                 title: 'DNSSEC',
                 display: function (zone) {
-                    console.log(zone);
+            if (zone.record.dnssec == true) {
+                var $img = $('<img class="list" src="img/lock.png" title="DNSSec Info" />');
+                $img.click(function () {
+                    $("#dnssecinfo").html("");
+                    $.each(zone.record.keyinfo, function ( i, val) {
+                        if (val.dstxt) {
+                            $("#dnssecinfo").append("<p><h2>"+val.keytype+"</h2><pre>"+val.dstxt+"</pre></p>");
+                        }
+                    });
+                    $("#dnssecinfo").dialog({
+                        modal: true,
+                        title: "DS-records for "+zone.record.name,
+                        width: 'auto',
+                        buttons: {
+                            Ok: function() {
+                                $( this ).dialog( "close" );
+                            }
+                        }
+                    });
+                });
+                return $img;
+            } else {
+               return '<img src="img/lock_open.png" title="DNSSec Disabled" />';
+             }
                 }
             },
             <? if (is_adminuser()) { ?>
