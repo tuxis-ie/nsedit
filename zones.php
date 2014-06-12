@@ -187,6 +187,9 @@ if ($action == "list" or $action== "listslaves") {
     if (_valid_label($_POST['name']) === FALSE) {
         _jtable_respond(null, 'error', "Please only use [a-z0-9_/.-]");
     }
+    if (is_ascii($_POST['name']) === FALSE) {
+        _jtable_respond(null, 'error', "Please only use ASCII-characters in your domainname");
+    }
     if ($_POST['kind'] != null and $_POST['name'] != null) {
         $nameservers = array();
         if ($_POST['kind'] != "Slave") {
