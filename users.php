@@ -15,7 +15,7 @@ if (isset($_GET['action'])) {
 }
 
 function _valid_user($name) {
-    return ( bool ) ! preg_match( '/^[a-z0-9@_.-]+$/i' , $name );
+    return ( bool ) preg_match( "/^[a-z0-9@_.-]+$/i" , $name );
 }
 
 
@@ -24,7 +24,7 @@ if ($action == "list") {
     _jtable_respond($users);
 } elseif ($action == "create" or $action == "update") {
     if (_valid_user($_POST['emailaddress']) === FALSE) {
-        _jtable_respond(null, 'error', "Please only use [a-z0-9@_/.-] for usernames");
+        _jtable_respond(null, 'error', "Please only use ^[a-z0-9@_.-]+$ for usernames");
     }
     $isadmin = $_POST['isadmin'] ? $_POST['isadmin'] : '0';
     if (add_user($_POST['emailaddress'], $isadmin, $_POST['password']) === TRUE) {
