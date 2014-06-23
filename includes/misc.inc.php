@@ -2,7 +2,7 @@
 
 include('config.inc.php');
 
-function _get_db() {
+function get_db() {
     global $authdb;
 
     $db = new SQLite3($authdb, SQLITE3_OPEN_READWRITE);
@@ -17,7 +17,7 @@ function gen_pw() {
 }
 
 function get_all_users() {
-    $db = _get_db();
+    $db = get_db();
     $r = $db->query('SELECT id, emailaddress, isadmin FROM users');
     $ret = array();
     while ($row = $r->fetchArray()) {
@@ -29,7 +29,7 @@ function get_all_users() {
 }
 
 function get_pw($username) {
-    $db = _get_db();
+    $db = get_db();
     $pw = $db->querySingle("SELECT password FROM users WHERE emailaddress = '".$username."'");
     $db->close();
     return $pw;
@@ -43,7 +43,7 @@ function add_user($username, $isadmin = '0', $password = FALSE) {
         $password = crypt($password, '$6$'.$salt);
     }
 
-    $db = _get_db();
+    $db = get_db();
     $ret = $db->exec("INSERT OR REPLACE INTO users (emailaddress, password, isadmin) VALUES ('".$username."', '".$password."', $isadmin)");
     $db->close();
 
@@ -51,14 +51,14 @@ function add_user($username, $isadmin = '0', $password = FALSE) {
 }
 
 function delete_user($id) {
-    $db = _get_db();
+    $db = get_db();
     $ret = $db->exec("DELETE FROM users WHERE id = $id");
     $db->close();
 
     return $ret;
 }
 
-function _jtable_respond($records, $method = 'multiple', $msg = 'Undefined errormessage') {
+function jtable_respond($records, $method = 'multiple', $msg = 'Undefined errormessage') {
     $jTableResult = array();
     if ($method == 'error') {
         $jTableResult['Result'] = "ERROR";
@@ -81,4 +81,10 @@ function _jtable_respond($records, $method = 'multiple', $msg = 'Undefined error
     print json_encode($jTableResult);
     exit(0);
 }
+
+function valid_user($name) {
+    return ( bool ) preg_match( "/^[a-z0-9@_.-]+$/i" , $name );
+}
+
+
 ?>

@@ -40,7 +40,10 @@ function logout() {
 
 function try_login() {
     if (isset($_POST['username']) and isset($_POST['password'])) {
-        $db = _get_db();
+        if (valid_user($_POST['username']) === FALSE) {
+            return FALSE;
+        }
+        $db = get_db();
         $userinfo = $db->querySingle("SELECT * FROM users WHERE emailaddress = '".$_POST['username']."'", 1);
         if (isset($userinfo['password']) and (crypt($_POST['password'], $userinfo['password']) == $userinfo['password'])) {
             set_logged_in($_POST['username']);

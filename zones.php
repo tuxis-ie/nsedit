@@ -35,7 +35,7 @@ function _do_curl($method, $opts = null, $type = 'post') {
     $return = curl_exec($ch); 
     $json = json_decode($return, 1);
     if (isset($json['error'])) {
-        _jtable_respond(null, 'error', 'API Responds: '.$json['error']);
+        jtable_respond(null, 'error', 'API Responds: '.$json['error']);
     } else {
         return $return;
     }
@@ -51,10 +51,10 @@ function _create_record($name, $records, $input, $zoneurl) {
     $content = ($input['type'] == "TXT") ? '"'.$input['content'].'"' : $input['content'];
 
     if (_valid_label($input['name']) === FALSE) {
-        _jtable_respond(null, 'error', "Please only use [a-z0-9_/.-]");
+        jtable_respond(null, 'error', "Please only use [a-z0-9_/.-]");
     }
     if (is_ascii($content) === FALSE or is_ascii($input['name']) === FALSE) {
-        _jtable_respond(null, 'error', "Please only use ASCII-characters in your fields");
+        jtable_respond(null, 'error', "Please only use ASCII-characters in your fields");
     }
 
     if (preg_match('/^TXT$/', $input['type'])) {
@@ -111,13 +111,22 @@ function zonesort($a, $b) {
 }
 
 function add_db_zone($zone, $owner) {
-    $db = _get_db();
+    if (valid_user($owner) === FALSE) {
+        jtable_respond(null, 'error', "$owner is not a valid username");
+    }
+    if (_valid_label($zone) === FALSE) {
+        jtable_respond(null, 'error', "$zone is not a valid zonename");
+    }
+    $db = get_db();
     $zoneinfo = $db->querySingle("INSERT OR REPLACE INTO zones (zone, owner) VALUES ('".$zone."', (SELECT id FROM users WHERE emailaddress = '".$owner."'))");
     $db->close();
 }
 
 function get_zone_owner($zone) {
-    $db = _get_db();
+    if (_valid_label($zone) === FALSE) {
+        jtable_respond(null, 'error', "$zone is not a valid zonename");
+    }
+    $db = get_db();
     $zoneinfo = $db->querySingle("SELECT u.emailaddress FROM users u, zones z WHERE z.owner = u.id AND z.zone = '".$zone."'", 1);
     $db->close();
     if (isset($zoneinfo['emailaddress']) && $zoneinfo['emailaddress'] != NULL ) {
@@ -160,7 +169,7 @@ function check_owner($zone) {
 if (isset($_GET['action'])) {
     $action = $_GET['action'];
 } else {
-    _jtable_respond(null, 'error', 'No action given');
+    jtable_respond(null, 'error', 'No action given');
 }
 
 if ($action == "list" or $action== "listslaves") {
@@ -182,13 +191,13 @@ if ($action == "list" or $action== "listslaves") {
         }
     }
     usort($return, "zonesort");
-    _jtable_respond($return);
+    jtable_respond($return);
 } elseif ($action == "create") {
     if (_valid_label($_POST['name']) === FALSE) {
-        _jtable_respond(null, 'error', "Please only use [a-z0-9_/.-]");
+        jtable_respond(null, 'error', "Please only use [a-z0-9_/.-]");
     }
     if (is_ascii($_POST['name']) === FALSE) {
-        _jtable_respond(null, 'error', "Please only use ASCII-characters in your domainname");
+        jtable_respond(null, 'error', "Please only use ASCII-characters in your domainname");
     }
     if ($_POST['kind'] != null and $_POST['name'] != null) {
         $nameservers = array();
@@ -199,7 +208,7 @@ if ($action == "list" or $action== "listslaves") {
                     array_push($nameservers, $_POST['nameserver2']);
                 }
             } else {
-                _jtable_respond(null, 'error', "Not enough data: ".print_r($_POST, 1));
+                jtable_respond(null, 'error', "Not enough data: ".print_r($_POST, 1));
             }
             $vars['soa_edit_api'] = $defaults['soa_edit_api'];
         }
@@ -231,9 +240,9 @@ if ($action == "list" or $action== "listslaves") {
         $vars = $_POST;
         $vars['serial'] = 0;
         $vars['records'] = array();
-        _jtable_respond($vars, 'single');
+        jtable_respond($vars, 'single');
     } else {
-        _jtable_respond(null, 'error', "Not enough data: ".print_r($_POST, 1));
+        jtable_respond(null, 'error', "Not enough data: ".print_r($_POST, 1));
     }
 } elseif ($action == "listrecords" && $_GET['zoneurl'] != null) {
     $rows = json_decode(_do_curl($_GET['zoneurl']), 1);
@@ -254,10 +263,10 @@ if ($action == "list" or $action== "listslaves") {
 
     }
     $ret = array_merge($soa, $ns, $mx, $any);
-    _jtable_respond($ret);
+    jtable_respond($ret);
 } elseif ($action == "delete") {
     _do_curl("/servers/:serverid:/zones/".$_POST['id'], array(), 'delete');
-    _jtable_respond(null, 'delete');
+    jtable_respond(null, 'delete');
 } elseif ($action == "createrecord" or $action == "editrecord") {
     $name = (!preg_match("/\.".$_POST['domain']."\.?$/", $_POST['name'])) ? $_POST['name'].'.'.$_POST['domain'] : $_POST['name'];
     $name = preg_replace("/\.$/", "", $name);
@@ -268,7 +277,7 @@ if ($action == "list" or $action== "listslaves") {
     }
 
     $records =_create_record($name, $records, $_POST, $_GET['zoneurl']);
-    _jtable_respond($records[sizeof($records)-1], 'single');
+    jtable_respond($records[sizeof($records)-1], 'single');
 } elseif ($action == "deleterecord") {
     $todel = json_decode($_POST['id'], 1);
     $records = getrecords_by_name_type($_GET['zoneurl'], $todel['name'], $todel['type']);
@@ -294,11 +303,11 @@ if ($action == "list" or $action== "listslaves") {
         'type'      => $todel['type'],
         'name'      => $todel['name']));
     _do_curl($_GET['zoneurl'], $patch, 'patch');
-    _jtable_respond(null, 'delete');
+    jtable_respond(null, 'delete');
 } elseif ($action == "update") {
     add_db_zone($_POST['name'], $_POST['owner']);
-    _jtable_respond($_POST, 'single');
+    jtable_respond($_POST, 'single');
 } else {
-    _jtable_respond(null, 'error', 'No such action');
+    jtable_respond(null, 'error', 'No such action');
 }
 ?>
