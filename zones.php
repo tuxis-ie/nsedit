@@ -15,6 +15,7 @@ header("Content-Type: application/json");
 function _do_curl($method, $opts = null, $type = 'post') {
     global $apisid, $apiuser, $apipass, $apiip, $apiport;
     $method = preg_replace('/:serverid:/', $apisid, $method);
+    $method = preg_replace('/^\/+//', '', $method);
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_USERPWD, "$apiuser:$apipass");
