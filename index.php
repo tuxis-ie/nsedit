@@ -420,16 +420,29 @@ $(document).ready(function () {
                                         create: true
                                     },
                                     type: {
-                                        options: {
-                                            'AAAA': 'AAAA',
-                                            'A': 'A',
-                                            'CNAME': 'CNAME',
-                                            'MX': 'MX',
-                                            'PTR': 'PTR',
-                                            'SRV': 'SRV',
-                                            'TXT': 'TXT',
-                                            'NS': 'NS',
-                                            'SOA': 'SOA'
+                                        options: function() {
+                                            zonename = new String(zone.record.name);
+                                            if (zonename.match(/(\.in-addr|\.ip6)\.arpa/)) {
+                                                return {
+                                                    'PTR':'PTR',
+                                                    'NS':'NS',
+                                                    'MX':'MX',
+                                                    'TXT':'TXT',
+                                                    'SOA':'SOA'
+                                                };
+                                            } else {
+                                                return {
+                                                    'AAAA': 'AAAA',
+                                                    'A': 'A',
+                                                    'CNAME': 'CNAME',
+                                                    'MX': 'MX',
+                                                    'PTR': 'PTR',
+                                                    'SRV': 'SRV',
+                                                    'TXT': 'TXT',
+                                                    'NS': 'NS',
+                                                    'SOA': 'SOA'
+                                                };
+                                            }
                                         },
                                         create: true
                                     },
