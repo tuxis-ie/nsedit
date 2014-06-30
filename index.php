@@ -425,6 +425,7 @@ $(document).ready(function () {
                                             'A': 'A',
                                             'CNAME': 'CNAME',
                                             'MX': 'MX',
+                                            'PTR': 'PTR',
                                             'SRV': 'SRV',
                                             'TXT': 'TXT',
                                             'NS': 'NS',
