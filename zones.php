@@ -143,6 +143,8 @@ function get_zone_keys($zone) {
         if (!isset($key['active']))
             continue;
 
+        $key['dstxt'] = $zone.' IN DNSKEY '.$key['dnskey']."\n\n";
+
         if (isset($key['ds'])) {
             foreach ($key['ds'] as $ds) {
                 $key['dstxt'] .= $zone.' IN DS '.$ds."\n";
