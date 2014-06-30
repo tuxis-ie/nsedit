@@ -194,9 +194,6 @@ if ($action == "list" or $action== "listslaves") {
         }
     }
     usort($return, "zonesort");
-    if (isset($_GET['jtStartIndex']) and isset($_GET['jtPageSize'])) {
-        jtable_respond(array_slice($return, $_GET['jtStartIndex'], $_GET['jtPageSize']));
-    }
     jtable_respond($return);
 } elseif ($action == "create") {
     if (_valid_label($_POST['name']) === FALSE) {
