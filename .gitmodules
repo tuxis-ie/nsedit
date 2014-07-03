@@ -4,3 +4,6 @@
 [submodule "jtable"]
 	path = jtable
 	url = https://github.com/hikalkan/jtable.git
+[submodule "addclear"]
+    path = js/addclear
+    url = https://github.com/skorecky/Add-Clear.git

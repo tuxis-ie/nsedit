@@ -182,6 +182,13 @@ if ($action == "list" or $action== "listslaves") {
         if (check_owner($zone['name']) === FALSE)
             continue;
 
+        if (isset($_POST['domsearch'])) {
+            $q = $_POST['domsearch'];
+            if (!preg_match("/$q/", $zone['name']) == 1) {
+                continue;
+            }
+        }
+
         $zone['name'] = htmlspecialchars($zone['name']);
         $zone['owner'] = get_zone_owner($zone['name']);
         if ($action == "listslaves" and $zone['kind'] == "Slave") {

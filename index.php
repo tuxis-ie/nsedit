@@ -34,6 +34,7 @@ if (!is_logged_in() and isset($_POST['formname']) && $_POST['formname'] == "logi
     <script src="jquery-ui/ui/jquery.ui.resizable.js" type="text/javascript"></script>
     <script src="jquery-ui/ui/jquery.ui.dialog.js" type="text/javascript"></script>
     <script src="jtable/lib/jquery.jtable.min.js" type="text/javascript"></script>
+    <script src="js/addclear/addclear.js" type="text/javascript"></script>
 </head>
 
 <?
@@ -52,16 +53,16 @@ if (!is_logged_in()) {
         <form action="index.php" method="post">
             <table>
                 <tr>
-                    <td class="label">Gebruikersnaam:</td>
+                    <td class="label">Username:</td>
                     <td><input id="username" type="text" name="username"/></td>
                 </tr>
                 <tr>
-                    <td class="label">Wachtwoord:</td>
+                    <td class="label">Password:</td>
                     <td><input type="password" name="password"/></td>
                 </tr>
                 <tr>
                     <td></td>
-                    <td><input type="submit" name="submit" value="Inloggen"/></td>
+                    <td><input type="submit" name="submit" value="Log me in!"/></td>
                 </tr>
             </table>
             <input type="hidden" name="formname" value="loginform"/>
@@ -117,7 +118,13 @@ if (isset($templatelist)) {
         </ul>
     </div>
     <div id="zones">
-        <div class="tables" id="MasterZones"></div>
+        <div class="tables" id="MasterZones">
+            <div class="searchbar" id="searchbar">
+                <form>
+                    <input type="text" id="domsearch" name="domsearch" placeholder="Search...."/>
+                </form>
+            </div>
+        </div>
         <div class="tables" id="SlaveZones"></div>
     </div>
     <? if (is_adminuser()) { ?>
@@ -472,6 +479,15 @@ $(document).ready(function () {
                 }
             }
         }
+    });
+    $('#domsearch').addClear({
+        onClear: function() { $('#MasterZones').jtable('load'); }
+    });
+    $('#domsearch').on('input', function (e) {
+        e.preventDefault();
+        $('#MasterZones').jtable('load', {
+            domsearch: $('#domsearch').val()
+        });
     });
     $('#MasterZones').jtable('load');
 });
