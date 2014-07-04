@@ -119,9 +119,9 @@ function add_db_zone($zone, $owner) {
         jtable_respond(null, 'error', "$zone is not a valid zonename");
     }
     $db = get_db();
-    $q = $db->prepare("INSERT OR REPLACE INTO zones (zone, owner) VALUES (':zone', (SELECT id FROM users WHERE emailaddress = ':ownwer'))");
-    $q->bindValue(':zone', $zone);
-    $q->bindValue(':owner', $owner);
+    $q = $db->prepare("INSERT OR REPLACE INTO zones (zone, owner) VALUES (? (SELECT id FROM users WHERE emailaddress = ?))");
+    $q->bindValue(1, $zone, SQLITE3_TEXT);
+    $q->bindValue(2, $owner, SQLITE3_TEXT);
     $q->execute();
     $db->close();
 }
@@ -131,8 +131,8 @@ function get_zone_owner($zone) {
         jtable_respond(null, 'error', "$zone is not a valid zonename");
     }
     $db = get_db();
-    $q = $db->prepare("SELECT u.emailaddress FROM users u, zones z WHERE z.owner = u.id AND z.zone = ':zone'");
-    $q->bindValue(':zone', $zone);
+    $q = $db->prepare("SELECT u.emailaddress FROM users u, zones z WHERE z.owner = u.id AND z.zone = ?");
+    $q->bindValue(1, $zone, SQLITE3_TEXT);
     $result = $q->execute();
     $zoneinfo = $result->fetchArray(SQLITE3_ASSOC);
     $db->close();
