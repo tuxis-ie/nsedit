@@ -206,7 +206,7 @@ $(document).ready(function () {
         sorting: false,
         messages: {
             addNewRecord: 'Add new slave zone',
-            noDataAvailable: 'No slave zones configured'
+            noDataAvailable: 'No slave zones found'
         },
         openChildAsAccordion: true,
         actions: {
@@ -291,7 +291,7 @@ $(document).ready(function () {
         pageSize: 20,
         messages: {
             addNewRecord: 'Add new zone',
-            noDataAvailable: 'No zones configured'
+            noDataAvailable: 'No zones found'
         },
         sorting: false,
         openChildAsAccordion: true,
