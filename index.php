@@ -120,9 +120,7 @@ if (isset($templatelist)) {
     <div id="zones">
         <div class="tables" id="MasterZones">
             <div class="searchbar" id="searchbar">
-                <form>
-                    <input type="text" id="domsearch" name="domsearch" placeholder="Search...."/>
-                </form>
+                <input type="text" id="domsearch" name="domsearch" placeholder="Search...."/>
             </div>
         </div>
         <div class="tables" id="SlaveZones"></div>
@@ -162,6 +160,8 @@ $(document).ready(function () {
         $('#Users').hide();
         $('#MasterZones').show();
         $('#SlaveZones').show();
+        $('#MasterZones').jtable('load');
+        $('#SlaveZones').jtable('load');
     });
     $('#Users').jtable({
         title: 'Users',
