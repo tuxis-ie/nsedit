@@ -26,14 +26,14 @@ if ($action == "list") {
         jtable_respond(null, 'error', "Please only use ^[a-z0-9@_.-]+$ for usernames");
     }
     $isadmin = $_POST['isadmin'] ? $_POST['isadmin'] : '0';
-    if (add_user($_POST['emailaddress'], $isadmin, $_POST['password']) === TRUE) {
+    if (add_user($_POST['emailaddress'], $isadmin, $_POST['password']) !== FALSE) {
         unset($_POST['password']);
         jtable_respond($_POST, 'single');
     } else {
         jtable_respond(null, 'error', 'Could not add/change this user');
     }
 } elseif ($action == "delete") {
-    if (delete_user($_POST['id']) === TRUE) {
+    if (delete_user($_POST['id']) !== FALSE) {
         jtable_respond(null, 'delete');
     } else {
         jtable_respond(null, 'error', 'Could not delete this user');
