@@ -131,7 +131,7 @@ function get_zone_owner($zone) {
         jtable_respond(null, 'error', "$zone is not a valid zonename");
     }
     $db = get_db();
-    $q = $db->prepare("SELECT u.emailaddress FROM users u, zones z WHERE z.owner = u.id AND z.zone = ':zone", 1);
+    $q = $db->prepare("SELECT u.emailaddress FROM users u, zones z WHERE z.owner = u.id AND z.zone = ':zone'");
     $q->bindValue(':zone', $zone);
     $result = $q->execute();
     $zoneinfo = $result->fetchArray(SQLITE3_ASSOC);
