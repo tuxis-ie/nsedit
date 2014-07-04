@@ -278,6 +278,7 @@ if ($action == "list" or $action== "listslaves") {
 
 
     }
+    usort($any, "zonesort");
     $ret = array_merge($soa, $ns, $mx, $any);
     jtable_respond($ret);
 } elseif ($action == "delete") {
