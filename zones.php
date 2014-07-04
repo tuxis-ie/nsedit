@@ -108,7 +108,7 @@ function getrecords_by_name_type($zoneurl, $name, $type) {
 }
 
 function zonesort($a, $b) {
-      return strcmp($a["name"], $b["name"]);
+    return strncmp($a["name"], $b["name"], 30);
 }
 
 function add_db_zone($zone, $owner) {
