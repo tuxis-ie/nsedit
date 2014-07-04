@@ -30,9 +30,16 @@ function get_all_users() {
 
 function get_pw($username) {
     $db = get_db();
-    $pw = $db->querySingle("SELECT password FROM users WHERE emailaddress = '".$username."'");
+    $q = $db->prepare('SELECT password FROM users WHERE emailaddress = ? LIMIT 1');
+    $q->bindValue(1, $username, SQLITE_TEXT);
+    $result = $q->execute();
+    $pw = $result->fetchArray(SQLITE3_ASSOC);
     $db->close();
-    return $pw;
+    if (isset($pw['password'])) {
+        return $pw['password'];
+    }
+
+    return FALSE;
 }
 
 function add_user($username, $isadmin = '0', $password = FALSE) {
@@ -44,7 +51,11 @@ function add_user($username, $isadmin = '0', $password = FALSE) {
     }
 
     $db = get_db();
-    $ret = $db->exec("INSERT OR REPLACE INTO users (emailaddress, password, isadmin) VALUES ('".$username."', '".$password."', $isadmin)");
+    $q = $db->prepare('INSERT OR REPLACE INTO users (emailaddress, password, isadmin) VALUES (?, ?, ?)');
+    $q->bindValue(1, $username, SQLITE3_TEXT);
+    $q->bindValue(2, $password, SQLITE3_TEXT);
+    $q->bindValue(3, $isadmin, SQLITE3_INTEGER);
+    $ret = $q->execute();
     $db->close();
 
     return $ret;
@@ -52,7 +63,9 @@ function add_user($username, $isadmin = '0', $password = FALSE) {
 
 function delete_user($id) {
     $db = get_db();
-    $ret = $db->exec("DELETE FROM users WHERE id = $id");
+    $q = $db->prepare('DELETE FROM users WHERE id = ?');
+    $q->bindValue(1, $id, SQLITE3_INTEGER);
+    $ret = $q->execute();
     $db->close();
 
     return $ret;

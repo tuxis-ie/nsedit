@@ -44,7 +44,10 @@ function try_login() {
             return FALSE;
         }
         $db = get_db();
-        $userinfo = $db->querySingle("SELECT * FROM users WHERE emailaddress = '".$_POST['username']."'", 1);
+        $q = $db->prepare('SELECT * FROM users WHERE emailaddress = ?');
+        $q->bindValue(1, $_POST['username']);
+        $result = $q->execute();
+        $userinfo = $result->fetchArray(SQLITE3_ASSOC);
         if (isset($userinfo['password']) and (crypt($_POST['password'], $userinfo['password']) == $userinfo['password'])) {
             set_logged_in($_POST['username']);
             if (isset($userinfo['isadmin']) && $userinfo['isadmin'] == 1) {
