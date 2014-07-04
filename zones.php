@@ -119,7 +119,7 @@ function add_db_zone($zone, $owner) {
         jtable_respond(null, 'error', "$zone is not a valid zonename");
     }
     $db = get_db();
-    $q = $db->prepare("INSERT OR REPLACE INTO zones (zone, owner) VALUES (? (SELECT id FROM users WHERE emailaddress = ?))");
+    $q = $db->prepare("INSERT OR REPLACE INTO zones (zone, owner) VALUES (?, (SELECT id FROM users WHERE emailaddress = ?))");
     $q->bindValue(1, $zone, SQLITE3_TEXT);
     $q->bindValue(2, $owner, SQLITE3_TEXT);
     $q->execute();
