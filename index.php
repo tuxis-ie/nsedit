@@ -285,7 +285,6 @@ $(document).ready(function () {
             }
         }
     });
-    $('#SlaveZones').jtable('load');
     $('#MasterZones').jtable({
         title: 'Master/Native Zones',
         paging: true,
@@ -488,8 +487,12 @@ $(document).ready(function () {
         $('#MasterZones').jtable('load', {
             domsearch: $('#domsearch').val()
         });
+        $('#SlaveZones').jtable('load', {
+            domsearch: $('#domsearch').val()
+        });
     });
     $('#MasterZones').jtable('load');
+    $('#SlaveZones').jtable('load');
 });
 </script>
 </body>
