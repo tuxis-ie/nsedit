@@ -126,6 +126,17 @@ function add_db_zone($zone, $owner) {
     $db->close();
 }
 
+function delete_db_zone($owner) {
+    if (_valid_label($zone) === FALSE) {
+        jtable_respond(null, 'error', "$zone is not a valid zonename");
+    }
+    $db = get_db();
+    $q = $db->prepare("DELETE FROM zones WHERE zone = ?");
+    $q->bindValue(1, $zone, SQLITE3_TEXT);
+    $q->execute();
+    $db->close();
+}
+
 function get_zone_owner($zone) {
     if (_valid_label($zone) === FALSE) {
         jtable_respond(null, 'error', "$zone is not a valid zonename");
@@ -283,6 +294,8 @@ if ($action == "list" or $action== "listslaves") {
     jtable_respond($ret);
 } elseif ($action == "delete") {
     _do_curl("/servers/:serverid:/zones/".$_POST['id'], array(), 'delete');
+    $zone = preg_replace("/\.$/", "", $_POST['id']);
+    delete_db_zone($zone);
     jtable_respond(null, 'delete');
 } elseif ($action == "createrecord" or $action == "editrecord") {
     $name = (!preg_match("/\.".$_POST['domain']."\.?$/", $_POST['name'])) ? $_POST['name'].'.'.$_POST['domain'] : $_POST['name'];
