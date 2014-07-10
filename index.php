@@ -149,56 +149,6 @@ function escapeHtml(string) {
 
 
 $(document).ready(function () {
-    <? if (is_adminuser()) { ?>
-    $('#Users').hide();
-    $('#useradmin').click(function () {
-        $('#Users').show();
-        $('#MasterZones').hide();
-        $('#SlaveZones').hide();
-    });
-    $('#zoneadmin').click(function () {
-        $('#Users').hide();
-        $('#MasterZones').show();
-        $('#SlaveZones').show();
-        $('#MasterZones').jtable('load');
-        $('#SlaveZones').jtable('load');
-    });
-    $('#Users').jtable({
-        title: 'Users',
-        paging: true,
-        pageSize: 20,
-        sorting: false,
-        actions: {
-            listAction: 'users.php?action=list',
-            createAction: 'users.php?action=create',
-            deleteAction: 'users.php?action=delete',
-            updateAction: 'users.php?action=update'
-        },
-        messages: {
-            addNewRecord: 'Add new user'
-        },
-        fields: {
-            id: {
-                key: true,
-                type: 'hidden'
-            },
-            emailaddress: {
-                title: 'User'
-            },
-            password: {
-                title: 'Password',
-                type: 'password',
-                list: false
-            },
-            isadmin: {
-                title: 'Admin',
-                type: 'checkbox',
-                values: {'0': 'No', '1': 'Yes'}
-            }
-        }
-    });
-    $('#Users').jtable('load');
-    <? } ?>
     $('#SlaveZones').jtable({
         title: 'Slave Zones',
         paging: true,
@@ -225,7 +175,10 @@ $(document).ready(function () {
             <? if (is_adminuser()) { ?>
             owner: {
                 title: 'Owner',
-                options: {'admin': 'admin'<? echo $ulist; ?>},
+                options: function(data) {
+                    data.clearCache();
+                    return 'users.php?action=listoptions';
+                },
                 defaultValue: 'admin'
             },
             <? } ?>
@@ -345,7 +298,10 @@ $(document).ready(function () {
             <? if (is_adminuser()) { ?>
             owner: {
                 title: 'Owner',
-                options: {'admin': 'admin'<? echo $ulist; ?>},
+                options: function(data) {
+                    data.clearCache();
+                    return 'users.php?action=listoptions';
+                },
                 defaultValue: 'admin'
             },
             <? } ?>
@@ -494,6 +450,59 @@ $(document).ready(function () {
     });
     $('#MasterZones').jtable('load');
     $('#SlaveZones').jtable('load');
+    <? if (is_adminuser()) { ?>
+    $('#Users').hide();
+    $('#useradmin').click(function () {
+        $('#Users').jtable('reload');
+        $('#Users').show();
+        $('#MasterZones').hide();
+        $('#SlaveZones').hide();
+    });
+    $('#zoneadmin').click(function () {
+        $('#Users').hide();
+        $('#MasterZones').jtable('reload');
+        $('#MasterZones').show();
+        $('#SlaveZones').jtable('reload');
+        $('#SlaveZones').show();
+        $('#MasterZones').jtable('load');
+        $('#SlaveZones').jtable('load');
+    });
+    $('#Users').jtable({
+        title: 'Users',
+        paging: true,
+        pageSize: 20,
+        sorting: false,
+        actions: {
+            listAction: 'users.php?action=list',
+            createAction: 'users.php?action=create',
+            deleteAction: 'users.php?action=delete',
+            updateAction: 'users.php?action=update'
+        },
+        messages: {
+            addNewRecord: 'Add new user'
+        },
+        fields: {
+            id: {
+                key: true,
+                type: 'hidden'
+            },
+            emailaddress: {
+                title: 'User'
+            },
+            password: {
+                title: 'Password',
+                type: 'password',
+                list: false
+            },
+            isadmin: {
+                title: 'Admin',
+                type: 'checkbox',
+                values: {'0': 'No', '1': 'Yes'}
+            }
+        }
+    });
+    $('#Users').jtable('load');
+    <? } ?>
 });
 </script>
 </body>
