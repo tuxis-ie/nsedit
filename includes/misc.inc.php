@@ -81,6 +81,9 @@ function jtable_respond($records, $method = 'multiple', $msg = 'Undefined errorm
         $jTableResult['Record'] = $records;
     } elseif ($method == 'delete') {
         $jTableResult['Result'] = "OK";
+    } elseif ($method == 'options') {
+        $jTableResult['Result'] = "OK";
+        $jTableResult['Options'] = $records;
     } else {
         if (isset($_GET['jtPageSize'])) {
             $jTableResult['TotalRecordCount'] = count($records);
