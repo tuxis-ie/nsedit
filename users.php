@@ -21,6 +21,15 @@ if (isset($_GET['action'])) {
 if ($action == "list") {
     $users = get_all_users();
     jtable_respond($users);
+} elseif ($action == "listoptions") {
+    $users = get_all_users();
+    $retusers = [];
+    foreach ($users as $user) {
+        $retusers[] = array (
+            'DisplayText' => $user['emailaddress'],
+            'Value'       => $user['emailaddress']);
+    }
+    jtable_respond($retusers, 'options');
 } elseif ($action == "create" or $action == "update") {
     if (valid_user($_POST['emailaddress']) === FALSE) {
         jtable_respond(null, 'error', "Please only use ^[a-z0-9@_.-]+$ for usernames");
