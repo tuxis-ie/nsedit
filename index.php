@@ -76,15 +76,6 @@ if (!is_logged_in()) {
 exit(0);
 }
 
-if (is_adminuser()) {
-    foreach (get_all_users() as $user) {
-        $userlist[] = "'" . $user['emailaddress'] . "':'" . $user['emailaddress'] . "'";
-    }
-
-    $ulist = ',';
-    $ulist .= join(',', $userlist);
-}
-
 foreach ($templates as $template) {
     if (is_adminuser() or (isset($template['owner']) && $template['owner'] == get_sess_user()) or ($template['owner'] == 'public')) {
         $templatelist[] = "'" . $template['name'] . "':'" . $template['name'] . "'";
