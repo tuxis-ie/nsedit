@@ -23,7 +23,7 @@ if ($action == "list") {
     jtable_respond($users);
 } elseif ($action == "listoptions") {
     $users = get_all_users();
-    $retusers = [];
+    $retusers = array();
     foreach ($users as $user) {
         $retusers[] = array (
             'DisplayText' => $user['emailaddress'],
