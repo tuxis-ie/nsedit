@@ -168,7 +168,6 @@ $(document).ready(function () {
             owner: {
                 title: 'Owner',
                 options: function(data) {
-                    data.clearCache();
                     return 'users.php?action=listoptions';
                 },
                 defaultValue: 'admin'
@@ -513,24 +512,17 @@ $(document).ready(function () {
             domsearch: $('#domsearch').val()
         });
     });
-    $('#MasterZones').jtable('load');
-    $('#SlaveZones').jtable('load');
     <? if (is_adminuser()) { ?>
     $('#Users').hide();
     $('#useradmin').click(function () {
-        $('#Users').jtable('reload');
         $('#Users').show();
         $('#MasterZones').hide();
         $('#SlaveZones').hide();
     });
     $('#zoneadmin').click(function () {
         $('#Users').hide();
-        $('#MasterZones').jtable('reload');
         $('#MasterZones').show();
-        $('#SlaveZones').jtable('reload');
         $('#SlaveZones').show();
-        $('#MasterZones').jtable('load');
-        $('#SlaveZones').jtable('load');
     });
     $('#Users').jtable({
         title: 'Users',
@@ -564,8 +556,14 @@ $(document).ready(function () {
                 type: 'checkbox',
                 values: {'0': 'No', '1': 'Yes'}
             }
+        },
+        recordAdded: function() {
+            $("#MasterZones").jtable('reload');
+            $("#SlaveZones").jtable('reload');
         }
     });
+    $('#MasterZones').jtable('load');
+    $('#SlaveZones').jtable('load');
     $('#Users').jtable('load');
     $('#ImportZone').jtable('load');
     <? } ?>
