@@ -116,6 +116,7 @@ if (isset($templatelist)) {
         </div>
         <div class="tables" id="SlaveZones"></div>
     </div>
+    <div style="visibility: hidden;" id="ImportZone"></div>
     <? if (is_adminuser()) { ?>
         <div id="users">
             <div class="tables" id="Users"></div>
@@ -193,7 +194,7 @@ $(document).ready(function () {
                 display: function (zone) {
                     var $img = $('<img class="list" src="img/list.png" title="Records" />');
                     $img.click(function () {
-                        $('#MasterZones').jtable('openChildTable',
+                        $('#SlaveZones').jtable('openChildTable',
                             $img.closest('tr'), {
                                 title: 'Records in ' + zone.record.name,
                                 openChildAsAccordion: true,
@@ -236,6 +237,18 @@ $(document).ready(function () {
         messages: {
             addNewRecord: 'Add new zone',
             noDataAvailable: 'No zones found'
+        },
+        toolbar: {
+            hoverAnimation: true,
+            hoverAnimationDuration: 60,
+            hoverAnimationEasing: undefined,
+            items: [{
+                icon: 'jtable/lib/themes/metro/add.png',
+                text: 'Import a new zone',
+                click: function() {
+                    $('#ImportZone').jtable('showCreateForm');
+                }
+                }],
         },
         sorting: false,
         openChildAsAccordion: true,
@@ -427,6 +440,67 @@ $(document).ready(function () {
             }
         }
     });
+    $('#ImportZone').jtable({
+        title: 'Import zone',
+        actions: {
+            createAction: 'zones.php?action=create',
+            listAction: 'zones.php?action=list',
+        },
+        fields: {
+            id: {
+                key: true,
+                type: 'hidden'
+            },
+            name: {
+                title: 'Domain'
+            },
+            <? if (is_adminuser()) { ?>
+            owner: {
+                title: 'Owner',
+                options: function(data) {
+                    data.clearCache();
+                    return 'users.php?action=listoptions';
+                },
+                defaultValue: 'admin'
+            },
+            <? } ?>
+            kind: {
+                title: 'Type',
+                options: {'Native': 'Native', 'Master': 'Master'},
+                defaultValue: '<? echo $defaults['defaulttype']; ?>',
+                edit: false
+            },
+            zone: {
+                title: 'Zonedata',
+                type: 'textarea'
+            },
+            owns: {
+                title: 'Overwrite Nameservers',
+                type: 'checkbox',
+                values: {'0': 'No', '1': 'Yes'},
+                defaultValue: 1
+            },
+            nameserver1: {
+                title: 'Pri. Nameserver',
+                create: true,
+                list: false,
+                edit: false,
+                defaultValue: '<? echo $defaults['primaryns']; ?>'
+            },
+            nameserver2: {
+                title: 'Sec. Nameserver',
+                create: true,
+                list: false,
+                edit: false,
+                defaultValue: '<? echo $defaults['secondaryns']; ?>'
+            },
+        },
+        recordAdded: function() {
+            $("#MasterZones").jtable('load');
+            $("#SlaveZones").jtable('load');
+        }
+
+    });
     $('#domsearch').addClear({
         onClear: function() { $('#MasterZones').jtable('load'); }
     });
@@ -493,6 +567,7 @@ $(document).ready(function () {
         }
     });
     $('#Users').jtable('load');
+    $('#ImportZone').jtable('load');
     <? } ?>
 });
 </script>

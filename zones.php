@@ -241,7 +241,12 @@ if ($action == "list" or $action== "listslaves") {
         }
         $vars['name'] = $_POST['name'];
         $vars['kind'] = $_POST['kind'];
-        $vars['nameservers'] = $nameservers;
+        if (isset($_POST['zone'])) {
+            $vars['zone'] = $_POST['zone'];
+            $vars['nameservers'] = array();
+        } else {
+            $vars['nameservers'] = $nameservers;
+        }
         _do_curl('/servers/:serverid:/zones', $vars); 
         if (isset($_POST['owner']) and $_POST['owner'] != 'admin') {
             add_db_zone($vars['name'], $_POST['owner']);
@@ -264,9 +269,31 @@ if ($action == "list" or $action== "listslaves") {
                 }
             }
         }
-        $vars = $_POST;
-        $vars['serial'] = 0;
-        $vars['records'] = array();
+        
+        if (!isset($_POST['zone'])) {
+            $vars = $_POST;
+            $vars['serial'] = 0;
+            $vars['records'] = array();
+            jtable_respond($vars, 'single');
+        }
+        $zoneurl = '/servers/:serverid:/zones/'.$vars['name'].'.';
+        if (isset($_POST['owns'])) {
+            $patch = array();
+            $patch['rrsets'] = array();
+            array_push($patch['rrsets'], array(
+                'comments'  => array(),
+                'records'   => array(),
+                'changetype'=> "REPLACE",
+                'type'      => 'NS',
+                'name'      => $vars['name']));
+            _do_curl($zoneurl, $patch, 'patch');
+            foreach ($nameservers as $ns) {
+                $records = getrecords_by_name_type($zoneurl, $vars['name'], 'NS');
+                $records = _create_record($vars['name'], $records, array('type' => 'NS', 'name' => '', 'content' => $ns), $zoneurl);
+            }
+        }
+
+        $vars = _do_curl($zoneurl);
         jtable_respond($vars, 'single');
     } else {
         jtable_respond(null, 'error', "Not enough data: ".print_r($_POST, 1));
@@ -286,8 +313,6 @@ if ($action == "list" or $action== "listslaves") {
         else {
             array_push($any, $rows['records'][$idx]);
         };
-
-
     }
     usort($any, "zonesort");
     $ret = array_merge($soa, $ns, $mx, $any);
