@@ -16,6 +16,10 @@ body, html {
     font-size: 14px;
     line-height: 1.3;
 }
+#ImportZone {
+    height: 0px;
+    width: 0px;
+}
 .tables {
     float: right;
     width: 89%;

@@ -442,8 +442,7 @@ $(document).ready(function () {
     $('#ImportZone').jtable({
         title: 'Import zone',
         actions: {
-            createAction: 'zones.php?action=create',
-            listAction: 'zones.php?action=list',
+            createAction: 'zones.php?action=create'
         },
         fields: {
             id: {
