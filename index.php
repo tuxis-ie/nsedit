@@ -564,7 +564,6 @@ $(document).ready(function () {
     $('#MasterZones').jtable('load');
     $('#SlaveZones').jtable('load');
     $('#Users').jtable('load');
-    $('#ImportZone').jtable('load');
     <? } ?>
 });
 </script>
