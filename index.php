@@ -109,6 +109,7 @@ if (isset($templatelist)) {
         </ul>
     </div>
     <div id="zones">
+        <div style="visibility: hidden;" id="ImportZone"></div>
         <div class="tables" id="MasterZones">
             <div class="searchbar" id="searchbar">
                 <input type="text" id="domsearch" name="domsearch" placeholder="Search...."/>
@@ -116,7 +117,6 @@ if (isset($templatelist)) {
         </div>
         <div class="tables" id="SlaveZones"></div>
     </div>
-    <div style="visibility: hidden;" id="ImportZone"></div>
     <? if (is_adminuser()) { ?>
         <div id="users">
             <div class="tables" id="Users"></div>
