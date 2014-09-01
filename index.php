@@ -302,7 +302,6 @@ $(document).ready(function () {
             owner: {
                 title: 'Owner',
                 options: function(data) {
-                    data.clearCache();
                     return 'users.php?action=listoptions';
                 },
                 defaultValue: 'admin'
@@ -456,7 +455,6 @@ $(document).ready(function () {
             owner: {
                 title: 'Owner',
                 options: function(data) {
-                    data.clearCache();
                     return 'users.php?action=listoptions';
                 },
                 defaultValue: 'admin'
