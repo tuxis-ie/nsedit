@@ -43,19 +43,31 @@ function try_login() {
         if (valid_user($_POST['username']) === FALSE) {
             return FALSE;
         }
-        $db = get_db();
-        $q = $db->prepare('SELECT * FROM users WHERE emailaddress = ?');
-        $q->bindValue(1, $_POST['username']);
-        $result = $q->execute();
-        $userinfo = $result->fetchArray(SQLITE3_ASSOC);
-        if (isset($userinfo['password']) and (crypt($_POST['password'], $userinfo['password']) == $userinfo['password'])) {
-            set_logged_in($_POST['username']);
-            if (isset($userinfo['isadmin']) && $userinfo['isadmin'] == 1) {
-                set_is_adminuser();
+        $do_local_auth = 1;
+
+        if (isset($wefactapiurl) && isset($wefactapikey)) {
+            $wefact = do_wefact_auth($_POST['username'], $_POST['password']);
+            if ($wefact === FALSE) {
+                return FALSE;
             }
-            return TRUE;
+            if ($wefact != -1) {
+                $do_local_auth = 0;
+            }
         }
-        $db->close();
+
+        if ($do_local_auth == 1) {
+            if (do_db_auth($_POST['username'], $_POST['password']) === FALSE) {
+                return FALSE;
+            }
+        }
+
+        $userinfo = get_user_info($_POST['username']);
+
+        set_logged_in($_POST['username']);
+        if (isset($userinfo['isadmin']) && $userinfo['isadmin'] == 1) {
+            set_is_adminuser();
+        }
+        return TRUE;
     }
 
     return FALSE;

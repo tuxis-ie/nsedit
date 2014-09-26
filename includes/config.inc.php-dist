@@ -6,6 +6,13 @@ $apiip   = '';      # The IP of the PowerDNS API
 $apiport = '8081';  # The port of the PowerDNS API
 $apisid  = '';      # PowerDNS's :server_id
 
+
+# If you configure this, nsedit will try to authenticate via WeFact too.
+# Debtors will be added to the sqlitedatabase with their crypted password.
+
+#$wefactapiurl = 'https://yourdomain/Pro/apiv2/api.php';
+#$wefactapikey = 'xyz';
+
 $authdb  = "../etc/pdns.users.sqlite3";
 
 $templates = array();

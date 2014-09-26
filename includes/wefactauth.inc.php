@@ -1,6 +1,10 @@
 <?php
 
 include_once('config.inc.php');
+include_once('misc.inc.php');
+
+/* This class is written by Wefact. See https://www.wefact.nl/wefact-hosting/apiv2/
+*/
 
 class WeFactAPI
 {
@@ -52,16 +56,26 @@ class WeFactAPI
 
 function do_wefact_auth($u, $p) {
     $wefact = new WeFactApi();
-    $r = $wefact->sendRequest('debtor', 'checklogin', array(
-        'Username'  => $u,
-        'Password'  => $p
-    ));
+    $r = $wefact->sendRequest('debtor', 'show', array(
+        'DebtorCode' => $u));
 
     if (isset($r['status']) && $r['status'] == 'success') {
-        return TRUE;
-    }
+        $r = $wefact->sendRequest('debtor', 'checklogin', array(
+            'Username'  => $u,
+            'Password'  => $p
+        ));
 
-    return FALSE;
+        if (isset($r['status']) && $r['status'] == 'success') {
+            if (get_user_info($u) == FALSE) {
+                add_user($u);
+            }
+            return TRUE;
+        }
+
+        return FALSE;
+    } else {
+        return -1;
+    }
 }
 
 ?>

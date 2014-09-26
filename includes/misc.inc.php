@@ -28,6 +28,31 @@ function get_all_users() {
     return $ret;
 }
 
+function get_user_info($u) {
+    $db = get_db();
+    $q = $db->prepare('SELECT * FROM users WHERE emailaddress = ?');
+    $q->bindValue(1, $u);
+    $result = $q->execute();
+    $userinfo = $result->fetchArray(SQLITE3_ASSOC);
+    $db->close();
+
+    return $userinfo;
+}
+
+function do_db_auth($u, $p) {
+    $db = get_db();
+    $q = $db->prepare('SELECT * FROM users WHERE emailaddress = ?');
+    $q->bindValue(1, $u);
+    $result = $q->execute();
+    $userinfo = $result->fetchArray(SQLITE3_ASSOC);
+    $db->close();
+    if (isset($userinfo['password']) and (crypt($p, $userinfo['password']) == $userinfo['password'])) {
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 function get_pw($username) {
     $db = get_db();
     $q = $db->prepare('SELECT password FROM users WHERE emailaddress = ? LIMIT 1');
