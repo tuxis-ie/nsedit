@@ -118,6 +118,13 @@ function add_db_zone($zone, $owner) {
     if (_valid_label($zone) === FALSE) {
         jtable_respond(null, 'error', "$zone is not a valid zonename");
     }
+
+    if (is_apiuser()) {
+        if (!get_user_info($owner)) {
+            add_user($owner);
+        }
+    }
+
     $db = get_db();
     $q = $db->prepare("INSERT OR REPLACE INTO zones (zone, owner) VALUES (?, (SELECT id FROM users WHERE emailaddress = ?))");
     $q->bindValue(1, $zone, SQLITE3_TEXT);

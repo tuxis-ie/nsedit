@@ -13,18 +13,30 @@ function is_logged_in() {
         global $adminapikey;
         global $adminapiips;
 
-        if (isset($adminapikey) && isset($allowedips)) {
+        if (isset($adminapikey) && isset($adminapiips)) {
             if (array_search($_SERVER['REMOTE_ADDR'], $adminapiips) !== FALSE) {
                 if ($_POST['adminapikey'] == $adminapikey) {
                     # Allow this request, fake that we're logged in.
                     set_logged_in('admin');
                     set_is_adminuser();
+                    $_SESSION['apientrance'] = 'true';
                     return TRUE;
                 }
             }
         }
         return FALSE;
     }
+}
+
+function set_apiuser() {
+    $_SESSION['apientrance'] = 'true';
+}
+
+function is_apiuser() {
+    if (isset($_SESSION['apientrance']) && $_SESSION['apientrance'] = 'true') {
+        return TRUE;
+    }
+    return FALSE;
 }
 
 function set_logged_in($login_user) {
