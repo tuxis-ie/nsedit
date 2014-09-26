@@ -236,15 +236,17 @@ if ($action == "list" or $action== "listslaves") {
     if ($_POST['kind'] != null and $_POST['name'] != null) {
         $nameservers = array();
         if ($_POST['kind'] != "Slave") {
-            if ($_POST['nameserver1'] != null) {
+            if (isset($_POST['nameserver1']) && $_POST['nameserver1'] != null) {
                 array_push($nameservers, $_POST['nameserver1']);
-                if ($_POST['nameserver2'] != null) {
+                if (isset($_POST['nameserver2']) && $_POST['nameserver2'] != null) {
                     array_push($nameservers, $_POST['nameserver2']);
                 }
             } else {
                 jtable_respond(null, 'error', "Not enough data: ".print_r($_POST, 1));
             }
-            $vars['soa_edit_api'] = $defaults['soa_edit_api'];
+            if (isset($defaults['soa_edit_api'])) {
+                $vars['soa_edit_api'] = $defaults['soa_edit_api'];
+            }
         }
         $vars['name'] = $_POST['name'];
         $vars['kind'] = $_POST['kind'];
