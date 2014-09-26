@@ -272,7 +272,7 @@ if ($action == "list" or $action== "listslaves") {
                         } else {
                             $name = $vars['name'];
                         }
-                        if (!isset($record['name']) {
+                        if (!isset($record['name'])) {
                             $record['name'] = "";
                         }
                         $records = getrecords_by_name_type($zoneurl, $name, $record['type']);
