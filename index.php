@@ -559,10 +559,10 @@ $(document).ready(function () {
             $("#SlaveZones").jtable('reload');
         }
     });
-    $('#MasterZones').jtable('load');
-    $('#SlaveZones').jtable('load');
     $('#Users').jtable('load');
     <? } ?>
+    $('#MasterZones').jtable('load');
+    $('#SlaveZones').jtable('load');
 });
 </script>
 </body>
