@@ -69,7 +69,7 @@ function _create_record($name, $records, $input, $zoneurl) {
         'disabled' => false,
         'type' => $input['type'],
         'name' => $name,
-        'ttl'  => $input['ttl'] ? $input['ttl'] : $defaults['ttl'],
+        'ttl'  => isset($input['ttl']) ? $input['ttl'] : $defaults['ttl'],
         'priority'  => $input['priority'] ? $input['priority'] : $defaults['priority'],
         'content'   => $content));
 
