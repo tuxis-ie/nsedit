@@ -13,6 +13,11 @@ $apisid  = '';      # PowerDNS's :server_id
 #$wefactapiurl = 'https://yourdomain/Pro/apiv2/api.php';
 #$wefactapikey = 'xyz';
 
+# If you want external scripts to be able to execute stuff here, add the
+# remote-ip to $adminapiips and create a $adminapikey
+#$adminapiips = array();
+#$adminapikey = 'thisshouldbequitealongstring,youknow';
+
 $authdb  = "../etc/pdns.users.sqlite3";
 
 $templates = array();
