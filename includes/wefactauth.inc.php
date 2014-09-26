@@ -6,14 +6,15 @@ include_once('misc.inc.php');
 /* This class is written by Wefact. See https://www.wefact.nl/wefact-hosting/apiv2/
 */
 
-class WeFactAPI
-{
+class WeFactAPI {
     
     private $url;
     private $responseType;
     private $apiKey;
     
     function __construct(){
+        global $wefactapiurl;
+        global $wefactapikey;
         $this->url      = $wefactapiurl;
         $this->api_key  = $wefactapikey;
     }

@@ -2,6 +2,7 @@
 
 include_once('config.inc.php');
 include_once('misc.inc.php');
+include_once('wefactauth.inc.php');
 
 session_start();
 
@@ -39,6 +40,9 @@ function logout() {
 }
 
 function try_login() {
+    global $wefactapiurl;
+    global $wefactapikey;
+
     if (isset($_POST['username']) and isset($_POST['password'])) {
         if (valid_user($_POST['username']) === FALSE) {
             return FALSE;
@@ -50,7 +54,7 @@ function try_login() {
             if ($wefact === FALSE) {
                 return FALSE;
             }
-            if ($wefact != -1) {
+            if ($wefact !== -1) {
                 $do_local_auth = 0;
             }
         }

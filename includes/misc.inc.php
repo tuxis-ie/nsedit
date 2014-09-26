@@ -112,7 +112,7 @@ function jtable_respond($records, $method = 'multiple', $msg = 'Undefined errorm
     } else {
         if (isset($_GET['jtPageSize'])) {
             $jTableResult['TotalRecordCount'] = count($records);
-            $records = array_slice($records, $_GET['jtStartIndex'], $_GET['jtPageSize']);
+            $records = array_slice($records, $_GET['jtStartIndex']-1, $_GET['jtPageSize']);
         }
         $jTableResult['Result'] = "OK";
         $jTableResult['Records'] = $records;
