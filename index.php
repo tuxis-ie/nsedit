@@ -246,11 +246,13 @@ $(document).ready(function () {
             hoverAnimationDuration: 60,
             hoverAnimationEasing: undefined,
             items: [{
+                <? if (is_adminuser() or $allowzoneadd === TRUE) { ?>
                 icon: 'jtable/lib/themes/metro/add.png',
                 text: 'Import a new zone',
                 click: function() {
                     $('#ImportZone').jtable('showCreateForm');
                 }
+                <? } ?>
                 }],
         },
         sorting: false,
