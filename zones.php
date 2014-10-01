@@ -227,7 +227,7 @@ if ($action == "list" or $action== "listslaves") {
     usort($return, "zonesort");
     jtable_respond($return);
 } elseif ($action == "create") {
-    if (is_adminuser() !== TRUE or ($allowzoneadd !== TRUE)) {
+    if (is_adminuser() !== TRUE and $allowzoneadd !== TRUE) {
         jtable_respond(null, 'error', "You are not allowed to add zones");
     }
     if (_valid_label($_POST['name']) === FALSE) {
