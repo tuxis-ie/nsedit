@@ -109,7 +109,9 @@ if (isset($templatelist)) {
         </ul>
     </div>
     <div id="zones">
+        <? if (is_adminuser() or $allowzoneadd === TRUE) { ?>
         <div style="visibility: hidden;" id="ImportZone"></div>
+        <? } ?>
         <div class="tables" id="MasterZones">
             <div class="searchbar" id="searchbar">
                 <input type="text" id="domsearch" name="domsearch" placeholder="Search...."/>
@@ -153,8 +155,10 @@ $(document).ready(function () {
         openChildAsAccordion: true,
         actions: {
             listAction: 'zones.php?action=listslaves',
+            <? if (is_adminuser() or $allowzoneadd === TRUE) { ?>
             createAction: 'zones.php?action=create',
             deleteAction: 'zones.php?action=delete'
+            <? } ?>
         },
         fields: {
             id: {
@@ -253,8 +257,10 @@ $(document).ready(function () {
         openChildAsAccordion: true,
         actions: {
             listAction: 'zones.php?action=list',
+            <? if (is_adminuser() or $allowzoneadd === TRUE) { ?>
             createAction: 'zones.php?action=create',
             deleteAction: 'zones.php?action=delete',
+            <? } ?>
             <? if (is_adminuser()) { ?>
             updateAction: 'zones.php?action=update'
             <? } ?>
