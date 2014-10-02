@@ -26,14 +26,14 @@ product_. nsedit can authenticate against the WeFact API, which allows your
 customers to login on nsedit with their WeFact credentials. It will
 automatically show their domains and allow them to edit them.
 
-requirements
+Requirements
 ============
 * A webserver running php
 * php sqlite3
 * php curl
 * PowerDNS with the experimental JSON-api enabled (3.4.0 should do)
 
-installing
+Installing
 ==========
 
 * Run 
@@ -45,4 +45,12 @@ where you want to run nsedit
 * Visit http(s)://<url>/nsedit/ and login with admin/admin (Don't forget to update your password!)
 
 Have fun ;)
+
+Screenshots
+===========
+
+![The login screen](screenshots/login.png)
+![Master zones](screenshots/master-import-zones.png)
+![Slave zones](screenshots/slavezones.png)
+
 
