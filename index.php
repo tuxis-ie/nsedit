@@ -113,21 +113,45 @@ exit(0);
     <? } ?>
 </div>
 <script type="text/javascript">
-var entityMap = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': '&quot;',
-    "'": '&#39;',
-    "/": '&#x2F;'
-};
 
-function escapeHtml(string) {
-    return String(string).replace(/[&<>"'\/]/g, function (s) {
-        return entityMap[s];
-    });
-};
+function displayDnssecIcon(zone) {
+    if (zone.record.dnssec == true) {
+        var $img = $('<img class="list" src="img/lock.png" title="DNSSec Info" />');
+        $img.click(function () {
+            $("#dnssecinfo").html("");
+            $.each(zone.record.keyinfo, function ( i, val) {
+                if (val.dstxt) {
+                    $("#dnssecinfo").append("<p><h2>"+val.keytype+"</h2><pre>"+val.dstxt+"</pre></p>");
+                }
+            });
+            $("#dnssecinfo").dialog({
+                modal: true,
+                title: "DS-records for "+zone.record.name,
+                width: 'auto',
+                buttons: {
+                    Ok: function() {
+                        $( this ).dialog( "close" );
+                    }
+                }
+            });
+        });
+        return $img;
+    } else {
+        return '<img src="img/lock_open.png" title="DNSSec Disabled" />';
+    }
+}
 
+function displayContent(fieldName) {
+    return function(data) {
+        var value = data.record[fieldName];
+        switch (fieldName) {
+        case 'priority':
+            value = (value === 0) ? '' : value;
+            break;
+        }
+        return $('<span>').text(value);
+    }
+}
 
 $(document).ready(function () {
     $('#SlaveZones').jtable({
@@ -142,12 +166,10 @@ $(document).ready(function () {
         openChildAsAccordion: true,
         actions: {
             listAction: 'zones.php?action=listslaves',
+            updateAction: 'zones.php?action=update',
             <? if (is_adminuser() or $allowzoneadd === TRUE) { ?>
             createAction: 'zones.php?action=create',
             deleteAction: 'zones.php?action=delete',
-            <? } ?>
-            <? if (is_adminuser()) { ?>
-            updateAction: 'zones.php?action=update'
             <? } ?>
         },
         fields: {
@@ -156,15 +178,32 @@ $(document).ready(function () {
                 type: 'hidden'
             },
             name: {
-                title: 'Domain'
+                title: 'Domain',
+                width: '8%',
+                display: displayContent('name'),
+                edit: false,
+                inputClass: 'domain',
+                listClass: 'domain'
+            },
+            dnssec: {
+                title: 'DNSSEC',
+                width: '3%',
+                create: false,
+                edit: false,
+                display: displayDnssecIcon,
+                listClass: 'dnssec'
             },
             <? if (is_adminuser()) { ?>
             owner: {
                 title: 'Owner',
+                width: '8%',
+                display: displayContent('owner'),
                 options: function(data) {
                     return 'users.php?action=listoptions';
                 },
-                defaultValue: 'admin'
+                defaultValue: 'admin',
+                inputClass: 'owner',
+                listClass: 'owner'
             },
             <? } ?>
             kind: {
@@ -173,9 +212,30 @@ $(document).ready(function () {
                 list: false,
                 defaultValue: 'Slave'
             },
+            masters: {
+                title: 'Masters',
+                width: '20%',
+                display: function(data) {
+                    return $('<span>').text(data.record.masters.join('\n'));
+                },
+                input: function(data) {
+                    var elem = $('<input type="text" name="masters">');
+                    if (data && data.record) {
+                        elem.attr('value', data.record.masters.join(','));
+                    }
+                    return elem;
+                },
+                inputClass: 'masters',
+                listClass: 'masters'
+            },
             serial: {
                 title: 'Serial',
-                create: false
+                width: '10%',
+                display: displayContent('serial'),
+                create: false,
+                edit: false,
+                inputClass: 'serial',
+                listClass: 'serial'
             },
             records: {
                 width: '5%',
@@ -196,22 +256,34 @@ $(document).ready(function () {
                                 },
                                 fields: {
                                     name: {
-                                        title: 'Label'
+                                        title: 'Label',
+                                        width: '7%',
+                                        display: displayContent('name'),
+                                        listClass: 'name'
                                     },
                                     type: {
-                                        title: 'Type'
+                                        title: 'Type',
+                                        width: '2%',
+                                        display: displayContent('type'),
+                                        listClass: 'type'
                                     },
-                                    prio: {
-                                        title: 'Prio'
+                                    priority: {
+                                        title: 'Prio',
+                                        width: '1%',
+                                        display: displayContent('priority'),
+                                        listClass: 'priority'
                                     },
                                     content: {
                                         title: 'Content',
-                                        display: function (data) {
-                                            return escapeHtml(data.record.content);
-                                        }
+                                        width: '30%',
+                                        display: displayContent('content'),
+                                        listClass: 'content'
                                     },
                                     ttl: {
-                                        title: 'TTL'
+                                        title: 'TTL',
+                                        width: '2%',
+                                        display: displayContent('ttl'),
+                                        listClass: 'ttl'
                                     }
                                 }
                             }, function (data) {
@@ -263,79 +335,76 @@ $(document).ready(function () {
                 type: 'hidden'
             },
             name: {
-                title: 'Domain'
+                title: 'Domain',
+                width: '8%',
+                display: displayContent('name'),
+                edit: false,
+                inputClass: 'domain',
+                listClass: 'domain'
             },
             dnssec: {
                 title: 'DNSSEC',
+                width: '3%',
                 create: false,
                 edit: false,
-                display: function (zone) {
-            if (zone.record.dnssec == true) {
-                var $img = $('<img class="list" src="img/lock.png" title="DNSSec Info" />');
-                $img.click(function () {
-                    $("#dnssecinfo").html("");
-                    $.each(zone.record.keyinfo, function ( i, val) {
-                        if (val.dstxt) {
-                            $("#dnssecinfo").append("<p><h2>"+val.keytype+"</h2><pre>"+val.dstxt+"</pre></p>");
-                        }
-                    });
-                    $("#dnssecinfo").dialog({
-                        modal: true,
-                        title: "DS-records for "+zone.record.name,
-                        width: 'auto',
-                        buttons: {
-                            Ok: function() {
-                                $( this ).dialog( "close" );
-                            }
-                        }
-                    });
-                });
-                return $img;
-            } else {
-               return '<img src="img/lock_open.png" title="DNSSec Disabled" />';
-             }
-                }
+                display: displayDnssecIcon,
+                listClass: 'dnssec'
             },
             <? if (is_adminuser()) { ?>
             owner: {
                 title: 'Owner',
+                width: '8%',
+                display: displayContent('owner'),
                 options: function(data) {
                     return 'users.php?action=listoptions';
                 },
-                defaultValue: 'admin'
+                defaultValue: 'admin',
+                inputClass: 'owner',
+                listClass: 'owner'
             },
             <? } ?>
             kind: {
                 title: 'Type',
+                width: '20%',
+                display: displayContent('kind'),
                 options: {'Native': 'Native', 'Master': 'Master'},
                 defaultValue: '<? echo $defaults['defaulttype']; ?>',
-                edit: false
+                edit: false,
+                inputClass: 'kind',
+                listClass: 'kind'
             },
             template: {
                 title: 'Template',
                 options: <? echo json_encode(user_template_names()); ?>,
                 list: false,
                 create: true,
-                edit: false
+                edit: false,
+                inputClass: 'template'
             },
             nameserver1: {
                 title: 'Pri. Nameserver',
                 create: true,
                 list: false,
                 edit: false,
-                defaultValue: '<? echo $defaults['primaryns']; ?>'
+                defaultValue: '<? echo $defaults['primaryns']; ?>',
+                inputClass: 'nameserver nameserver1'
             },
             nameserver2: {
                 title: 'Sec. Nameserver',
                 create: true,
                 list: false,
                 edit: false,
-                defaultValue: '<? echo $defaults['secondaryns']; ?>'
+                defaultValue: '<? echo $defaults['secondaryns']; ?>',
+                inputClass: 'nameserver nameserver2'
             },
             serial: {
                 title: 'Serial',
+                width: '10%',
+                display: displayContent('serial'),
                 create: false,
-                edit: false
+                edit: false,
+                inputClass: 'serial',
+                listClass: 'serial'
             },
             records: {
                 width: '5%',
@@ -369,6 +438,7 @@ $(document).ready(function () {
                                     },
                                     id: {
                                         key: true,
+                                        type: 'hidden',
                                         create: false,
                                         edit: false,
                                         list: false
@@ -380,10 +450,17 @@ $(document).ready(function () {
                                     },
                                     name: {
                                         title: 'Label',
-                                        create: true
+                                        width: '7%',
+                                        create: true,
+                                        display: displayContent('name'),
+                                        inputClass: 'name',
+                                        listClass: 'name'
                                     },
                                     type: {
+                                        title: 'Type',
+                                        width: '2%',
                                         options: function() {
+/*
                                             zonename = new String(zone.record.name);
                                             if (zonename.match(/(\.in-addr|\.ip6)\.arpa/)) {
                                                 return {
@@ -393,38 +470,53 @@ $(document).ready(function () {
                                                     'TXT':'TXT',
                                                     'SOA':'SOA'
                                                 };
-                                            } else {
-                                                return {
-                                                    'AAAA': 'AAAA',
-                                                    'A': 'A',
-                                                    'CNAME': 'CNAME',
-                                                    'MX': 'MX',
-                                                    'PTR': 'PTR',
-                                                    'SRV': 'SRV',
-                                                    'TXT': 'TXT',
-                                                    'NS': 'NS',
-                                                    'SOA': 'SOA'
-                                                };
                                             }
+*/
+                                            return {
+                                                'A': 'A',
+                                                'AAAA': 'AAAA',
+                                                'CNAME': 'CNAME',
+                                                'MX': 'MX',
+                                                'NAPTR': 'NAPTR',
+                                                'NS': 'NS',
+                                                'PTR': 'PTR',
+                                                'SOA': 'SOA',
+                                                'SPF': 'SPF',
+                                                'SRV': 'SRV',
+                                                'TLSA': 'TLSA',
+                                                'TXT': 'TXT',
+                                            };
                                         },
-                                        create: true
+                                        display: displayContent('type'),
+                                        create: true,
+                                        inputClass: 'type',
+                                        listClass: 'type'
                                     },
                                     priority: {
                                         title: 'Prio',
+                                        width: '1%',
                                         create: true,
-                                        defaultValue: '<? echo $defaults['priority']; ?>'
+                                        display: displayContent('priority'),
+                                        defaultValue: '<? echo $defaults['priority']; ?>',
+                                        inputClass: 'priority',
+                                        listClass: 'priority'
                                     },
                                     content: {
                                         title: 'Content',
+                                        width: '30%',
                                         create: true,
-                                        display: function (data) {
-                                            return escapeHtml(data.record.content);
-                                        }
+                                        display: displayContent('content'),
+                                        inputClass: 'content',
+                                        listClass: 'content'
                                     },
                                     ttl: {
                                         title: 'TTL',
+                                        width: '2%',
                                         create: true,
-                                        defaultValue: '<? echo $defaults['ttl']; ?>'
+                                        display: displayContent('ttl'),
+                                        defaultValue: '<? echo $defaults['ttl']; ?>',
+                                        inputClass: 'ttl',
+                                        listClass: 'ttl'
                                     }
                                 }
                             }, function (data) {
@@ -447,7 +539,8 @@ $(document).ready(function () {
                 type: 'hidden'
             },
             name: {
-                title: 'Domain'
+                title: 'Domain',
+                inputClass: 'domain'
             },
             <? if (is_adminuser()) { ?>
             owner: {
@@ -455,38 +548,44 @@ $(document).ready(function () {
                 options: function(data) {
                     return 'users.php?action=listoptions';
                 },
-                defaultValue: 'admin'
+                defaultValue: 'admin',
+                inputClass: 'owner'
             },
             <? } ?>
             kind: {
                 title: 'Type',
                 options: {'Native': 'Native', 'Master': 'Master'},
                 defaultValue: '<? echo $defaults['defaulttype']; ?>',
-                edit: false
+                edit: false,
+                inputClass: 'type'
             },
             zone: {
                 title: 'Zonedata',
-                type: 'textarea'
+                type: 'textarea',
+                inputClass: 'zonedata'
             },
             owns: {
                 title: 'Overwrite Nameservers',
                 type: 'checkbox',
                 values: {'0': 'No', '1': 'Yes'},
-                defaultValue: 1
+                defaultValue: 1,
+                inputClass: 'overwrite_namerserver'
             },
             nameserver1: {
                 title: 'Pri. Nameserver',
                 create: true,
                 list: false,
                 edit: false,
-                defaultValue: '<? echo $defaults['primaryns']; ?>'
+                defaultValue: '<? echo $defaults['primaryns']; ?>',
+                inputClass: 'nameserver nameserver1'
             },
             nameserver2: {
                 title: 'Sec. Nameserver',
                 create: true,
                 list: false,
                 edit: false,
-                defaultValue: '<? echo $defaults['secondaryns']; ?>'
+                defaultValue: '<? echo $defaults['secondaryns']; ?>',
+                inputClass: 'nameserver nameserver2'
             },
         },
         recordAdded: function() {
@@ -539,17 +638,23 @@ $(document).ready(function () {
                 type: 'hidden'
             },
             emailaddress: {
-                title: 'User'
+                title: 'User',
+                display: displayContent('emailaddress'),
+                inputClass: 'emailaddress',
+                listClass: 'emailaddress'
             },
             password: {
                 title: 'Password',
                 type: 'password',
-                list: false
+                list: false,
+                inputClass: 'password',
             },
             isadmin: {
                 title: 'Admin',
                 type: 'checkbox',
-                values: {'0': 'No', '1': 'Yes'}
+                values: {'0': 'No', '1': 'Yes'},
+                inputClass: 'isadmin',
+                listClass: 'isadmin'
             }
         },
         recordAdded: function() {

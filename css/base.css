@@ -139,3 +139,31 @@ pre {
 .ui-dialog {
     max-width: 80%;
 }
+tr.jtable-data-row td {
+    font-family: monospace;
+    font-size: 16px;
+    vertical-align: top;
+    white-space: pre-wrap;       /* css-3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;
+}
+tr.jtable-data-row td.ttl, tr.jtable-data-row td.priority,
+.jtable-input input.ttl, .jtable-input input.priority {
+    text-align: right;
+}
+tr.jtable-data-row td.content {
+    max-width: 800px;
+}
+.jtable-input input {
+    font-family: monospace;
+    font-size: 16px;
+}
+.jtable-input input.name {
+    width: 100%;
+}
+.jtable-input input.content {
+    min-width: 600px;
+    width: 100%;
+}
