@@ -78,5 +78,3 @@ function do_wefact_auth($u, $p) {
         return -1;
     }
 }
-
-?>

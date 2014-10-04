@@ -7,12 +7,11 @@ include_once('includes/misc.inc.php');
 if (isset($_GET['logout']) or isset($_POST['logout'])) {
     logout();
     header("Location: index.php");
+    exit(0);
 }
 
-if (!is_logged_in() and isset($_POST['formname']) && $_POST['formname'] == "loginform") {
-    if (try_login() === TRUE) {
-        set_logged_in($_POST['username']);
-    } else {
+if (!is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "loginform") {
+    if (!try_login()) {
         $errormsg = "Error while trying to authenticate you\n";
     }
 }
@@ -54,18 +53,28 @@ if (!is_logged_in()) {
             <table>
                 <tr>
                     <td class="label">Username:</td>
-                    <td><input id="username" type="text" name="username"/></td>
+                    <td><input id="username" type="text" name="username"></td>
                 </tr>
                 <tr>
                     <td class="label">Password:</td>
-                    <td><input type="password" name="password"/></td>
+                    <td><input type="password" name="password"></td>
                 </tr>
+                <?php
+                if (isset($secret) && $secret) {
+                ?>
+                <tr>
+                    <td class="label">Remember me:</td>
+                    <td><input type="checkbox" name="autologin" value="1"></td>
+                </tr>
+                <?php
+                }
+                ?>
                 <tr>
                     <td></td>
-                    <td><input type="submit" name="submit" value="Log me in!"/></td>
+                    <td><input type="submit" name="submit" value="Log me in!"></td>
                 </tr>
             </table>
-            <input type="hidden" name="formname" value="loginform"/>
+            <input type="hidden" name="formname" value="loginform">
         </form>
     </div>
 </div>
@@ -113,6 +122,21 @@ exit(0);
     <? } ?>
 </div>
 <script type="text/javascript">
+window.csrf_token = '<?php echo CSRF_TOKEN ?>';
+
+$(document).ready(function () {
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRF-Token", window.csrf_token);
+            }
+        }
+    });
+});
 
 function displayDnssecIcon(zone) {
     if (zone.record.dnssec == true) {
@@ -670,4 +694,3 @@ $(document).ready(function () {
 </script>
 </body>
 </html>
-

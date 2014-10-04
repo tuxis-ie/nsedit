@@ -4,7 +4,7 @@ include_once('includes/config.inc.php');
 include_once('includes/session.inc.php');
 include_once('includes/misc.inc.php');
 
-if (!is_logged_in()) {
+if (!is_csrf_safe()) {
     header('Status: 403');
     header('Location: ./index.php');
     jtable_respond(null, 'error', "Authentication required");
@@ -96,5 +96,3 @@ default:
     jtable_respond(null, 'error', 'Invalid action');
     break;
 }
-
-?>

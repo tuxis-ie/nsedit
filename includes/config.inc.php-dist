@@ -20,6 +20,9 @@ $allowzoneadd = FALSE;  # Allow normal users to add zones
 
 $authdb  = "../etc/pdns.users.sqlite3";
 
+# Set a random generated secret to enable auto-login and long living csrf tokens
+// $secret = '...';
+
 $templates = array();
 /*
 $templates[] = array(
@@ -57,5 +60,3 @@ if (!file_exists($authdb)) {
     $salt = bin2hex(openssl_random_pseudo_bytes(16));
     $db->exec("INSERT INTO users (emailaddress, password, isadmin) VALUES ('admin', '".crypt("admin", '$6$'.$salt)."', 1)");
 }
-
-?>
