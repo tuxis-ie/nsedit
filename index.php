@@ -76,19 +76,6 @@ if (!is_logged_in()) {
 exit(0);
 }
 
-foreach ($templates as $template) {
-    if (is_adminuser() or (isset($template['owner']) && $template['owner'] == get_sess_user()) or ($template['owner'] == 'public')) {
-        $templatelist[] = "'" . $template['name'] . "':'" . $template['name'] . "'";
-    }
-}
-
-if (isset($templatelist)) {
-    $tmpllist = ',';
-    $tmpllist .= join(',', $templatelist);
-} else {
-    $tmpllist = '';
-}
-
 ?>
 <body>
 <div id="wrap">
@@ -157,7 +144,10 @@ $(document).ready(function () {
             listAction: 'zones.php?action=listslaves',
             <? if (is_adminuser() or $allowzoneadd === TRUE) { ?>
             createAction: 'zones.php?action=create',
-            deleteAction: 'zones.php?action=delete'
+            deleteAction: 'zones.php?action=delete',
+            <? } ?>
+            <? if (is_adminuser()) { ?>
+            updateAction: 'zones.php?action=update'
             <? } ?>
         },
         fields: {
@@ -323,7 +313,7 @@ $(document).ready(function () {
             },
             template: {
                 title: 'Template',
-                options: {'None': 'None'<? echo $tmpllist; ?>},
+                options: <? echo json_encode(user_template_names()); ?>,
                 list: false,
                 create: true,
                 edit: false

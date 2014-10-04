@@ -4,7 +4,7 @@ $apiuser = '';          # The PowerDNS API username
 $apipass = '';          # The PowerDNS API-user password
 $apiip   = '';          # The IP of the PowerDNS API
 $apiport = '8081';      # The port of the PowerDNS API
-$apisid  = '';          # PowerDNS's :server_id
+$apisid  = 'localhost'; # PowerDNS's :server_id
 $allowzoneadd = FALSE;  # Allow normal users to add zones
 
 
@@ -27,7 +27,7 @@ $templates[] = array(
     'owner' => 'username', # Set to 'public' to make it available to all users
     'records' => array(
         array(
-            'label'     => '',
+            'name'      => '',
             'type'      => 'MX',
             'content'   => 'mx2.tuxis.nl',
             'priority'  => '200')
@@ -35,6 +35,7 @@ $templates[] = array(
 );
 */
 
+$defaults['soa_edit']    = 'INCEPTION-INCREMENT';
 $defaults['soa_edit_api'] = 'INCEPTION-INCREMENT';
 $defaults['defaulttype'] = 'Master';                    # Choose between 'Native' or 'Master'
 $defaults['primaryns']   = 'unconfigured.primaryns';    # The value of the first NS-record
