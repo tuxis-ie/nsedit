@@ -140,7 +140,6 @@ pre {
     max-width: 80%;
 }
 tr.jtable-data-row td {
-    font-family: monospace;
     font-size: 16px;
     vertical-align: top;
     white-space: pre-wrap;       /* css-3 */
@@ -157,7 +156,6 @@ tr.jtable-data-row td.content {
     max-width: 800px;
 }
 .jtable-input input {
-    font-family: monospace;
     font-size: 16px;
 }
 .jtable-input input.name {
