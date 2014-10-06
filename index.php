@@ -177,7 +177,13 @@ function displayContent(fieldName) {
     }
 }
 
+function getEpoch() {
+    return Math.round(+new Date()/1000);
+}
+
 $(document).ready(function () {
+    var $epoch = getEpoch();
+
     $('#SlaveZones').jtable({
         title: 'Slave Zones',
         paging: true,
@@ -223,7 +229,7 @@ $(document).ready(function () {
                 width: '8%',
                 display: displayContent('owner'),
                 options: function(data) {
-                    return 'users.php?action=listoptions';
+                    return 'users.php?action=listoptions&e='+$epoch;
                 },
                 defaultValue: 'admin',
                 inputClass: 'owner',
@@ -380,7 +386,7 @@ $(document).ready(function () {
                 width: '8%',
                 display: displayContent('owner'),
                 options: function(data) {
-                    return 'users.php?action=listoptions';
+                    return 'users.php?action=listoptions&e='+$epoch;
                 },
                 defaultValue: 'admin',
                 inputClass: 'owner',
@@ -570,7 +576,7 @@ $(document).ready(function () {
             owner: {
                 title: 'Owner',
                 options: function(data) {
-                    return 'users.php?action=listoptions';
+                    return 'users.php?action=listoptions&e='+$epoch;
                 },
                 defaultValue: 'admin',
                 inputClass: 'owner'
@@ -682,6 +688,7 @@ $(document).ready(function () {
             }
         },
         recordAdded: function() {
+            $epoch = getEpoch();
             $("#MasterZones").jtable('reload');
             $("#SlaveZones").jtable('reload');
         }
