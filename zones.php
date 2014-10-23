@@ -551,7 +551,8 @@ case "delete":
 case "listrecords":
     $zone = get_zone_by_url(isset($_GET['zoneurl']) ? $_GET['zoneurl'] : '');
 
-    $records = api_request($zone['url'])['records'];
+    $a = api_request($zone['url']);
+    $records = $a['records'];
     foreach ($records as &$record) {
         $record['id'] = json_encode($record);
     }
