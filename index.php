@@ -627,15 +627,24 @@ $(document).ready(function () {
     $('#domsearch').addClear({
         onClear: function() { $('#MasterZones').jtable('load'); }
     });
-    $('#domsearch').on('input', function (e) {
-        e.preventDefault();
+
+    function searchDoms() {
         $('#MasterZones').jtable('load', {
             domsearch: $('#domsearch').val()
         });
         $('#SlaveZones').jtable('load', {
             domsearch: $('#domsearch').val()
         });
+    }
+
+    stimer = 0;
+
+    $('#domsearch').on('input', function (e) {
+        e.preventDefault();
+        clearTimeout(stimer);
+        stimer = setTimeout(searchDoms, 400);
     });
+
     <? if (is_adminuser()) { ?>
     $('#Users').hide();
     $('#useradmin').click(function () {
