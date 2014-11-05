@@ -436,11 +436,11 @@ case "create":
     }
 
     if ($zonekind != "Slave") {
+        $createOptions['nameservers'] = $nameservers;
         if (!isset($_POST['zone'])) {
             if (0 == count($nameservers)) {
                 jtable_respond(null, 'error', "Require nameservers");
             }
-            $createOptions['nameservers'] = $nameservers;
         } else {
             $createOptions['zone'] = $_POST['zone'];
         }
