@@ -181,7 +181,7 @@ function user_template_names() {
 /* This function was taken from https://gist.github.com/rsky/5104756 to make
 it available on older php versions. Thanks! */
 
-if (!function_exists(hash_pbkdf2)) {
+if (!function_exists('hash_pbkdf2')) {
     function hash_pbkdf2($algo, $password, $salt, $iterations, $length = 0, $rawOutput = false) {
         // check for hashing algorithm
         if (!in_array(strtolower($algo), hash_algos())) {
