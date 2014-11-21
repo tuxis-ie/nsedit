@@ -7,6 +7,12 @@ $apiport = '8081';      # The port of the PowerDNS API
 $apisid  = 'localhost'; # PowerDNS's :server_id
 $allowzoneadd = FALSE;  # Allow normal users to add zones
 
+# The first versions of the PowerDNS API used the standard webserver password
+# for authentication, newer versions use an X-API-Key mechanism. NSEdit tries
+# to autodetect the method you should use, but that does affect performance.
+# For optimal performance, configure the right method.
+# (Should be 'auto', 'xapikey' or 'userpass')
+$authmethod = 'auto';
 
 # If you configure this, nsedit will try to authenticate via WeFact too.
 # Debtors will be added to the sqlitedatabase with their crypted password.
@@ -46,7 +52,12 @@ $defaults['secondaryns'] = 'unconfigured.secondaryns';  # The value of the secon
 $defaults['ttl']         = 3600;                        # Default TTL for records
 $defaults['priority']    = 0;                           # Default for priority in records
 
+$blocklogin = FALSE;
 
+if (!preg_match('/^(xapikey|userpass|auto)$/', $authmethod)) {
+    $errormsg = "The value for $authmethod is incorrect in your config";
+    $blocklogin = TRUE;
+}
 
 
 /* No need to change stuf below */

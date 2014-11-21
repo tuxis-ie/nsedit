@@ -4,6 +4,8 @@ include_once('includes/config.inc.php');
 include_once('includes/session.inc.php');
 include_once('includes/misc.inc.php');
 
+global $errormsg, $blocklogin;
+
 if (isset($_GET['logout']) or isset($_POST['logout'])) {
     logout();
     header("Location: index.php");
@@ -71,7 +73,7 @@ if (!is_logged_in()) {
                 ?>
                 <tr>
                     <td></td>
-                    <td><input type="submit" name="submit" value="Log me in!"></td>
+                    <td><input type="submit" name="submit" value="Log me in!" <?php if ($blocklogin === TRUE)) { echo "disabled"; }; ?>></td>
                 </tr>
             </table>
             <input type="hidden" name="formname" value="loginform">

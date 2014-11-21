@@ -11,12 +11,29 @@ if (!is_csrf_safe()) {
 }
 
 function api_request($path, $opts = null, $type = null) {
-    global $apisid, $apiuser, $apipass, $apiip, $apiport;
+    global $apisid, $apiuser, $apipass, $apiip, $apiport, $authmethod;
 
     $url = "http://$apiip:$apiport${path}";
 
+    if ($authmethod == "auto") {
+        $ad = curl_init();
+        curl_setopt($ad, CURLOPT_HTTPHEADER, array('X-API-Key: '.$apipass));
+        curl_setopt($ad, CURLOPT_URL, "http://$apiip:$apiport/servers/localhost/statistics");
+        curl_setopt($ad, CURLOPT_RETURNTRANSFER, 1);
+        curl_exec($ad);
+        if (curl_getinfo($ad, CURLINFO_HTTP_CODE) == 401) {
+            $authmethod = 'userpass';
+        } else {
+            $authmethod = 'xapikey';
+        }
+    }
+
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_USERPWD, "$apiuser:$apipass");
+    if ($authmethod == "xapikey") {
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-API-Key: '.$apipass));
+    } else {
+        curl_setopt($ch, CURLOPT_USERPWD, "$apiuser:$apipass");
+    }
     curl_setopt($ch, CURLOPT_URL, $url); 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
     if ($opts) {
