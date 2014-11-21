@@ -2,6 +2,35 @@
 
 include('config.inc.php');
 
+$blocklogin = FALSE;
+
+if (empty($apipass) or empty($apiip) or empty($apiport)) {
+    $errormsg = "You need to configure your the setting for using the PowerDNS API";
+    $blocklogin = TRUE;
+}
+
+if (!preg_match('/^(xapikey|userpass|auto)$/', $authmethod)) {
+    $errormsg = "The value for \$authmethod is incorrect in your config";
+    $blocklogin = TRUE;
+}
+
+if (!isset($authdb)) {
+    $errormsg = "You did not configure a value for the setting \$authdb in yor config";
+    $blocklogin = TRUE;
+}
+
+/* No need to change stuf below */
+$defaults['defaulttype'] = ucfirst(strtolower($defaults['defaulttype']));
+
+if (isset($authdb) && !file_exists($authdb)) {
+    is_dir(dirname($authdb)) || mkdir(dirname($authdb));
+    $db = new SQLite3($authdb, SQLITE3_OPEN_CREATE|SQLITE3_OPEN_READWRITE);
+    $createsql = file_get_contents('includes/scheme.sql');
+    $db->exec($createsql);
+    $salt = bin2hex(openssl_random_pseudo_bytes(16));
+    $db->exec("INSERT INTO users (emailaddress, password, isadmin) VALUES ('admin', '".crypt("admin", '$6$'.$salt)."', 1)");
+}
+
 function string_starts_with($string, $prefix)
 {
     $length = strlen($prefix);

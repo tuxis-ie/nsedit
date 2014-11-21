@@ -51,23 +51,3 @@ $defaults['primaryns']   = 'unconfigured.primaryns';    # The value of the first
 $defaults['secondaryns'] = 'unconfigured.secondaryns';  # The value of the second NS-record
 $defaults['ttl']         = 3600;                        # Default TTL for records
 $defaults['priority']    = 0;                           # Default for priority in records
-
-$blocklogin = FALSE;
-
-if (!preg_match('/^(xapikey|userpass|auto)$/', $authmethod)) {
-    $errormsg = "The value for $authmethod is incorrect in your config";
-    $blocklogin = TRUE;
-}
-
-
-/* No need to change stuf below */
-$defaults['defaulttype'] = ucfirst(strtolower($defaults['defaulttype']));
-
-if (!file_exists($authdb)) {
-    is_dir(dirname($authdb)) || mkdir(dirname($authdb));
-    $db = new SQLite3($authdb, SQLITE3_OPEN_CREATE|SQLITE3_OPEN_READWRITE);
-    $createsql = file_get_contents('includes/scheme.sql');
-    $db->exec($createsql);
-    $salt = bin2hex(openssl_random_pseudo_bytes(16));
-    $db->exec("INSERT INTO users (emailaddress, password, isadmin) VALUES ('admin', '".crypt("admin", '$6$'.$salt)."', 1)");
-}
