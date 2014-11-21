@@ -73,7 +73,7 @@ if (!is_logged_in()) {
                 ?>
                 <tr>
                     <td></td>
-                    <td><input type="submit" name="submit" value="Log me in!" <?php if ($blocklogin === TRUE)) { echo "disabled"; }; ?>></td>
+                    <td><input type="submit" name="submit" value="Log me in!" <?php if ($blocklogin === TRUE) { echo "disabled"; }; ?>></td>
                 </tr>
             </table>
             <input type="hidden" name="formname" value="loginform">

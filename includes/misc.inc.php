@@ -4,12 +4,12 @@ include('config.inc.php');
 
 $blocklogin = FALSE;
 
-if (empty($apipass) or empty($apiip) or empty($apiport)) {
+if ((!isset($apipass) or empty($apipass)) or (!isset($apiip) or empty($apiip)) or (!isset($apiport) or empty($apiport))) {
     $errormsg = "You need to configure your the setting for using the PowerDNS API";
     $blocklogin = TRUE;
 }
 
-if (!preg_match('/^(xapikey|userpass|auto)$/', $authmethod)) {
+if (!isset($authmethod) or !preg_match('/^(xapikey|userpass|auto)$/', $authmethod)) {
     $errormsg = "The value for \$authmethod is incorrect in your config";
     $blocklogin = TRUE;
 }
