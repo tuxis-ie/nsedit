@@ -87,6 +87,13 @@ if (!is_logged_in()) {
 exit(0);
 }
 
+if ($blocklogin === TRUE) {
+
+       echo "<h2>There is an error in your config!</h2>";
+       echo "<a href=\"index.php\">Refresh</a>";
+       exit(0);
+}
+
 ?>
 <body>
 <div id="wrap">
