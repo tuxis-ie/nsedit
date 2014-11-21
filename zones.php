@@ -62,6 +62,9 @@ function api_request($path, $opts = null, $type = null) {
     if (isset($json['error'])) {
         jtable_respond(null, 'error', "API Error $code: ".$json['error']);
     } elseif ($code < 200 || $code >= 300) {
+        if ($code == 401) {
+            $code = "Authentication failed. Have you configured your authmethod correct?";
+        }
         jtable_respond(null, 'error', "API Error: $code");
     }
     return $json;
