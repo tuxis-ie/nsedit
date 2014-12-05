@@ -28,9 +28,11 @@ function api_request($path, $opts = null, $type = null) {
         }
     }
 
+    $headers = array();
+    array_push($headers, 'Accept: application/json');
     $ch = curl_init();
     if ($authmethod == "xapikey") {
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-API-Key: '.$apipass));
+        array_push($headers, 'X-API-Key: '.$apipass);
     } else {
         curl_setopt($ch, CURLOPT_USERPWD, "$apiuser:$apipass");
     }
@@ -41,10 +43,11 @@ function api_request($path, $opts = null, $type = null) {
             $type = 'POST';
         }
         $postdata = json_encode($opts);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        array_push($headers, 'Content-Type: application/json');
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata);
     }
+
     switch ($type) {
     case 'DELETE':
     case 'PATCH':
@@ -55,6 +58,7 @@ function api_request($path, $opts = null, $type = null) {
         break;
     }
 
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     $return = curl_exec($ch);
     $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $json = json_decode($return, 1);
@@ -620,6 +624,13 @@ case "deleterecord":
 
     update_records($zone, $old_record, $records);
     jtable_respond(null, 'delete');
+    break;
+
+case "export":
+    $zone = $_GET['zone'];
+    $export = api_request("/servers/${apisid}/zones/${zone}/export");
+
+    jtable_respond($export, 'single');
     break;
 
 default:

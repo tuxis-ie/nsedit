@@ -149,7 +149,7 @@ $(document).ready(function () {
 
 function displayDnssecIcon(zone) {
     if (zone.record.dnssec == true) {
-        var $img = $('<img class="list" src="img/lock.png" title="DNSSec Info" />');
+        var $img = $('<img class="clickme" src="img/lock.png" title="DNSSec Info" />');
         $img.click(function () {
             $("#dnssecinfo").html("");
             $.each(zone.record.keyinfo, function ( i, val) {
@@ -170,8 +170,21 @@ function displayDnssecIcon(zone) {
         });
         return $img;
     } else {
-        return '<img src="img/lock_open.png" title="DNSSec Disabled" />';
+        return '<img class="list" src="img/lock_open.png" title="DNSSec Disabled" />';
     }
+}
+
+function displayExportIcon(zone) {
+    var $img = $('<img class="list clickme" src="img/export.png" title="Export zone" />');
+    $img.click(function () {
+        var $zexport = $.getJSON("zones.php?zone="+zone.record.name+"&action=export", function(data) {
+            var dl = document.createElement('a');
+            dl.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(data.Record.zone));
+            dl.setAttribute('download', zone.record.name+'.txt');
+            dl.click();
+        });
+    });
+    return $img;
 }
 
 function displayContent(fieldName) {
@@ -331,6 +344,14 @@ $(document).ready(function () {
                     });
                     return $img;
                 }
+            },
+            exportzone: {
+                title: '',
+                width: '1%',
+                create: false,
+                edit: false,
+                display: displayExportIcon,
+                listClass: 'exportzone'
             }
         }
     });
@@ -564,6 +585,14 @@ $(document).ready(function () {
                     });
                     return $img;
                 }
+            },
+            exportzone: {
+                title: '',
+                width: '1%',
+                create: false,
+                edit: false,
+                display: displayExportIcon,
+                listClass: 'exportzone'
             }
         }
     });

@@ -68,9 +68,16 @@ input[type="submit"] {
     margin: 0 0 50px;
 }
 img.list {
+    opacity: .4;
+}
+
+.clickme {
     cursor: pointer;
 }
 
+.clickme:hover {
+    opacity: 1;
+}
 /* overrides jtable.css */
 div.jtable-main-container > div.jtable-title {
     background-color: #FFFFFF;
