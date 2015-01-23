@@ -1,12 +1,13 @@
 <?php
 
-$apiuser = '';          # The PowerDNS API username
-$apipass = '';          # The PowerDNS API-user password
+$apiuser = '';          # The PowerDNS API username. Leave empty for authmethod='xapikey' (see AUTHENTICATION)
+$apipass = '';          # The PowerDNS API-user password or the PowerDNS-API key (see AUTHENTICATION)
 $apiip   = '';          # The IP of the PowerDNS API
 $apiport = '8081';      # The port of the PowerDNS API
 $apisid  = 'localhost'; # PowerDNS's :server_id
 $allowzoneadd = FALSE;  # Allow normal users to add zones
 
+### AUTHENTICATION ###
 # The first versions of the PowerDNS API used the standard webserver password
 # for authentication, newer versions use an X-API-Key mechanism. NSEdit tries
 # to autodetect the method you should use, but that does affect performance.
