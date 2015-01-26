@@ -362,7 +362,7 @@ $(document).ready(function () {
         pageSize: 20,
         messages: {
             addNewRecord: 'Add new zone',
-            noDataAvailable: 'No zones found'
+            noDataAvailable: 'No zones found',
             deleteConfirmation: 'This zone will be deleted. Are you sure?'
         },
         toolbar: {
