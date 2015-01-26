@@ -38,7 +38,7 @@ if (!is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "lo
     <script src="js/addclear/addclear.js" type="text/javascript"></script>
 </head>
 
-<?
+<?php
 if (!is_logged_in()) {
 ?>
 <body onload="document.getElementById('username').focus()">
@@ -47,7 +47,7 @@ if (!is_logged_in()) {
         <img src="https://www.tuxis.nl/uploads/images/nsedit.png" alt="Logo"/>
     </div>
     <div class="login">
-        <? if (isset($errormsg)) {
+        <?php if (isset($errormsg)) {
             echo '<span style="color: red">' . $errormsg . '</span><br />';
         }
         ?>
@@ -83,7 +83,7 @@ if (!is_logged_in()) {
 </body>
 </html>
 
-<?
+<?php
 exit(0);
 }
 
@@ -107,16 +107,16 @@ if ($blocklogin === TRUE) {
         </div>
         <ul>
             <li><a href="#" id="zoneadmin">Zones</a></li>
-            <? if (is_adminuser()) { ?>
+            <?php if (is_adminuser()) { ?>
                 <li><a href="#" id="useradmin">Users</a></li>
-            <? } ?>
+            <?php } ?>
             <li><a href="index.php?logout=1">Logout</a></li>
         </ul>
     </div>
     <div id="zones">
-        <? if (is_adminuser() or $allowzoneadd === TRUE) { ?>
+        <?php if (is_adminuser() or $allowzoneadd === TRUE) { ?>
         <div style="visibility: hidden;" id="ImportZone"></div>
-        <? } ?>
+        <?php } ?>
         <div class="tables" id="MasterZones">
             <div class="searchbar" id="searchbar">
                 <input type="text" id="domsearch" name="domsearch" placeholder="Search...."/>
@@ -124,11 +124,11 @@ if ($blocklogin === TRUE) {
         </div>
         <div class="tables" id="SlaveZones"></div>
     </div>
-    <? if (is_adminuser()) { ?>
+    <?php if (is_adminuser()) { ?>
         <div id="users">
             <div class="tables" id="Users"></div>
         </div>
-    <? } ?>
+    <?php } ?>
 </div>
 <script type="text/javascript">
 window.csrf_token = '<?php echo CSRF_TOKEN ?>';
@@ -219,10 +219,10 @@ $(document).ready(function () {
         actions: {
             listAction: 'zones.php?action=listslaves',
             updateAction: 'zones.php?action=update',
-            <? if (is_adminuser() or $allowzoneadd === TRUE) { ?>
+            <?php if (is_adminuser() or $allowzoneadd === TRUE) { ?>
             createAction: 'zones.php?action=create',
             deleteAction: 'zones.php?action=delete',
-            <? } ?>
+            <?php } ?>
         },
         fields: {
             id: {
@@ -245,7 +245,7 @@ $(document).ready(function () {
                 display: displayDnssecIcon,
                 listClass: 'dnssec'
             },
-            <? if (is_adminuser()) { ?>
+            <?php if (is_adminuser()) { ?>
             owner: {
                 title: 'Owner',
                 width: '8%',
@@ -257,7 +257,7 @@ $(document).ready(function () {
                 inputClass: 'owner',
                 listClass: 'owner'
             },
-            <? } ?>
+            <?php } ?>
             kind: {
                 create: true,
                 type: 'hidden',
@@ -368,26 +368,26 @@ $(document).ready(function () {
             hoverAnimationDuration: 60,
             hoverAnimationEasing: undefined,
             items: [{
-                <? if (is_adminuser() or $allowzoneadd === TRUE) { ?>
+                <?php if (is_adminuser() or $allowzoneadd === TRUE) { ?>
                 icon: 'jtable/lib/themes/metro/add.png',
                 text: 'Import a new zone',
                 click: function() {
                     $('#ImportZone').jtable('showCreateForm');
                 }
-                <? } ?>
+                <?php } ?>
                 }],
         },
         sorting: false,
         openChildAsAccordion: true,
         actions: {
             listAction: 'zones.php?action=list',
-            <? if (is_adminuser() or $allowzoneadd === TRUE) { ?>
+            <?php if (is_adminuser() or $allowzoneadd === TRUE) { ?>
             createAction: 'zones.php?action=create',
             deleteAction: 'zones.php?action=delete',
-            <? } ?>
-            <? if (is_adminuser()) { ?>
+            <?php } ?>
+            <?php if (is_adminuser()) { ?>
             updateAction: 'zones.php?action=update'
-            <? } ?>
+            <?php } ?>
         },
         fields: {
             id: {
@@ -410,7 +410,7 @@ $(document).ready(function () {
                 display: displayDnssecIcon,
                 listClass: 'dnssec'
             },
-            <? if (is_adminuser()) { ?>
+            <?php if (is_adminuser()) { ?>
             owner: {
                 title: 'Owner',
                 width: '8%',
@@ -422,20 +422,20 @@ $(document).ready(function () {
                 inputClass: 'owner',
                 listClass: 'owner'
             },
-            <? } ?>
+            <?php } ?>
             kind: {
                 title: 'Type',
                 width: '20%',
                 display: displayContent('kind'),
                 options: {'Native': 'Native', 'Master': 'Master'},
-                defaultValue: '<? echo $defaults['defaulttype']; ?>',
+                defaultValue: '<?php echo $defaults['defaulttype']; ?>',
                 edit: false,
                 inputClass: 'kind',
                 listClass: 'kind'
             },
             template: {
                 title: 'Template',
-                options: <? echo json_encode(user_template_names()); ?>,
+                options: <?php echo json_encode(user_template_names()); ?>,
                 list: false,
                 create: true,
                 edit: false,
@@ -446,7 +446,7 @@ $(document).ready(function () {
                 create: true,
                 list: false,
                 edit: false,
-                defaultValue: '<? echo $defaults['primaryns']; ?>',
+                defaultValue: '<?php echo $defaults['primaryns']; ?>',
                 inputClass: 'nameserver nameserver1'
             },
             nameserver2: {
@@ -454,7 +454,7 @@ $(document).ready(function () {
                 create: true,
                 list: false,
                 edit: false,
-                defaultValue: '<? echo $defaults['secondaryns']; ?>',
+                defaultValue: '<?php echo $defaults['secondaryns']; ?>',
                 inputClass: 'nameserver nameserver2'
             },
             serial: {
@@ -557,7 +557,7 @@ $(document).ready(function () {
                                         width: '1%',
                                         create: true,
                                         display: displayContent('priority'),
-                                        defaultValue: '<? echo $defaults['priority']; ?>',
+                                        defaultValue: '<?php echo $defaults['priority']; ?>',
                                         inputClass: 'priority',
                                         listClass: 'priority'
                                     },
@@ -574,7 +574,7 @@ $(document).ready(function () {
                                         width: '2%',
                                         create: true,
                                         display: displayContent('ttl'),
-                                        defaultValue: '<? echo $defaults['ttl']; ?>',
+                                        defaultValue: '<?php echo $defaults['ttl']; ?>',
                                         inputClass: 'ttl',
                                         listClass: 'ttl'
                                     }
@@ -610,7 +610,7 @@ $(document).ready(function () {
                 title: 'Domain',
                 inputClass: 'domain'
             },
-            <? if (is_adminuser()) { ?>
+            <?php if (is_adminuser()) { ?>
             owner: {
                 title: 'Owner',
                 options: function(data) {
@@ -619,11 +619,11 @@ $(document).ready(function () {
                 defaultValue: 'admin',
                 inputClass: 'owner'
             },
-            <? } ?>
+            <?php } ?>
             kind: {
                 title: 'Type',
                 options: {'Native': 'Native', 'Master': 'Master'},
-                defaultValue: '<? echo $defaults['defaulttype']; ?>',
+                defaultValue: '<?php echo $defaults['defaulttype']; ?>',
                 edit: false,
                 inputClass: 'type'
             },
@@ -644,7 +644,7 @@ $(document).ready(function () {
                 create: true,
                 list: false,
                 edit: false,
-                defaultValue: '<? echo $defaults['primaryns']; ?>',
+                defaultValue: '<?php echo $defaults['primaryns']; ?>',
                 inputClass: 'nameserver nameserver1'
             },
             nameserver2: {
@@ -652,7 +652,7 @@ $(document).ready(function () {
                 create: true,
                 list: false,
                 edit: false,
-                defaultValue: '<? echo $defaults['secondaryns']; ?>',
+                defaultValue: '<?php echo $defaults['secondaryns']; ?>',
                 inputClass: 'nameserver nameserver2'
             },
         },
@@ -683,7 +683,7 @@ $(document).ready(function () {
         stimer = setTimeout(searchDoms, 400);
     });
 
-    <? if (is_adminuser()) { ?>
+    <?php if (is_adminuser()) { ?>
     $('#Users').hide();
     $('#useradmin').click(function () {
         $('#Users').show();
@@ -741,7 +741,7 @@ $(document).ready(function () {
         }
     });
     $('#Users').jtable('load');
-    <? } ?>
+    <?php } ?>
     $('#MasterZones').jtable('load');
     $('#SlaveZones').jtable('load');
 });
