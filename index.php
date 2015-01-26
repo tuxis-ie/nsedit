@@ -213,7 +213,8 @@ $(document).ready(function () {
         sorting: false,
         messages: {
             addNewRecord: 'Add new slave zone',
-            noDataAvailable: 'No slave zones found'
+            noDataAvailable: 'No slave zones found',
+            deleteConfirmation: 'This slave zone will be deleted. Are you sure?'
         },
         openChildAsAccordion: true,
         actions: {
@@ -361,7 +362,8 @@ $(document).ready(function () {
         pageSize: 20,
         messages: {
             addNewRecord: 'Add new zone',
-            noDataAvailable: 'No zones found'
+            noDataAvailable: 'No zones found',
+            deleteConfirmation: 'This zone will be deleted. Are you sure?'
         },
         toolbar: {
             hoverAnimation: true,
@@ -707,7 +709,8 @@ $(document).ready(function () {
             updateAction: 'users.php?action=update'
         },
         messages: {
-            addNewRecord: 'Add new user'
+            addNewRecord: 'Add new user',
+            deleteConfirmation: 'This user will be deleted. Are you sure?'
         },
         fields: {
             id: {
