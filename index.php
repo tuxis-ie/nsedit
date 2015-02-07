@@ -189,13 +189,7 @@ function displayExportIcon(zone) {
 
 function displayContent(fieldName) {
     return function(data) {
-        var value = data.record[fieldName];
-        switch (fieldName) {
-        case 'priority':
-            value = (value === 0) ? '' : value;
-            break;
-        }
-        return $('<span>').text(value);
+        return $('<span>').text(data.record[fieldName]);
     }
 }
 
@@ -319,12 +313,6 @@ $(document).ready(function () {
                                         width: '2%',
                                         display: displayContent('type'),
                                         listClass: 'type'
-                                    },
-                                    priority: {
-                                        title: 'Prio',
-                                        width: '1%',
-                                        display: displayContent('priority'),
-                                        listClass: 'priority'
                                     },
                                     content: {
                                         title: 'Content',
@@ -553,15 +541,6 @@ $(document).ready(function () {
                                         create: true,
                                         inputClass: 'type',
                                         listClass: 'type'
-                                    },
-                                    priority: {
-                                        title: 'Prio',
-                                        width: '1%',
-                                        create: true,
-                                        display: displayContent('priority'),
-                                        defaultValue: '<?php echo $defaults['priority']; ?>',
-                                        inputClass: 'priority',
-                                        listClass: 'priority'
                                     },
                                     content: {
                                         title: 'Content',

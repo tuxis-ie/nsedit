@@ -155,8 +155,7 @@ tr.jtable-data-row td {
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;
 }
-tr.jtable-data-row td.ttl, tr.jtable-data-row td.priority,
-.jtable-input input.ttl, .jtable-input input.priority {
+tr.jtable-data-row td.ttl, .jtable-input input.ttl {
     text-align: right;
 }
 tr.jtable-data-row td.content {

@@ -143,7 +143,6 @@ function make_record($zone, $input) {
     }
 
     $ttl = (int) ((isset($input['ttl']) && $input['ttl']) ? $input['ttl'] : $defaults['ttl']);
-    $priority = (int) ((isset($input['priority']) && $input['priority']) ? $input['priority'] : $defaults['priority']);
     $type = isset($input['type']) ? $input['type'] : '';
     $disabled = (bool) (isset($input['disabled']) && $input['disabled']);
 
@@ -172,7 +171,6 @@ function make_record($zone, $input) {
         'type' => $type,
         'name' => $name,
         'ttl'  => $ttl,
-        'priority'  => $priority,
         'content'   => $content);
 }
 
@@ -242,7 +240,6 @@ function decode_record_id($id) {
         || !isset($record['name'])
         || !isset($record['type'])
         || !isset($record['ttl'])
-        || !isset($record['priority'])
         || !isset($record['content'])
         || !isset($record['disabled'])) {
         jtable_respond(null, 'error', "Invalid record id");
@@ -267,7 +264,6 @@ function get_records_except($zone, $exclude) {
                 $found = true;
             } elseif ($record['content'] != $exclude['content']
                 or $record['ttl']        != $exclude['ttl']
-                or $record['priority']   != $exclude['priority']
                 or $record['disabled']   != $exclude['disabled']) {
                 array_push($records, $record);
             } else {
@@ -320,7 +316,6 @@ function rrtype_compare($a, $b) {
 function record_compare($a, $b) {
     if ($cmp = compareName($a['name'], $b['name'])) return $cmp;
     if ($cmp = rrtype_compare($a['type'], $b['type'])) return $cmp;
-    if ($cmp = ($a['priority'] - $b['priority'])) return $cmp;
     if ($cmp = strnatcasecmp($a['content'], $b['content'])) return $cmp;
     return 0;
 }

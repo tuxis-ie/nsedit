@@ -39,8 +39,7 @@ $templates[] = array(
         array(
             'name'      => '',
             'type'      => 'MX',
-            'content'   => 'mx2.tuxis.nl',
-            'priority'  => '200')
+            'content'   => '200 mx2.tuxis.nl')
     )
 );
 */
@@ -51,4 +50,3 @@ $defaults['defaulttype'] = 'Master';                    # Choose between 'Native
 $defaults['primaryns']   = 'unconfigured.primaryns';    # The value of the first NS-record
 $defaults['secondaryns'] = 'unconfigured.secondaryns';  # The value of the second NS-record
 $defaults['ttl']         = 3600;                        # Default TTL for records
-$defaults['priority']    = 0;                           # Default for priority in records
