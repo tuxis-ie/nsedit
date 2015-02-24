@@ -436,7 +436,23 @@ $(document).ready(function () {
                 create: true,
                 list: false,
                 edit: false,
-                defaultValue: '<?php echo $defaults['primaryns']; ?>',
+                input: function(data) {
+                    var $template = data.form.find('#Edit-template');
+                    var $elem = $('<input type="text" name="nameserver1" />');
+                    $elem.val(<?php echo "'".$defaults['primaryns']."'"; ?>);
+                    $template.change(function() {
+                        $.get('zones.php?action=gettemplatenameservers&template='+$template.val()+'&prisec=pri', function(getdata) {
+                            if (getdata != "") {
+                                $elem.val(getdata);
+                                $elem.attr('readonly', true);
+                            } else {
+                                $elem.val(<?php echo "'".$defaults['primaryns']."'"; ?>);
+                                $elem.attr('readonly', false);
+                            }
+                        });
+                    });
+                    return $elem;
+                },
                 inputClass: 'nameserver nameserver1'
             },
             nameserver2: {
@@ -444,7 +460,23 @@ $(document).ready(function () {
                 create: true,
                 list: false,
                 edit: false,
-                defaultValue: '<?php echo $defaults['secondaryns']; ?>',
+                input: function(data) {
+                    var $template = data.form.find('#Edit-template');
+                    var $elem = $('<input type="text" name="nameserver2" />');
+                    $elem.val(<?php echo "'".$defaults['secondaryns']."'"; ?>);
+                    $template.change(function() {
+                        $.get('zones.php?action=gettemplatenameservers&template='+$template+'&prisec=sec', function(getdata) {
+                            if (getdata != "") {
+                                $elem.val(getdata);
+                                $elem.attr('readonly', true);
+                            } else {
+                                $elem.val(<?php echo "'".$defaults['secondaryns']."'"; ?>);
+                                $elem.attr('readonly', false);
+                            }
+                        });
+                    });
+                    return $elem;
+                },
                 inputClass: 'nameserver nameserver2'
             },
             serial: {
