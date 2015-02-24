@@ -19,6 +19,7 @@ if (!is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "lo
 }
 
 ?>
+<!DOCTYPE html>
 <html>
 <head>
     <title>NSEdit!</title>
@@ -178,10 +179,18 @@ function displayExportIcon(zone) {
     var $img = $('<img class="list clickme" src="img/export.png" title="Export zone" />');
     $img.click(function () {
         var $zexport = $.getJSON("zones.php?zone="+zone.record.name+"&action=export", function(data) {
+            blob = new Blob([data.Record.zone], { type: 'text/plain' });
             var dl = document.createElement('a');
-            dl.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(data.Record.zone));
-            dl.setAttribute('download', zone.record.name+'.txt');
-            dl.click();
+            dl.addEventListener('click', function(ev) {
+                dl.href = URL.createObjectURL(blob);
+                dl.download = zone.record.name+'.txt';
+            }, false);
+
+            if (document.createEvent) {
+                var event = document.createEvent("MouseEvents");
+                event.initEvent("click", true, true);
+                dl.dispatchEvent(event);
+            }
         });
     });
     return $img;
