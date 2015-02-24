@@ -498,6 +498,9 @@ case "create":
             if ($template['name'] !== $_POST['template']) continue;
 
             foreach ($template['records'] as $record) {
+                if ($record['type'] == 'NS' and array_search($record['content'], $nameservers) !== FALSE) {
+                    continue;
+                }
                 if (isset($record['label'])) {
                     $record['name'] = $record['label'];
                     unset($record['label']);
@@ -628,6 +631,25 @@ case "export":
     jtable_respond($export, 'single');
     break;
 
+case "gettemplatenameservers":
+    $ret = array();
+    $type = $_GET['prisec'];
+
+    foreach (user_template_list() as $template) {
+        if ($template['name'] !== $_GET['template']) continue;
+        $rc = 0;
+        foreach ($template['records'] as $record) {
+            if ($record['type'] == "NS") {
+                if (($type == 'pri' && $rc == 0) or ($type == 'sec' && $rc == 1)) {
+                    echo $record['content'];
+                    exit(0);
+                }
+                $rc++;
+            }
+        }
+        echo "";
+    }
+    break;
 default:
     jtable_respond(null, 'error', 'No such action');
     break;
