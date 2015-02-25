@@ -474,7 +474,7 @@ $(document).ready(function () {
                     var $elem = $('<input type="text" name="nameserver2" />');
                     $elem.val(<?php echo "'".$defaults['secondaryns']."'"; ?>);
                     $template.change(function() {
-                        $.get('zones.php?action=gettemplatenameservers&template='+$template+'&prisec=sec', function(getdata) {
+                        $.get('zones.php?action=gettemplatenameservers&template='+$template.val()+'&prisec=sec', function(getdata) {
                             if (getdata != "") {
                                 $elem.val(getdata);
                                 $elem.attr('readonly', true);
