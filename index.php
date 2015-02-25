@@ -216,6 +216,7 @@ $(document).ready(function () {
         sorting: false,
         messages: {
             addNewRecord: 'Add new slave zone',
+            editRecord: 'Edit slave zone',
             noDataAvailable: 'No slave zones found',
             deleteConfirmation: 'This slave zone will be deleted. Are you sure?'
         },
@@ -359,6 +360,7 @@ $(document).ready(function () {
         pageSize: 20,
         messages: {
             addNewRecord: 'Add new zone',
+            editRecord: 'Edit zone',
             noDataAvailable: 'No zones found',
             deleteConfirmation: 'This zone will be deleted. Are you sure?'
         },
