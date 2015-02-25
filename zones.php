@@ -11,14 +11,14 @@ if (!is_csrf_safe()) {
 }
 
 function api_request($path, $opts = null, $type = null) {
-    global $apisid, $apiuser, $apipass, $apiip, $apiport, $authmethod;
+    global $apisid, $apiuser, $apipass, $apiip, $apiport, $authmethod, $apiprotocol;
 
-    $url = "http://$apiip:$apiport${path}";
+    $url = $apiprotocol."$apiip:$apiport${path}";
 
     if ($authmethod == "auto") {
         $ad = curl_init();
         curl_setopt($ad, CURLOPT_HTTPHEADER, array('X-API-Key: '.$apipass));
-        curl_setopt($ad, CURLOPT_URL, "http://$apiip:$apiport/servers/localhost/statistics");
+        curl_setopt($ad, CURLOPT_URL, $apiprotocol."$apiip:$apiport/servers/localhost/statistics");
         curl_setopt($ad, CURLOPT_RETURNTRANSFER, 1);
         curl_exec($ad);
         if (curl_getinfo($ad, CURLINFO_HTTP_CODE) == 401) {
@@ -452,11 +452,12 @@ case "create":
         );
 
     $nameservers = array();
-    if (isset($_POST['nameserver1']) && $_POST['nameserver1'] != null) {
-        array_push($nameservers, $_POST['nameserver1']);
-    }
-    if (isset($_POST['nameserver2']) && $_POST['nameserver2'] != null) {
-        array_push($nameservers, $_POST['nameserver2']);
+    $i = 1;
+    while(isset($_POST['nameserver'.$i])) {
+        if(!empty($_POST['nameserver'.$i])) {
+            array_push($nameservers, $_POST['nameserver'.$i]);
+        }
+        $i++;
     }
 
     if ($zonekind != "Slave") {

@@ -6,6 +6,7 @@ $apiip   = '';          # The IP of the PowerDNS API
 $apiport = '8081';      # The port of the PowerDNS API
 $apisid  = 'localhost'; # PowerDNS's :server_id
 $allowzoneadd = FALSE;  # Allow normal users to add zones
+$apiprotocol = 'http://'; # protocol used to connect with trailing slashs
 
 ### AUTHENTICATION ###
 # The first versions of the PowerDNS API used the standard webserver password
@@ -48,7 +49,7 @@ $templates[] = array(
 $defaults['soa_edit']    = 'INCEPTION-INCREMENT';
 $defaults['soa_edit_api'] = 'INCEPTION-INCREMENT';
 $defaults['defaulttype'] = 'Master';                    # Choose between 'Native' or 'Master'
-$defaults['primaryns']   = 'unconfigured.primaryns';    # The value of the first NS-record
-$defaults['secondaryns'] = 'unconfigured.secondaryns';  # The value of the second NS-record
+$defaults['ns'][0]   = 'unconfigured.primaryns';    # The value of the first NS-record
+$defaults['ns'][1] = 'unconfigured.secondaryns';  # The value of the second NS-record
 $defaults['ttl']         = 3600;                        # Default TTL for records
 $defaults['priority']    = 0;                           # Default for priority in records

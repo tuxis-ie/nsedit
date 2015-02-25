@@ -443,22 +443,20 @@ $(document).ready(function () {
                 edit: false,
                 inputClass: 'template'
             },
-            nameserver1: {
-                title: 'Pri. Nameserver',
+            <?php
+            $i = 1;
+            foreach($defaults['ns'] as $ns) {
+              echo "nameserver".$i.": {
+                title: '".($i == 1 ? 'Pri.' : 'Sec.')." Nameserver',
                 create: true,
                 list: false,
                 edit: false,
-                defaultValue: '<?php echo $defaults['primaryns']; ?>',
-                inputClass: 'nameserver nameserver1'
-            },
-            nameserver2: {
-                title: 'Sec. Nameserver',
-                create: true,
-                list: false,
-                edit: false,
-                defaultValue: '<?php echo $defaults['secondaryns']; ?>',
-                inputClass: 'nameserver nameserver2'
-            },
+                defaultValue: '".$ns."',
+                inputClass: 'nameserver nameserver".$i."'
+              },\n\t\t\t";
+              $i++;
+            }
+            ?>
             serial: {
                 title: 'Serial',
                 width: '10%',
