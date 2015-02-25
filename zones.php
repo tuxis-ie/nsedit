@@ -388,6 +388,18 @@ function get_zone_keys($zone) {
     return $ret;
 }
 
+function update_soa($zone) {
+    $soa = get_records_by_name_type($zone, $zone['name'], "SOA");
+    $serial = explode(" ", $soa[0]['content'])[2];
+    if(date("Ymd") == substr($serial, 0, -2)) {
+      $new_serial = date("Ymd").substr($serial, -2)+1;
+    } else {
+      $new_serial = date("Ymd")."00";
+    }
+    $soa[0]['content'] = str_replace($serial, $new_serial, $soa[0]['content']);
+    update_records($zone, $soa[0], $soa);
+}
+
 function check_owner($zone) {
     return is_adminuser() or ($zone['owner'] === get_sess_user());
 }
@@ -556,6 +568,7 @@ case "update":
     } else {
         $newZone = $zone;
     }
+    update_soa($newZone);
     unset($newZone['records']);
     unset($newZone['comments']);
 
@@ -567,6 +580,7 @@ case "delete":
 
     api_request($zone['url'], array(), 'DELETE');
     delete_db_zone($zone['name']);
+    update_soa($zone);
     jtable_respond(null, 'delete');
     break;
 
@@ -586,6 +600,7 @@ case "listrecords":
 case "createrecord":
     $zone = get_zone_by_url(isset($_GET['zoneurl']) ? $_GET['zoneurl'] : '');
     $record = create_record($zone, $_POST);
+    update_soa($zone);
 
     $record['id'] = json_encode($record);
     jtable_respond($record, 'single');
@@ -609,6 +624,7 @@ case "editrecord":
         array_push($records, $record);
         update_records($zone, $record, $records);
     }
+    update_soa($zone);
 
     $record['id'] = json_encode($record);
     jtable_respond($record, 'single');
@@ -621,6 +637,7 @@ case "deleterecord":
     $records = get_records_except($zone, $old_record);
 
     update_records($zone, $old_record, $records);
+    update_soa($zone);
     jtable_respond(null, 'delete');
     break;
 
