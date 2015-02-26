@@ -20,6 +20,12 @@ if (!isset($authdb)) {
 }
 
 /* No need to change stuf below */
+
+if (function_exists('curl_init') === FALSE) {
+    $errormsg = "You need PHP Curl to run nsedit";
+    $blocklogin = TRUE;
+}
+
 $defaults['defaulttype'] = ucfirst(strtolower($defaults['defaulttype']));
 
 if (isset($authdb) && !file_exists($authdb)) {
