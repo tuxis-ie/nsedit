@@ -11,14 +11,14 @@ if (!is_csrf_safe()) {
 }
 
 function api_request($path, $opts = null, $type = null) {
-    global $apisid, $apiuser, $apipass, $apiip, $apiport, $authmethod;
+    global $apisid, $apiuser, $apipass, $apiip, $apiport, $authmethod, $apiprotocol;
 
-    $url = "http://$apiip:$apiport${path}";
+    $url = $apiprotocol.$apiip.":".$apiport.$path;
 
     if ($authmethod == "auto") {
         $ad = curl_init();
         curl_setopt($ad, CURLOPT_HTTPHEADER, array('X-API-Key: '.$apipass));
-        curl_setopt($ad, CURLOPT_URL, "http://$apiip:$apiport/servers/localhost/statistics");
+        curl_setopt($ad, CURLOPT_URL, $apiprotocol.$apiip.":".$apiport."/servers/localhost/statistics");
         curl_setopt($ad, CURLOPT_RETURNTRANSFER, 1);
         curl_exec($ad);
         if (curl_getinfo($ad, CURLINFO_HTTP_CODE) == 401) {
@@ -447,11 +447,10 @@ case "create":
         );
 
     $nameservers = array();
-    if (isset($_POST['nameserver1']) && $_POST['nameserver1'] != null) {
-        array_push($nameservers, $_POST['nameserver1']);
-    }
-    if (isset($_POST['nameserver2']) && $_POST['nameserver2'] != null) {
-        array_push($nameservers, $_POST['nameserver2']);
+    foreach($_POST['nameserver'] as $ns) {
+        if (isset($ns) && !empty($ns)) {
+            array_push($nameservers, $ns);
+        }
     }
 
     if ($zonekind != "Slave") {
@@ -648,6 +647,18 @@ case "gettemplatenameservers":
             }
         }
         echo "";
+    }
+    break;
+case "getformnameservers":
+    $inputs = array();
+    foreach (user_template_list() as $template) {
+        if ($template['name'] !== $_GET['template']) continue;
+        foreach ($template['records'] as $record) {
+            if ($record['type'] == "NS" and array_search($record['content'], $inputs) === false) {
+		array_push($inputs, $record['content']);
+                echo '<input type="text" name="nameserver[]" value="'.$record['content'].'" readonly /><br />';
+            }
+        }
     }
     break;
 default:
