@@ -637,21 +637,17 @@ $(document).ready(function () {
                 defaultValue: 1,
                 inputClass: 'overwrite_namerserver'
             },
-            nameserver1: {
-                title: 'Pri. Nameserver',
+            nameserver: {
+                title: 'Nameservers',
                 create: true,
                 list: false,
                 edit: false,
-                defaultValue: '<?php echo $defaults['primaryns']; ?>',
+                input: function(data) {
+                    var ns_form = '<?php foreach($defaults['ns'] as $ns) echo '<input type="text" name="nameserver[]" value="'.$ns.'" /><br />'; ?>';
+                    var $elem = $('<div id="nameservers">' + ns_form + '</div>');
+                    return $elem;
+                },
                 inputClass: 'nameserver nameserver1'
-            },
-            nameserver2: {
-                title: 'Sec. Nameserver',
-                create: true,
-                list: false,
-                edit: false,
-                defaultValue: '<?php echo $defaults['secondaryns']; ?>',
-                inputClass: 'nameserver nameserver2'
             },
         },
         recordAdded: function() {
