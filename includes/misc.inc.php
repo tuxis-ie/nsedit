@@ -5,7 +5,7 @@ include('config.inc.php');
 $blocklogin = FALSE;
 
 if ((!isset($apipass) or empty($apipass)) or (!isset($apiip) or empty($apiip)) or (!isset($apiport) or empty($apiport))) {
-    $errormsg = "You need to configure your the setting for using the PowerDNS API";
+    $errormsg = "You need to configure your settings for the PowerDNS API";
     $blocklogin = TRUE;
 }
 
@@ -15,7 +15,7 @@ if (!isset($authmethod) or !preg_match('/^(xapikey|userpass|auto)$/', $authmetho
 }
 
 if (!isset($authdb)) {
-    $errormsg = "You did not configure a value for the setting \$authdb in yor config";
+    $errormsg = "You did not configure a value for the setting \$authdb in your config";
     $blocklogin = TRUE;
 }
 
@@ -26,9 +26,14 @@ if (function_exists('curl_init') === FALSE) {
     $blocklogin = TRUE;
 }
 
+if (class_exists('SQLite3') === FALSE) {
+    $errormsg = "You need PHP SQLite3 to run nsedit";
+    $blocklogin = TRUE;
+}
+
 $defaults['defaulttype'] = ucfirst(strtolower($defaults['defaulttype']));
 
-if (isset($authdb) && !file_exists($authdb)) {
+if (isset($authdb) && !file_exists($authdb) && class_exists('SQLite3')) {
     is_dir(dirname($authdb)) || mkdir(dirname($authdb));
     $db = new SQLite3($authdb, SQLITE3_OPEN_CREATE|SQLITE3_OPEN_READWRITE);
     $createsql = file_get_contents('includes/scheme.sql');
