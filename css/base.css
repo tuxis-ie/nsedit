@@ -5,6 +5,9 @@ body, html {
     background:#ffffff;
 }
 
+.lightgrey {
+    opacity: .6;
+}
 #wrap {
 }
 #menu {
