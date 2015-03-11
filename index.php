@@ -196,9 +196,17 @@ function displayExportIcon(zone) {
     return $img;
 }
 
-function displayContent(fieldName) {
+function displayContent(fieldName, zone) {
     return function(data) {
-        return $('<span>').text(data.record[fieldName]);
+        if (typeof(zone) != 'undefined') {
+            var rexp = new RegExp("(.*)"+zone);
+            var label = rexp.exec(data.record[fieldName]);
+            var lspan = $('<span>').text(label[1]);
+            var zspan = $('<span class="lightgrey">').text(zone);
+            return lspan.add(zspan);
+        } else {
+            return $('<span>').text(data.record[fieldName]);
+        }
     }
 }
 
@@ -545,7 +553,7 @@ $(document).ready(function () {
                                         title: 'Label',
                                         width: '7%',
                                         create: true,
-                                        display: displayContent('name'),
+                                        display: displayContent('name', zone.record.name),
                                         inputClass: 'name',
                                         listClass: 'name'
                                     },
