@@ -13,12 +13,17 @@ if (!is_csrf_safe()) {
 function api_request($path, $opts = null, $type = null) {
     global $apisid, $apiuser, $apipass, $apiip, $apiport, $authmethod;
 
-    $url = "http://$apiip:$apiport${path}";
+    $url = "$apiproto://$apiip:$apiport${path}";
 
     if ($authmethod == "auto") {
         $ad = curl_init();
+
+        if ( strcasecmp( $apiproto, 'https' ) == 0 ) {
+            curl_setopt($ad, CURLOPT_SSL_VERIFYPEER, $apisslverify);
+        }
+
         curl_setopt($ad, CURLOPT_HTTPHEADER, array('X-API-Key: '.$apipass));
-        curl_setopt($ad, CURLOPT_URL, "http://$apiip:$apiport/servers/localhost/statistics");
+        curl_setopt($ad, CURLOPT_URL, "$apiproto://$apiip:$apiport/servers/localhost/statistics");
         curl_setopt($ad, CURLOPT_RETURNTRANSFER, 1);
         curl_exec($ad);
         if (curl_getinfo($ad, CURLINFO_HTTP_CODE) == 401) {
