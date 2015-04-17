@@ -4,7 +4,6 @@
   color: #1C78DE;
   padding: 0;
   margin: 0;
-  line-height: 29px;
 }
 
 #menu {
@@ -40,6 +39,10 @@
 
 #menu.horizontal ul li a:hover {
   background: #1C78DE;
+}
+
+#menu div.jtable-title-text {
+  line-height: inherit !important;
 }
 
 .tables {
