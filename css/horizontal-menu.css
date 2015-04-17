@@ -10,12 +10,13 @@
   width: 100%;
   display: inline-block;
   margin-bottom: 5px;
+  border-bottom: 1px solid #DDD;
 }
 
 #menu.horizontal ul {
   padding: 0;
+  margin: 0;
   float: right;
-  border-bottom: 1px solid #DDD;
 }
 
 #menu.horizontal ul li {
