@@ -1,11 +1,14 @@
 <?php
 
-$apiuser = '';          # The PowerDNS API username. Leave empty for authmethod='xapikey' (see AUTHENTICATION)
-$apipass = '';          # The PowerDNS API-user password or the PowerDNS-API key (see AUTHENTICATION)
-$apiip   = '';          # The IP of the PowerDNS API
-$apiport = '8081';      # The port of the PowerDNS API
-$apisid  = 'localhost'; # PowerDNS's :server_id
-$allowzoneadd = FALSE;  # Allow normal users to add zones
+$apiuser = '';           # The PowerDNS API username. Leave empty for authmethod='xapikey' (see AUTHENTICATION)
+$apipass = '';           # The PowerDNS API-user password or the PowerDNS-API key (see AUTHENTICATION)
+$apiip   = '';           # The IP of the PowerDNS API
+$apiport = '8081';       # The port of the PowerDNS API
+$apisid  = 'localhost';  # PowerDNS's :server_id
+$apiproto      = 'http'; # http | https
+$apisslsverify = FALSE;  # Verify SSL Certificate if using https for apiproto
+$allowzoneadd  = FALSE;  # Allow normal users to add zones
+
 
 ### AUTHENTICATION ###
 # The first versions of the PowerDNS API used the standard webserver password
