@@ -26,8 +26,8 @@ if (!is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "lo
     <link href="jquery-ui/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css"/>
     <link href="jtable/lib/themes/metro/blue/jtable.min.css" rel="stylesheet" type="text/css"/>
     <link href="css/base.css" rel="stylesheet" type="text/css"/>
-    <?php if ($cssadditions === TRUE) { ?>
-    <link href="css/additions.css" rel="stylesheet" type="text/css"/>
+    <?php if ($menutype === horizontal) { ?>
+    <link href="css/horizontal-menu.css" rel="stylesheet" type="text/css"/>
     <?php } ?>
     <script src="jquery-ui/jquery-1.10.2.js" type="text/javascript"></script>
     <script src="jquery-ui/ui/jquery.ui.core.js" type="text/javascript"></script>
