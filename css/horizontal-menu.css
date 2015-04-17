@@ -1,6 +1,10 @@
 .menu-title {
   display: inline-block;
-  float: right;
+  float: left;
+  color: #1C78DE;
+  padding: 0;
+  margin: 0;
+  
 }
 
 #menu {
