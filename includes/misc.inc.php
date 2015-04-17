@@ -14,6 +14,16 @@ if (!isset($authmethod) or !preg_match('/^(xapikey|userpass|auto)$/', $authmetho
     $blocklogin = TRUE;
 }
 
+if (!isset($apiproto) or !preg_match('/^http(s)?$/', $apiproto)) {
+    $errormsg = "The value for \$apiproto is incorrect in your config. Did you configure it?";
+    $blocklogin = TRUE;
+}
+
+if (!isset($apisslverify) or !preg_match('/^[01]$/', $apisslverify)) {
+    $errormsg = "The value for \$apisslverify is incorrect in your config. Did you configure it?";
+    $blocklogin = TRUE;
+}
+
 if (!isset($authdb)) {
     $errormsg = "You did not configure a value for the setting \$authdb in your config";
     $blocklogin = TRUE;

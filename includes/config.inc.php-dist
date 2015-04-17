@@ -6,7 +6,7 @@ $apiip   = '';           # The IP of the PowerDNS API
 $apiport = '8081';       # The port of the PowerDNS API
 $apisid  = 'localhost';  # PowerDNS's :server_id
 $apiproto      = 'http'; # http | https
-$apisslsverify = FALSE;  # Verify SSL Certificate if using https for apiproto
+$apisslverify  = FALSE;  # Verify SSL Certificate if using https for apiproto
 $allowzoneadd  = FALSE;  # Allow normal users to add zones
 
 
