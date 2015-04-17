@@ -103,7 +103,7 @@ if ($blocklogin === TRUE) {
 <div id="wrap">
     <div id="dnssecinfo">
     </div>
-    <div id="menu" class="jtable-main-container">
+    <div id="menu" class="jtable-main-container <?php if ($menutype === horizontal) { ?>horizontal<?php } ?>">
         <div class="jtable-title">
             <div class="jtable-title-text">
                 Menu
