@@ -1,7 +1,6 @@
 .menu-title {
   display: block;
   float: left;
-  color: #1C78DE;
   padding: 0;
   margin: 0;
 }
@@ -43,6 +42,7 @@
 
 #menu div.jtable-title-text {
   line-height: inherit !important;
+  color: #1C78DE;
 }
 
 .tables {
