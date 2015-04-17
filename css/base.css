@@ -3,6 +3,7 @@ body, html {
     padding:0;
     color:#000;
     background:#ffffff;
+    font-family: 'Segoe UI Semilight','Open Sans',Verdana,Arial,Helvetica,sans-serif;
 }
 
 .lightgrey {
