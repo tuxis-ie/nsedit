@@ -106,7 +106,7 @@ if ($blocklogin === TRUE) {
     <div id="menu" class="jtable-main-container <?php if ($menutype === horizontal) { ?>horizontal<?php } ?>">
         <div class="jtable-title menu-title">
             <div class="jtable-title-text">
-                Menu
+                NSEdit!
             </div>
         </div>
         <ul>
