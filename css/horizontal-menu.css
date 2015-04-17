@@ -1,3 +1,7 @@
+.menu-title {
+  display: none;
+}
+
 #menu {
   border: none;
 }
