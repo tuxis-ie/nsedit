@@ -32,6 +32,10 @@
   display: inline-block;
 }
 
+#menu.horizontal ul li a:hover {
+  background: #1C78DE;
+}
+
 .tables {
   width: 100% !important;
 }
