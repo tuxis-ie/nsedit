@@ -9,14 +9,13 @@
 #menu.horizontal {
   right: 0;
   width: 100%;
-  display: inline-block;
+  display: inline;
   margin-bottom: 5px;
   border-bottom: 2px solid #DDD;
 }
 
 #menu.horizontal ul {
   padding: 0;
-  margin: 0;
 }
 
 #menu.horizontal ul li {
