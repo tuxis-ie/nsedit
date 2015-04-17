@@ -1,7 +1,12 @@
+#menu {
+  border: none;
+}
+
 #menu.horizontal {
   width: 100%;
   display: inline-block;
   margin-bottom: 5px;
+  border-bottom: 2px solid #DDD;
 }
 
 #menu.horizontal ul {
@@ -11,5 +16,12 @@
 
 #menu.horizontal ul li {
   float: left;
-  margin-left: 5px;
+  margin-right: 5px;
+  padding: 3px;
+  color: #FFF;
+  background: #000;
+}
+
+.tables {
+  width: 100% !important;
 }
