@@ -1,5 +1,6 @@
 .menu-title {
-  display: none;
+  display: inline-block;
+  float: right;
 }
 
 #menu {
