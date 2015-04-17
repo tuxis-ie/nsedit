@@ -19,9 +19,11 @@ if (!isset($apiproto) or !preg_match('/^http(s)?$/', $apiproto)) {
     $blocklogin = TRUE;
 }
 
-if (!isset($apisslverify) or !preg_match('/^[01]$/', $apisslverify)) {
+if (!isset($apisslverify)) {
     $errormsg = "The value for \$apisslverify is incorrect in your config. Did you configure it?";
     $blocklogin = TRUE;
+} else {
+    $apisslverify = ( bool ) $apisslverify;
 }
 
 if (!isset($authdb)) {
