@@ -21,10 +21,11 @@
 
 #menu.horizontal ul li {
   float: left;
-  margin-right: 5px;
+  margin: 0;
 }
 
 #menu.horizontal ul li a{
+  margin-left: 5px;
   padding: 6px;
   color: #FFF;
   background: #000;
