@@ -11,7 +11,7 @@ if (!is_csrf_safe()) {
 }
 
 function api_request($path, $opts = null, $type = null) {
-    global $apisid, $apiuser, $apipass, $apiip, $apiport, $authmethod;
+    global $apiproto, $apisslverify, $apisid, $apiuser, $apipass, $apiip, $apiport, $authmethod;
 
     $url = "$apiproto://$apiip:$apiport${path}";
 
