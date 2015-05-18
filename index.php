@@ -561,18 +561,23 @@ $(document).ready(function () {
                                         title: 'Type',
                                         width: '2%',
                                         options: function() {
-/*
                                             zonename = new String(zone.record.name);
                                             if (zonename.match(/(\.in-addr|\.ip6)\.arpa/)) {
                                                 return {
-                                                    'PTR':'PTR',
-                                                    'NS':'NS',
-                                                    'MX':'MX',
-                                                    'TXT':'TXT',
-                                                    'SOA':'SOA'
+                                                    'PTR': 'PTR',
+                                                    'NS': 'NS',
+                                                    'MX': 'MX',
+                                                    'TXT': 'TXT',
+                                                    'SOA': 'SOA',
+                                                    'A': 'A',
+                                                    'AAAA': 'AAAA',
+                                                    'CNAME': 'CNAME',
+                                                    'NAPTR': 'NAPTR',
+                                                    'SPF': 'SPF',
+                                                    'SRV': 'SRV',
+                                                    'TLSA': 'TLSA',
                                                 };
                                             }
-*/
                                             return {
                                                 'A': 'A',
                                                 'AAAA': 'AAAA',
