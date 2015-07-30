@@ -1,0 +1,50 @@
+.menu-title {
+  display: block;
+  float: left;
+  padding: 0;
+  margin: 0;
+}
+
+#menu {
+  border: none;
+}
+
+#menu.horizontal {
+  width: 100%;
+  display: inline-block;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #DDD;
+}
+
+#menu.horizontal ul {
+  padding: 0;
+  margin: 0;
+  float: right;
+}
+
+#menu.horizontal ul li {
+  float: left;
+  margin: 0;
+}
+
+#menu.horizontal ul li a{
+  margin-left: 5px;
+  padding: 6px;
+  color: #FFF;
+  background: #000;
+  border-radius: 8px 8px 0px 0px;
+  display: inline-block;
+}
+
+#menu.horizontal ul li a:hover {
+  background: #1C78DE;
+}
+
+#menu div.jtable-title-text {
+  line-height: inherit !important;
+  color: #1C78DE;
+}
+
+.tables {
+  width: 100% !important;
+}
