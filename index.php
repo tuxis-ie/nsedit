@@ -26,7 +26,7 @@ if (!is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "lo
     <link href="jquery-ui/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css"/>
     <link href="jtable/lib/themes/metro/blue/jtable.min.css" rel="stylesheet" type="text/css"/>
     <link href="css/base.css" rel="stylesheet" type="text/css"/>
-    <?php if ($menutype === horizontal) { ?>
+    <?php if ($menutype === 'horizontal') { ?>
     <link href="css/horizontal-menu.css" rel="stylesheet" type="text/css"/>
     <?php } ?>
     <script src="jquery-ui/jquery-1.10.2.js" type="text/javascript"></script>
@@ -103,7 +103,7 @@ if ($blocklogin === TRUE) {
 <div id="wrap">
     <div id="dnssecinfo">
     </div>
-    <div id="menu" class="jtable-main-container <?php if ($menutype === horizontal) { ?>horizontal<?php } ?>">
+    <div id="menu" class="jtable-main-container <?php if ($menutype === 'horizontal') { ?>horizontal<?php } ?>">
         <div class="jtable-title menu-title">
             <div class="jtable-title-text">
                 NSEdit!

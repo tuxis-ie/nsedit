@@ -55,4 +55,4 @@ $defaults['secondaryns'] = 'unconfigured.secondaryns';  # The value of the secon
 $defaults['ttl']         = 3600;                        # Default TTL for records
 
 ## UI Options
-$menutype = horizontal; # horizontal|vertical - use a horizontal or vertical menu
+$menutype = 'horizontal'; # horizontal|vertical - use a horizontal or vertical menu
