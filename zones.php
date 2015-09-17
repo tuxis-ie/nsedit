@@ -302,7 +302,7 @@ function compareName($a, $b) {
 }
 
 function zone_compare($a, $b) {
-    if ($cmp = compareName($a['name'], $b['name'])) return $cmp;
+    if ($cmp = strnatcasecmp($a['name'], $b['name'])) return $cmp;
     return 0;
 }
 
