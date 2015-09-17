@@ -604,8 +604,8 @@ case "editrecord":
 
     $record = make_record($zone, $_POST);
 
-    if ($record['name'] !== $old_record['name']) {
-        # rename:
+    if ($record['name'] !== $old_record['name'] || $record['type'] !== $old_record['type']) {
+        # rename or retype:
         $newRecords = get_records_by_name_type($zone, $record['name'], $record['type']);
         array_push($newRecords, $record);
         update_records($zone, $old_record, $records); # remove from old list
