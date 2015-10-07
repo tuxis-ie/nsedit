@@ -16,10 +16,10 @@ RUN apt-get -y update && \
     mkdir /app && \
     git clone https://github.com/tuxis-ie/nsedit.git /app/nsedit && \
     cp /app/nsedit/includes/config.inc.php-dist /app/nsedit/includes/config.inc.php && \
-    's/\$apipass = \'\'/\$apipass = \'$PDNSAPIPWD\'/' -i /app/nsedit/includes/config.inc.php && \
-    's/\$apiip   = \'\'/\$apiip = \'$PDNSAPIIP\'/' -i /app/nsedit/includes/config.inc.php && \
-    's/\$apiport = \'\'/\$apiport = \'$PDNSAPIPORT\'/' -i /app/nsedit/includes/config.inc.php && \
-    's/\$authdb  = \"\.\.\/etc\/pdns\.users\.sqlite3\"/\$authdb  = \"\/app\/pdns\.users\.sqlite3\"/' -i /app/nsedit/includes/config.inc.php
+    sed "s/\$apipass = ''/\$apipass = '$PDNSAPIPWD'/" -i /app/nsedit/includes/config.inc.php && \
+    sed "s/\$apiip   = ''/\$apiip = '$PDNSAPIIP'/" -i /app/nsedit/includes/config.inc.php && \
+    sed "s/\$apiport = ''/\$apiport = '$PDNSAPIPORT'/" -i /app/nsedit/includes/config.inc.php && \
+    sed "s/\$authdb  = \"\.\.\/etc\/pdns\.users\.sqlite3\"/\$authdb  = \"\/app\/pdns\.users\.sqlite3\"/" -i /app/nsedit/includes/config.inc.php
   
 # Define working directory.
 VOLUME /app/nsedit
