@@ -14,7 +14,7 @@ ENV PDNSAPIPORT 8081
 RUN apt-get -y update && \
     apt-get -y install curl git-core php5-cli php5-curl php5-json php5-sqlite && \
     mkdir /app && \
-    git clone https://github.com/tuxis-ie/nsedit.git /app/nsedit && \
+    git clone --recursive https://github.com/tuxis-ie/nsedit.git /app/nsedit && \
     cp /app/nsedit/includes/config.inc.php-dist /app/nsedit/includes/config.inc.php && \
     sed "s/\$apipass = ''/\$apipass = '$PDNSAPIPWD'/" -i /app/nsedit/includes/config.inc.php && \
     sed "s/\$apiip   = ''/\$apiip = '$PDNSAPIIP'/" -i /app/nsedit/includes/config.inc.php && \
