@@ -12,7 +12,7 @@ ENV PDNSAPIPORT 8081
 
 # Update and Upgrade system
 RUN apt-get -y update && \
-    apt-get -y install curl nginx php5-cli php5-curl php5-json libsqlite3-0 && \
+    apt-get -y install curl git-core php5-cli php5-curl php5-json libsqlite3-0 && \
     mkdir /app && \
     git clone https://github.com/tuxis-ie/nsedit.git /app/nsedit && \
     cp /app/nsedit/includes/config.inc.php-dist /app/nsedit/includes/config.inc.php && \
