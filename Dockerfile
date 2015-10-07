@@ -1,5 +1,11 @@
 FROM debian:jessie
 MAINTAINER Yury Evtikhov <yury@evtikhov.info>
+#
+# This Dockerfile is intended only for test/development use.
+# It will be a really BAD idea to use it for production or public services.
+# 
+
+
 
 ENV DEBIAN_FRONTEND noninteractive
 
