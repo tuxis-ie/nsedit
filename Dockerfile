@@ -4,7 +4,7 @@ MAINTAINER Yury Evtikhov <yury@evtikhov.info>
 ENV DEBIAN_FRONTEND noninteractive
 
 #
-# Please set the following variables befor building:
+# Please set the following variables before building:
 #
 ENV PDNSAPIPWD mypowerdnsapipassword
 ENV PDNSAPIIP 192.168.1.2
@@ -19,7 +19,7 @@ RUN apt-get -y update && \
     's/\$apipass = \'\'/\$apipass = \'$PDNSAPIPWD\'/' -i /app/nsedit/includes/config.inc.php && \
     's/\$apiip   = \'\';/\$apiip = \'$PDNSAPIIP\'/' -i /app/nsedit/includes/config.inc.php && \
     's/\$apiport = \'\'/\$apiport = \'$PDNSAPIPORT\'/' -i /app/nsedit/includes/config.inc.php && \
-    's/\$authdb  = \"\.\.\/etc\/pdns\.users\.sqlite3\"/\\$authdb  = \"/app/pdns\.users\.sqlite3\"/' -i /app/nsedit/includes/config.inc.php
+    's/\$authdb  = \"\.\.\/etc\/pdns\.users\.sqlite3\"/\$authdb  = \"/app/pdns\.users\.sqlite3\"/' -i /app/nsedit/includes/config.inc.php
   
 # Define working directory.
 VOLUME /app/nsedit
