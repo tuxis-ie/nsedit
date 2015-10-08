@@ -152,6 +152,7 @@ function make_record($zone, $input) {
     $disabled = (bool) (isset($input['disabled']) && $input['disabled']);
 
     $content = isset($input['content']) ? $input['content'] : '';
+    $priority = isset($input['priority']) ? $input['priority'] : '';
 
     if ($type === 'TXT') {
         # empty TXT records are ok, otherwise require surrounding quotes: "..."
@@ -176,7 +177,8 @@ function make_record($zone, $input) {
         'type' => $type,
         'name' => $name,
         'ttl'  => $ttl,
-        'content'   => $content);
+        'content'   => $content,
+        'priority' => $priority) ;
 }
 
 function update_records($zone, $name_and_type, $inputs) {
