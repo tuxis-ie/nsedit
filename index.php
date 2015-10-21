@@ -20,70 +20,96 @@ if (!is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "lo
 
 ?>
 <!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <html>
 <head>
-    <title>NSEdit!</title>
-    <link href="jquery-ui/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css"/>
-    <link href="jtable/lib/themes/metro/blue/jtable.min.css" rel="stylesheet" type="text/css"/>
-    <link href="css/base.css" rel="stylesheet" type="text/css"/>
-    <?php if ($menutype === horizontal) { ?>
-    <link href="css/horizontal-menu.css" rel="stylesheet" type="text/css"/>
-    <?php } ?>
-    <script src="jquery-ui/jquery-1.10.2.js" type="text/javascript"></script>
-    <script src="jquery-ui/ui/jquery.ui.core.js" type="text/javascript"></script>
-    <script src="jquery-ui/ui/jquery.ui.widget.js" type="text/javascript"></script>
-    <script src="jquery-ui/ui/jquery.ui.mouse.js" type="text/javascript"></script>
-    <script src="jquery-ui/ui/jquery.ui.draggable.js" type="text/javascript"></script>
-    <script src="jquery-ui/ui/jquery.ui.position.js" type="text/javascript"></script>
-    <script src="jquery-ui/ui/jquery.ui.button.js" type="text/javascript"></script>
-    <script src="jquery-ui/ui/jquery.ui.resizable.js" type="text/javascript"></script>
-    <script src="jquery-ui/ui/jquery.ui.dialog.js" type="text/javascript"></script>
-    <script src="jtable/lib/jquery.jtable.min.js" type="text/javascript"></script>
-    <script src="js/addclear/addclear.js" type="text/javascript"></script>
+	<title>NSEdit!</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<link rel="stylesheet" href="theme/css/dtsi.css">
+	<link rel="stylesheet" href="theme/fnd5/css/foundation.css">
+	<script src="theme/fnd5/js/vendor/modernizr.js"></script>
+	<link href="jquery-ui/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css"/>
+        <link href="jtable/lib/themes/metro/blue/jtable.min.css" rel="stylesheet" type="text/css"/>
+	<link href="css/base.css" rel="stylesheet" type="text/css"/>
+	<script src="jquery-ui/jquery-1.10.2.js" type="text/javascript"></script>
+	<script src="jquery-ui/ui/jquery.ui.core.js" type="text/javascript"></script>
+	<script src="jquery-ui/ui/jquery.ui.widget.js" type="text/javascript"></script>
+	<script src="jquery-ui/ui/jquery.ui.mouse.js" type="text/javascript"></script>
+	<script src="jquery-ui/ui/jquery.ui.draggable.js" type="text/javascript"></script>
+	<script src="jquery-ui/ui/jquery.ui.position.js" type="text/javascript"></script>
+	<script src="jquery-ui/ui/jquery.ui.button.js" type="text/javascript"></script>
+	<script src="jquery-ui/ui/jquery.ui.resizable.js" type="text/javascript"></script>
+	<script src="jquery-ui/ui/jquery.ui.dialog.js" type="text/javascript"></script>
+	<script src="jtable/lib/jquery.jtable.min.js" type="text/javascript"></script>
+	<script src="js/addclear/addclear.js" type="text/javascript"></script>
 </head>
 
 <?php
-if (!is_logged_in()) {
+	if (!is_logged_in()) {
 ?>
 <body onload="document.getElementById('username').focus()">
-<div class="loginblock">
-    <div class="logo">
-        <img src="https://www.tuxis.nl/uploads/images/nsedit.png" alt="Logo"/>
-    </div>
-    <div class="login">
-        <?php if (isset($errormsg)) {
-            echo '<span style="color: red">' . $errormsg . '</span><br />';
-        }
-        ?>
-        <form action="index.php" method="post">
-            <table>
-                <tr>
-                    <td class="label">Username:</td>
-                    <td><input id="username" type="text" name="username"></td>
-                </tr>
-                <tr>
-                    <td class="label">Password:</td>
-                    <td><input type="password" name="password"></td>
-                </tr>
-                <?php
-                if (isset($secret) && $secret) {
-                ?>
-                <tr>
-                    <td class="label">Remember me:</td>
-                    <td><input type="checkbox" name="autologin" value="1"></td>
-                </tr>
-                <?php
-                }
-                ?>
-                <tr>
-                    <td></td>
-                    <td><input type="submit" name="submit" value="Log me in!" <?php if ($blocklogin === TRUE) { echo "disabled"; }; ?>></td>
-                </tr>
-            </table>
-            <input type="hidden" name="formname" value="loginform">
-        </form>
-    </div>
+<!--<nav class="top-bar" data-topbar role="navigation">
+	<ul class="title-area">
+		<li class="name">
+			<h2><a href="#">NSEdit!</a></h1>
+		</li>
+	</ul>
+</nav>-->
+
+
+<div class="row">
+	
+	<div class="large-12 columns">
+		<?php if (isset($errormsg)) { echo '<div data-alert class="alert-box alert">' . $errormsg . '<a href="#" class="close">&times;</a></div>'; }	?>
+	</div>
+
+	<div class="large-6 large-centered columns">
+		<div class="login-box">
+			<div class="row">
+				<div class="large-12 columns">
+					<form action="index.php" method="post">
+						<div class="row">
+							<div class="large-12 columns">
+								<p class="text-center"><img src="https://www.powerdns.com/img/powerdns-logo-220px.png"/></p>
+							</div>
+						</div>
+						<div class="row">
+							<div class="large-12 columns">
+							<input id="username" type="text" name="username" placeholder="Username">
+							</div>
+						</div>
+						<div class="row">
+							<div class="large-12 columns">
+							<input type="password" name="password" placeholder="Password">
+							</div>
+						</div>
+						<div class="row">
+							<div class="large-12 large-centered columns">
+							<input type="submit" class="button expand" <?php if ($blocklogin == TRUE) { echo "disabled"; }; ?> value="Log In"/>
+							</div>
+						</div>
+						<?php if (isset($secret) && $secret) { ?>
+						<div class="row">
+							<div class="large-12 large-centered columns">
+							<input id="autologin" type="checkbox" value="1"><label for="autologin">Remember me</label>
+							</div>
+							<?php } ?>
+						</div>
+						<input type="hidden" name="formname" value="loginform">
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	
 </div>
+		<script src="theme/fnd5/js/vendor/jquery.js"></script>
+		<script src="theme/fnd5/js/foundation.min.js"></script>
+		<script>
+			$(document).foundation();
+		</script>
 </body>
 </html>
 
@@ -100,33 +126,50 @@ if ($blocklogin === TRUE) {
 
 ?>
 <body>
-<div id="wrap">
-    <div id="dnssecinfo">
-    </div>
-    <div id="menu" class="jtable-main-container <?php if ($menutype === horizontal) { ?>horizontal<?php } ?>">
-        <div class="jtable-title menu-title">
-            <div class="jtable-title-text">
-                NSEdit!
-            </div>
-        </div>
-        <ul>
-            <li><a href="#" id="zoneadmin">Zones</a></li>
-            <?php if (is_adminuser()) { ?>
-                <li><a href="#" id="useradmin">Users</a></li>
-            <?php } ?>
-            <li><a href="index.php?logout=1">Logout</a></li>
-        </ul>
-    </div>
+<nav class="top-bar" data-topbar role="navigation">
+	<ul class="title-area">
+		<li class="name">
+			<h2><a href="#">NSEdit!</a></h1>
+		</li>
+		<!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+		<li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+	</ul>
+
+	<section class="top-bar-section">
+		<!-- Right Nav Section -->
+		<ul class="right">
+			<!-- <?php if (is_adminuser() or $allowzoneadd === TRUE) { ?><li><a href=# id="ImportZone">Import Zone</a></li><?php } ?> -->
+			<li><a href="#" id="zoneadmin">Zones</a></li>
+			<?php if (is_adminuser()) { ?><li><a href="#" id="useradmin">Users</a></li><?php } ?>
+			<li><a href="index.php?logout=1">Logout</a></li>
+		</ul>
+
+		<!-- Left Nav Section -->
+		<ul class="left">
+			<li class="has-form">
+				<div class="row collapse">
+					<div class="large-8 small-9 columns">
+						<input id="domsearch" type="text" name="domsearch" placeholder="Search...">
+					</div>
+					<div class="large-4 small-3 columns">
+						<a href="#" class="alert button expand">Search</a>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</section>
+</nav>
+
+
     <div id="zones">
         <?php if (is_adminuser() or $allowzoneadd === TRUE) { ?>
         <div style="visibility: hidden;" id="ImportZone"></div>
         <?php } ?>
         <div class="tables" id="MasterZones">
-            <div class="searchbar" id="searchbar">
-                <input type="text" id="domsearch" name="domsearch" placeholder="Search...."/>
-            </div>
         </div>
+        <?php if ($showslavezones === TRUE) { ?>
         <div class="tables" id="SlaveZones"></div>
+        <?php } ?>
     </div>
     <?php if (is_adminuser()) { ?>
         <div id="users">
@@ -134,6 +177,7 @@ if ($blocklogin === TRUE) {
         </div>
     <?php } ?>
 </div>
+
 <script type="text/javascript">
 window.csrf_token = '<?php echo CSRF_TOKEN ?>';
 
@@ -564,18 +608,23 @@ $(document).ready(function () {
                                         title: 'Type',
                                         width: '2%',
                                         options: function() {
-/*
                                             zonename = new String(zone.record.name);
                                             if (zonename.match(/(\.in-addr|\.ip6)\.arpa/)) {
                                                 return {
-                                                    'PTR':'PTR',
-                                                    'NS':'NS',
-                                                    'MX':'MX',
-                                                    'TXT':'TXT',
-                                                    'SOA':'SOA'
+                                                    'PTR': 'PTR',
+                                                    'NS': 'NS',
+                                                    'MX': 'MX',
+                                                    'TXT': 'TXT',
+                                                    'SOA': 'SOA',
+                                                    'A': 'A',
+                                                    'AAAA': 'AAAA',
+                                                    'CNAME': 'CNAME',
+                                                    'NAPTR': 'NAPTR',
+                                                    'SPF': 'SPF',
+                                                    'SRV': 'SRV',
+                                                    'TLSA': 'TLSA',
                                                 };
                                             }
-*/
                                             return {
                                                 'A': 'A',
                                                 'AAAA': 'AAAA',
