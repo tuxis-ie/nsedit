@@ -1,0 +1,23 @@
+body, html {
+		margin: 0 !important;
+		padding: 0 !important;
+}
+
+body {
+		background: #F0F0F3 !important;
+}
+
+.login-box {
+		background: #fff;
+		border: 1px solid #ddd; 
+		margin: 100px 0;
+		padding: 40px 20px 0 20px;
+}
+
+.tables {
+		width: 100% !important;
+}
+
+td .jtable-main-container {
+		margin: 0 !important
+}
