@@ -56,3 +56,4 @@ $defaults['ttl']         = 3600;                        # Default TTL for record
 
 ## UI Options
 $menutype = horizontal; # horizontal|vertical - use a horizontal or vertical menu
+$showslavezones = TRUE; # TRUE|FALSE - show|hide the slave zones
