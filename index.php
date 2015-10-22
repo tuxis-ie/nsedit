@@ -27,7 +27,7 @@ if (!is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "lo
 	<title>NSEdit!</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<link rel="stylesheet" href="theme/css/dtsi.css">
+	<link rel="stylesheet" href="theme/css/main.css">
 	<link rel="stylesheet" href="theme/fnd5/css/foundation.css">
 	<script src="theme/fnd5/js/vendor/modernizr.js"></script>
 	<link href="jquery-ui/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css"/>
