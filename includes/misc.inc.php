@@ -31,6 +31,14 @@ if (!isset($authdb)) {
     $blocklogin = TRUE;
 }
 
+if (isset($defaults['primaryns'])) {
+    $errormsg = "You should reconfigure your \$defaults['primaryns'] settings to use <code>\$defaults['ns'][0]</code>. We converted if for you now.";
+    $defaults['ns'][] = $defaults['primaryns'];
+    if (isset($defaults['secondaryns'])) {
+        $defaults['ns'][] = $defaults['secondaryns'];
+    }
+}
+
 /* No need to change stuf below */
 
 if (function_exists('curl_init') === FALSE) {

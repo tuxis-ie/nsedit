@@ -452,11 +452,10 @@ case "create":
         );
 
     $nameservers = array();
-    if (isset($_POST['nameserver1']) && $_POST['nameserver1'] != null) {
-        array_push($nameservers, $_POST['nameserver1']);
-    }
-    if (isset($_POST['nameserver2']) && $_POST['nameserver2'] != null) {
-        array_push($nameservers, $_POST['nameserver2']);
+    foreach($_POST['nameserver'] as $ns) {
+        if (isset($ns) && !empty($ns)) {
+            array_push($nameservers, $ns);
+        }
     }
 
     if ($zonekind != "Slave") {
@@ -653,6 +652,18 @@ case "gettemplatenameservers":
             }
         }
         echo "";
+    }
+    break;
+case "getformnameservers":
+    $inputs = array();
+    foreach (user_template_list() as $template) {
+        if ($template['name'] !== $_GET['template']) continue;
+        foreach ($template['records'] as $record) {
+            if ($record['type'] == "NS" and array_search($record['content'], $inputs) === false) {
+		array_push($inputs, $record['content']);
+                echo '<input type="text" name="nameserver[]" value="'.$record['content'].'" readonly /><br />';
+            }
+        }
     }
     break;
 default:
