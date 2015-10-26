@@ -453,53 +453,27 @@ $(document).ready(function () {
                 edit: false,
                 inputClass: 'template'
             },
-            nameserver1: {
-                title: 'Pri. Nameserver',
+            nameserver: {
+                title: 'Nameservers',
                 create: true,
                 list: false,
                 edit: false,
                 input: function(data) {
                     var $template = data.form.find('#Edit-template');
-                    var $elem = $('<input type="text" name="nameserver1" />');
-                    $elem.val(<?php echo "'".$defaults['primaryns']."'"; ?>);
+                    var ns_form = '<?php foreach($defaults['ns'] as $ns) echo '<input type="text" name="nameserver[]" value="'.$ns.'" /><br />'; ?>';
+                    var $elem = $('<div id="nameservers">' + ns_form + '</div>');
                     $template.change(function() {
-                        $.get('zones.php?action=gettemplatenameservers&template='+$template.val()+'&prisec=pri', function(getdata) {
+                        $.get('zones.php?action=getformnameservers&template='+$template.val(), function(getdata) {
                             if (getdata != "") {
-                                $elem.val(getdata);
-                                $elem.attr('readonly', true);
+				$("#nameservers").html(getdata);
                             } else {
-                                $elem.val(<?php echo "'".$defaults['primaryns']."'"; ?>);
-                                $elem.attr('readonly', false);
+                                $("#nameservers").html(ns_form);
                             }
                         });
                     });
                     return $elem;
                 },
                 inputClass: 'nameserver nameserver1'
-            },
-            nameserver2: {
-                title: 'Sec. Nameserver',
-                create: true,
-                list: false,
-                edit: false,
-                input: function(data) {
-                    var $template = data.form.find('#Edit-template');
-                    var $elem = $('<input type="text" name="nameserver2" />');
-                    $elem.val(<?php echo "'".$defaults['secondaryns']."'"; ?>);
-                    $template.change(function() {
-                        $.get('zones.php?action=gettemplatenameservers&template='+$template.val()+'&prisec=sec', function(getdata) {
-                            if (getdata != "") {
-                                $elem.val(getdata);
-                                $elem.attr('readonly', true);
-                            } else {
-                                $elem.val(<?php echo "'".$defaults['secondaryns']."'"; ?>);
-                                $elem.attr('readonly', false);
-                            }
-                        });
-                    });
-                    return $elem;
-                },
-                inputClass: 'nameserver nameserver2'
             },
             serial: {
                 title: 'Serial',
@@ -679,21 +653,17 @@ $(document).ready(function () {
                 defaultValue: 1,
                 inputClass: 'overwrite_namerserver'
             },
-            nameserver1: {
-                title: 'Pri. Nameserver',
+            nameserver: {
+                title: 'Nameservers',
                 create: true,
                 list: false,
                 edit: false,
-                defaultValue: '<?php echo $defaults['primaryns']; ?>',
+                input: function(data) {
+                    var ns_form = '<?php foreach($defaults['ns'] as $ns) echo '<input type="text" name="nameserver[]" value="'.$ns.'" /><br />'; ?>';
+                    var $elem = $('<div id="nameservers">' + ns_form + '</div>');
+                    return $elem;
+                },
                 inputClass: 'nameserver nameserver1'
-            },
-            nameserver2: {
-                title: 'Sec. Nameserver',
-                create: true,
-                list: false,
-                edit: false,
-                defaultValue: '<?php echo $defaults['secondaryns']; ?>',
-                inputClass: 'nameserver nameserver2'
             },
         },
         recordAdded: function() {
