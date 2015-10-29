@@ -41,6 +41,9 @@ function api_request($path, $opts = null, $type = null) {
     } else {
         curl_setopt($ch, CURLOPT_USERPWD, "$apiuser:$apipass");
     }
+    if ( strcasecmp( $apiproto, 'https' ) == 0 ) {
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $apisslverify);
+    }
     curl_setopt($ch, CURLOPT_URL, $url); 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
     if ($opts) {
