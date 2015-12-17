@@ -1,0 +1,8 @@
+There are several values in config.inc.php that you MUST set for the API to work.
+
+$apipass : The API password or API Authentication Key
+$apiip   : The IP on which the API is reachable
+$apiport : The port on which the API is reachable. Default port is 8081
+$apivers : The version of the API to use. In pre-PDNS 4.0, the API was
+ reachable via /. In 4.0, the path was changed to /api/v1. You do NOT set the path of the API, you set the version of the API. 0 is for pre 4.0, 1 is currently only used in 4.0.
+

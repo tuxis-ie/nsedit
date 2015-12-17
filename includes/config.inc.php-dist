@@ -4,6 +4,7 @@ $apiuser = '';           # The PowerDNS API username. Leave empty for authmethod
 $apipass = '';           # The PowerDNS API-user password or the PowerDNS-API key (see AUTHENTICATION)
 $apiip   = '';           # The IP of the PowerDNS API
 $apiport = '8081';       # The port of the PowerDNS API
+$apivers = 0;            # The version of the PowerDNS API. 0 == experimental, 1 = v1 (pdns 4.0)
 $apisid  = 'localhost';  # PowerDNS's :server_id
 $apiproto      = 'http'; # http | https
 $apisslverify  = FALSE;  # Verify SSL Certificate if using https for apiproto

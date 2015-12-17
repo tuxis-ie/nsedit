@@ -11,9 +11,9 @@ if (!is_csrf_safe()) {
 }
 
 function api_request($path, $opts = null, $type = null) {
-    global $apiproto, $apisslverify, $apisid, $apiuser, $apipass, $apiip, $apiport, $authmethod;
+    global $apiproto, $apisslverify, $apisid, $apiuser, $apipass, $apiip, $apiport, $authmethod, $apipath;
 
-    $url = "$apiproto://$apiip:$apiport${path}";
+    $url = "$apiproto://$apiip:$apiport${apipath}${path}";
 
     if ($authmethod == "auto") {
         $ad = curl_init();
