@@ -4,7 +4,7 @@ include('config.inc.php');
 
 $blocklogin = FALSE;
 
-if ((!isset($apipass) or empty($apipass)) or (!isset($apiip) or empty($apiip)) or (!isset($apiport) or empty($apiport)) or (!isset($apivers) or empty($apivers)) {
+if ((!isset($apipass) or empty($apipass)) or (!isset($apiip) or empty($apiip)) or (!isset($apiport) or empty($apiport)) or (!isset($apivers) or is_null($apivers))) {
     $errormsg = 'You need to configure your settings for the PowerDNS API. See <a href="doc/apiconf.txt">doc/apiconf.txt</a>';
     $blocklogin = TRUE;
 }

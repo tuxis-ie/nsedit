@@ -31,6 +31,7 @@ Requirements
 * A webserver running php
 * php sqlite3
 * php curl
+* php with openssl support
 * PowerDNS with the experimental JSON-api enabled (3.4.0 should do)
 
 Installing
