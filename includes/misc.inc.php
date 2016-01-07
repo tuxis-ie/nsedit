@@ -44,6 +44,11 @@ if (isset($defaults['primaryns'])) {
     }
 }
 
+if (!isset($logo) or empty($logo)) {
+    $logo = 'http://www.tuxis.nl/uploads/images/nsedit.png';
+}
+
+
 /* No need to change stuf below */
 
 if ($apivers == 0) {
