@@ -548,16 +548,19 @@ $(document).ready(function () {
                                                     'SOA': 'SOA',
                                                     'A': 'A',
                                                     'AAAA': 'AAAA',
+                                                    'CERT': 'CERT',
                                                     'CNAME': 'CNAME',
                                                     'NAPTR': 'NAPTR',
                                                     'SPF': 'SPF',
                                                     'SRV': 'SRV',
+                                                    'SSHFP': 'SSHFP',
                                                     'TLSA': 'TLSA',
                                                 };
                                             }
                                             return {
                                                 'A': 'A',
                                                 'AAAA': 'AAAA',
+                                                'CERT': 'CERT',
                                                 'CNAME': 'CNAME',
                                                 'MX': 'MX',
                                                 'NAPTR': 'NAPTR',
@@ -566,6 +569,7 @@ $(document).ready(function () {
                                                 'SOA': 'SOA',
                                                 'SPF': 'SPF',
                                                 'SRV': 'SRV',
+                                                'SSHFP': 'SSHFP',
                                                 'TLSA': 'TLSA',
                                                 'TXT': 'TXT',
                                             };
