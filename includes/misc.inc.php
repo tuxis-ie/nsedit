@@ -44,6 +44,11 @@ if (isset($defaults['primaryns'])) {
     }
 }
 
+if (!isset($logo) or empty($logo)) {
+    $logo = 'http://www.tuxis.nl/uploads/images/nsedit.png';
+}
+
+
 /* No need to change stuf below */
 
 if ($apivers == 0) {
@@ -61,6 +66,12 @@ if (class_exists('SQLite3') === FALSE) {
     $errormsg = "You need PHP SQLite3 to run nsedit";
     $blocklogin = TRUE;
 }
+ 
+if (function_exists('openssl_random_pseudo_bytes') === FALSE) {
+    $errormsg = "You need PHP compiled with openssl to run nsedit";
+    $blocklogin = TRUE;
+}
+
 
 $defaults['defaulttype'] = ucfirst(strtolower($defaults['defaulttype']));
 

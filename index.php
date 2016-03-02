@@ -48,7 +48,7 @@ if (!is_logged_in()) {
 <body onload="document.getElementById('username').focus()">
 <div class="loginblock">
     <div class="logo">
-        <img src="https://www.tuxis.nl/uploads/images/nsedit.png" alt="Logo"/>
+        <img src="<?php echo $logo ?>" alt="Logo"/>
     </div>
     <div class="login">
         <?php if (isset($errormsg)) {
@@ -548,17 +548,22 @@ $(document).ready(function () {
                                                     'SOA': 'SOA',
                                                     'A': 'A',
                                                     'AAAA': 'AAAA',
+                                                    'CERT': 'CERT',
                                                     'CNAME': 'CNAME',
+                                                    'LOC': 'LOC',
                                                     'NAPTR': 'NAPTR',
                                                     'SPF': 'SPF',
                                                     'SRV': 'SRV',
+                                                    'SSHFP': 'SSHFP',
                                                     'TLSA': 'TLSA',
                                                 };
                                             }
                                             return {
                                                 'A': 'A',
                                                 'AAAA': 'AAAA',
+                                                'CERT': 'CERT',
                                                 'CNAME': 'CNAME',
+                                                'LOC': 'LOC',
                                                 'MX': 'MX',
                                                 'NAPTR': 'NAPTR',
                                                 'NS': 'NS',
@@ -566,6 +571,7 @@ $(document).ready(function () {
                                                 'SOA': 'SOA',
                                                 'SPF': 'SPF',
                                                 'SRV': 'SRV',
+                                                'SSHFP': 'SSHFP',
                                                 'TLSA': 'TLSA',
                                                 'TXT': 'TXT',
                                             };
