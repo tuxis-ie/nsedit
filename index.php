@@ -18,6 +18,16 @@ if (!is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "lo
     }
 }
 
+if (is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "changepwform") {
+    if (get_sess_user() == $_POST['username']) {
+        if (!update_user(get_sess_user(), is_adminuser(), $_POST['password'])) {
+            $errormsg = "Unable to update password!\n";
+        }
+    } else {
+        $errormsg = "You can only update your own password!".$_POST['username'];
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -114,9 +124,14 @@ if ($blocklogin === TRUE) {
             <?php if (is_adminuser()) { ?>
                 <li><a href="#" id="useradmin">Users</a></li>
             <?php } ?>
+            <li><a href="#" id="aboutme">About me</a></li>
             <li><a href="index.php?logout=1">Logout</a></li>
         </ul>
     </div>
+    <?php if (isset($errormsg)) {
+        echo '<span style="color: red">' . $errormsg . '</span><br />';
+    }
+    ?>
     <div id="zones">
         <?php if (is_adminuser() or $allowzoneadd === TRUE) { ?>
         <div style="visibility: hidden;" id="ImportZone"></div>
@@ -129,10 +144,38 @@ if ($blocklogin === TRUE) {
         <div class="tables" id="SlaveZones"></div>
     </div>
     <?php if (is_adminuser()) { ?>
-        <div id="users">
-            <div class="tables" id="Users"></div>
-        </div>
+    <div id="users">
+        <div class="tables" id="Users"></div>
+    </div>
     <?php } ?>
+
+    <div id="AboutMe">
+        <div class="tables">
+            <p>Hi <?php echo get_sess_user(); ?>. You can change your password here.</p>
+
+            <form action="index.php" method="POST">
+                <table>
+                    <tr>
+                        <td class="label">Username:</td>
+                        <td><input readonly value="<?php echo get_sess_user(); ?>" id="username" type="text" name="username"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Password:</td>
+                        <td><input type="password" name="password" id="changepw1"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Password again:</td>
+                        <td><input type="password" name="password2" id="changepw2"></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><input type="submit" name="submit" id="changepwsubmit" value="Change password!"></td>
+                    </tr>
+                </table>
+                <input type="hidden" name="formname" value="changepwform">
+            </form>
+        </div>
+    </div>
 </div>
 <script type="text/javascript">
 window.csrf_token = '<?php echo CSRF_TOKEN ?>';
@@ -714,6 +757,14 @@ $(document).ready(function () {
 
     stimer = 0;
 
+    $('#changepw1, #changepw2').on('input', function(e) {
+        if ($('#changepw1').val() != $('#changepw2').val()) {
+            $('#changepwsubmit').prop("disabled",true);
+        } else {
+            $('#changepwsubmit').prop("disabled",false);
+        }
+    });
+
     $('#domsearch').on('input', function (e) {
         e.preventDefault();
         clearTimeout(stimer);
@@ -722,13 +773,22 @@ $(document).ready(function () {
 
     <?php if (is_adminuser()) { ?>
     $('#Users').hide();
+    $('#AboutMe').hide();
+    $('#aboutme').click(function () {
+        $('#Users').hide();
+        $('#MasterZones').hide();
+        $('#SlaveZones').hide();
+        $('#AboutMe').show();
+    });
     $('#useradmin').click(function () {
         $('#Users').show();
         $('#MasterZones').hide();
         $('#SlaveZones').hide();
+        $('#AboutMe').hide();
     });
     $('#zoneadmin').click(function () {
         $('#Users').hide();
+        $('#AboutMe').hide();
         $('#MasterZones').show();
         $('#SlaveZones').show();
     });
