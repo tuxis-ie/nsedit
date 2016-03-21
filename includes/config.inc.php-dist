@@ -54,6 +54,7 @@ $defaults['defaulttype'] = 'Master';                    # Choose between 'Native
 $defaults['ns'][0] = 'unconfigured.primaryns';          # The value of the first NS-record
 $defaults['ns'][1] = 'unconfigured.secondaryns';        # The value of the second NS-record
 $defaults['ttl']   = 3600;                              # Default TTL for records
+$defaults['disabled'] = false;                          # Default disabled state
 
 ## UI Options
 $menutype = 'horizontal'; # horizontal|vertical - use a horizontal or vertical menu

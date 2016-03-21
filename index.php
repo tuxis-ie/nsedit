@@ -346,6 +346,12 @@ $(document).ready(function () {
                                         width: '2%',
                                         display: displayContent('ttl'),
                                         listClass: 'ttl'
+                                    },
+                                    disabled: {
+                                        title: 'Disabled',
+                                        width: '2%',
+                                        display: displayContent('disabled'),
+                                        listClass: 'disabled'
                                     }
                                 }
                             }, function (data) {
@@ -597,7 +603,22 @@ $(document).ready(function () {
                                         defaultValue: '<?php echo $defaults['ttl']; ?>',
                                         inputClass: 'ttl',
                                         listClass: 'ttl'
-                                    }
+                                    },
+                                    disabled: {
+                                        title: 'Disabled',
+                                        width: '2%',
+                                        create: true,
+                                        display: displayContent('disabled'),
+                                        defaultValue: '<?php echo $defaults['disabled'] ? 'false' : 'true'; ?>',
+                                        inputClass: 'disabled',
+                                        listClass: 'disabled',
+                                        options: function() {
+                                            return {
+                                                '0': 'false',
+                                                '1': 'true',
+                                            };
+                                        },
+                                    },
                                 }
                             }, function (data) {
                                 data.childTable.jtable('load');
