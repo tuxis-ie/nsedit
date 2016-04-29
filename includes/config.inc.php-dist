@@ -58,4 +58,4 @@ $defaults['disabled'] = false;                          # Default disabled state
 
 ## UI Options
 $menutype = 'horizontal'; # horizontal|vertical - use a horizontal or vertical menu
-$logo = 'https://www.tuxis.nl/uploads/images/nsedit.png';
+$logo = 'img/nsedit.png';
