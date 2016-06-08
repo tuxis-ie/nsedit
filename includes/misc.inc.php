@@ -111,7 +111,7 @@ function get_db() {
 
 function get_all_users() {
     $db = get_db();
-    $r = $db->query('SELECT id, emailaddress, isadmin FROM users');
+    $r = $db->query('SELECT id, emailaddress, isadmin FROM users ORDER BY emailaddress');
     $ret = array();
     while ($row = $r->fetchArray(SQLITE3_ASSOC)) {
         array_push($ret, $row);
