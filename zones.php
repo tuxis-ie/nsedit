@@ -10,76 +10,133 @@ if (!is_csrf_safe()) {
     jtable_respond(null, 'error', "Authentication required");
 }
 
-function api_request($path, $opts = null, $type = null) {
-    global $apiproto, $apisslverify, $apisid, $apiuser, $apipass, $apiip, $apiport, $authmethod, $apipath;
+class ApiHandler {
+    public function __construct() {
+        global $apiip, $apiport, $apipass, $apiproto, $apisslverify;
 
-    $url = "$apiproto://$apiip:$apiport${apipath}${path}";
+        $this->headers = Array();
+        $this->hostname = $apiip;
+        $this->port = $apiport;
+        $this->auth = $apipass;
+        $this->proto = $apiproto;
+        $this->sslverify = $apisslverify;
+        $this->curlh = curl_init();
+        $this->method = FALSE;
+        $this->content = FALSE;
+        $this->apiurl = '';
+    }
 
-    if ($authmethod == "auto") {
-        $ad = curl_init();
+    public function addheader($field, $content) {
+        $this->headers[$field] = $content;
+    }
 
-        if ( strcasecmp( $apiproto, 'https' ) == 0 ) {
-            curl_setopt($ad, CURLOPT_SSL_VERIFYPEER, $apisslverify);
-        }
+    private function authheaders() {
+        $this->addheader('X-API-Key', $this->auth);
+    }
 
-        curl_setopt($ad, CURLOPT_HTTPHEADER, array('X-API-Key: '.$apipass));
-        curl_setopt($ad, CURLOPT_URL, "$apiproto://$apiip:$apiport/servers/localhost/statistics");
-        curl_setopt($ad, CURLOPT_RETURNTRANSFER, 1);
-        curl_exec($ad);
-        if (curl_getinfo($ad, CURLINFO_HTTP_CODE) == 401) {
-            $authmethod = 'userpass';
+    private function apiurl() {
+        $tmp = new ApiHandler();
+
+        $tmp->url = '/api';
+        $tmp->go();
+
+        if ($tmp->json[0]['version'] <= 1) {
+            $this->apiurl = $tmp->json[0]['url'];
         } else {
-            $authmethod = 'xapikey';
+            throw new Exception("Unsupported API version");
         }
+
     }
 
-    $headers = array();
-    array_push($headers, 'Accept: application/json');
-    $ch = curl_init();
-    if ($authmethod == "xapikey") {
-        array_push($headers, 'X-API-Key: '.$apipass);
-    } else {
-        curl_setopt($ch, CURLOPT_USERPWD, "$apiuser:$apipass");
-    }
-    if ( strcasecmp( $apiproto, 'https' ) == 0 ) {
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $apisslverify);
-    }
-    curl_setopt($ch, CURLOPT_URL, $url); 
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
-    if ($opts) {
-        if (!$type) {
-            $type = 'POST';
+    private function curlopts() {
+        $this->authheaders();
+        $this->addheader('Accept', 'application/json');
+
+        curl_setopt($this->curlh, CURLOPT_HTTPHEADER, Array());
+        curl_setopt($this->curlh, CURLOPT_RETURNTRANSFER, 1);
+
+        if (strcasecmp($this->proto, 'https')) {
+            curl_setopt($this->curlh, CURLOPT_SSL_VERIFYPEER, $this->sslverify);
         }
-        $postdata = json_encode($opts);
-        array_push($headers, 'Content-Type: application/json');
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata);
-    }
 
-    switch ($type) {
-    case 'DELETE':
-    case 'PATCH':
-    case 'PUT':
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $type);
-        break;
-    case 'POST':
-        break;
-    }
+        $setheaders = Array();
 
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    $return = curl_exec($ch);
-    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $json = json_decode($return, 1);
-
-    if (isset($json['error'])) {
-        jtable_respond(null, 'error', "API Error $code: ".$json['error']);
-    } elseif ($code < 200 || $code >= 300) {
-        if ($code == 401) {
-            $code = "Authentication failed. Have you configured your authmethod correct?";
+        foreach ($this->headers as $k => $v) {
+            array_push($setheaders, join(": ", Array($k, $v)));
         }
-        jtable_respond(null, 'error', "API Error: $code");
+        curl_setopt($this->curlh, CURLOPT_HTTPHEADER, $setheaders);
     }
-    return $json;
+
+    private function baseurl() {
+        return $this->proto.'://'.$this->hostname.':'.$this->port.$this->apiurl;
+    }
+
+    private function go() {
+        if ($this->content) {
+            $this->addheader('Content-Type', 'application/json');
+            curl_setopt($this->curlh, CURLOPT_POST, 1);
+            curl_setopt($this->curlh, CURLOPT_POSTFIELDS, $this->content);
+        }
+
+        switch ($this->method) {
+            case 'DELETE':
+            case 'PATCH':
+            case 'PUT':
+                curl_setopt($this->curlh, CURLOPT_CUSTOMREQUEST, $this->method);
+                break;
+            case 'POST':
+                break;
+        }
+
+        curl_setopt($this->curlh, CURLOPT_URL, $this->baseurl().$this->url);
+
+        $this->curlopts();
+
+        $return = curl_exec($this->curlh);
+        $code = curl_getinfo($this->curlh, CURLINFO_HTTP_CODE);
+        $json = json_decode($return, 1);
+
+        if (isset($json['error'])) {
+            throw new Exception("API Error $code: ".$json['error']);
+        } elseif ($code < 200 || $code >= 300) {
+            if ($code == 401) {
+                throw new Exception("Authentication failed. Have you configured your authmethod correct?");
+            }
+            throw new Exception("Curl Error: $code ".curl_error($this->curlh));
+        }
+
+        $this->json = $json;
+    }
+
+    public function call() {
+        if (empty($this->apiurl) and substr($this->url, 0, 1) == '/') {
+            $this->apiurl();
+        } else {
+            $this->apiurl = '/';
+        }
+
+        $this->go();
+    }
+}
+
+
+function api_request($path, $opts = null, $type = null) {
+    try {
+        $myapi = new ApiHandler();
+        if ($type) {
+            $myapi->method = $type;
+        };
+        $myapi->url = $path;
+        if ($opts) {
+            $myapi->content = json_encode($opts);
+        }
+
+        $myapi->call();
+
+        return $myapi->json;
+    } catch (Exception $e) {
+        jtable_respond(null, 'error', $e->getMessage());
+    }
 }
 
 function zones_api_request($opts = null, $type = 'POST') {
@@ -150,7 +207,6 @@ function make_record($zone, $input) {
         $name = $name . '.' . $zone['name'];
     }
 
-    $ttl = (int) ((isset($input['ttl']) && $input['ttl']) ? $input['ttl'] : $defaults['ttl']);
     $type = isset($input['type']) ? $input['type'] : '';
     $disabled = (bool) (isset($input['disabled']) && $input['disabled']);
 
@@ -178,7 +234,6 @@ function make_record($zone, $input) {
         'disabled' => $disabled,
         'type' => $type,
         'name' => $name,
-        'ttl'  => $ttl,
         'content'   => $content);
 }
 
@@ -203,6 +258,7 @@ function update_records($zone, $name_and_type, $inputs) {
         jtable_respond(null, 'error', "Please only use [a-z0-9_/.-]");
     }
 
+
     $patch = array(
         'rrsets' => array(array(
             'name' => $name,
@@ -217,11 +273,13 @@ function create_record($zone, $input) {
     $record = make_record($zone, $input);
     $records = get_records_by_name_type($zone, $record['name'], $record['type']);
     array_push($records, $record);
+    $ttl = (int) ((isset($input['ttl']) && $input['ttl']) ? $input['ttl'] : $defaults['ttl']);
 
     $patch = array(
         'rrsets' => array(array(
             'name' => $record['name'],
             'type' => $record['type'],
+            'ttl' => $ttl,
             'changetype' => 'REPLACE',
             'records' => $records)));
 
