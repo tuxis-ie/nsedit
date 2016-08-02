@@ -4,18 +4,8 @@ include('config.inc.php');
 
 $blocklogin = FALSE;
 
-if ((!isset($apipass) or empty($apipass)) or (!isset($apiip) or empty($apiip)) or (!isset($apiport) or empty($apiport)) or (!isset($apivers) or is_null($apivers))) {
+if ((!isset($apipass) or empty($apipass)) or (!isset($apiip) or empty($apiip)) or (!isset($apiport) or empty($apiport))) {
     $errormsg = 'You need to configure your settings for the PowerDNS API. See <a href="doc/apiconf.txt">doc/apiconf.txt</a>';
-    $blocklogin = TRUE;
-}
-
-if (!preg_match('/^[01]$/', $apivers)) {
-    $errormsg = "The value for \$apivers is incorrect your config";
-    $blocklogin = TRUE;
-}
-
-if (!isset($authmethod) or !preg_match('/^(xapikey|userpass|auto)$/', $authmethod)) {
-    $errormsg = "The value for \$authmethod is incorrect in your config";
     $blocklogin = TRUE;
 }
 
@@ -50,12 +40,6 @@ if (!isset($logo) or empty($logo)) {
 
 
 /* No need to change stuf below */
-
-if ($apivers == 0) {
-    $apipath = "";
-} elseif ($apivers == 1) {
-    $apipath = "/api/v1";
-}
 
 if (function_exists('curl_init') === FALSE) {
     $errormsg = "You need PHP Curl to run nsedit";

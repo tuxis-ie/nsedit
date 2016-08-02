@@ -1,23 +1,13 @@
 <?php
 
-$apiuser = '';           # The PowerDNS API username. Leave empty for authmethod='xapikey' (see AUTHENTICATION)
-$apipass = '';           # The PowerDNS API-user password or the PowerDNS-API key (see AUTHENTICATION)
+$apipass = '';           # The PowerDNS API-key
 $apiip   = '';           # The IP of the PowerDNS API
 $apiport = '8081';       # The port of the PowerDNS API
-$apivers = 0;            # The version of the PowerDNS API. 0 == experimental, 1 = v1 (pdns 4.0)
 $apisid  = 'localhost';  # PowerDNS's :server_id
 $apiproto      = 'http'; # http | https
 $apisslverify  = FALSE;  # Verify SSL Certificate if using https for apiproto
 $allowzoneadd  = FALSE;  # Allow normal users to add zones
 
-
-### AUTHENTICATION ###
-# The first versions of the PowerDNS API used the standard webserver password
-# for authentication, newer versions use an X-API-Key mechanism. NSEdit tries
-# to autodetect the method you should use, but that does affect performance.
-# For optimal performance, configure the right method.
-# (Should be 'auto', 'xapikey' or 'userpass')
-$authmethod = 'auto';
 
 # If you configure this, nsedit will try to authenticate via WeFact too.
 # Debtors will be added to the sqlitedatabase with their crypted password.
