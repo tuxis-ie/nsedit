@@ -144,6 +144,21 @@ class Zone {
         }
     }
 
+    public function rrsets2records() {
+        $ret = Array();
+
+        foreach ($this->rrsets as $rrset) {
+            foreach ($rrset->export_records() as $record) {
+                $record['name'] = $rrset['name'];
+                $record['ttl']  = $rrset['ttl'];
+                $record['type'] = $rrset['type'];
+            }
+            array_push($ret, $record);
+        }
+
+        return $ret;
+    }
+
     public function export() {
         $ret = Array();
         $ret['account'] = $this->account;
@@ -213,21 +228,6 @@ class RRSet {
     public function addComment($content, $account, $modified_at = false) {
         $comment = new Comment($content, $account, $modified_at);
         array_push($this->comments, $comment);
-    }
-
-    public function rrsets2records() {
-        $ret = Array();
-
-        foreach ($this->rrsets as $rrset) {
-            foreach ($rrset->export_records() as $record) {
-                $record['name'] = $rrset['name'];
-                $record['ttl']  = $rrset['ttl'];
-                $record['type'] = $rrset['type'];
-            }
-            array_push($ret, $record);
-        }
-
-        return $ret;
     }
 
     public function export() {

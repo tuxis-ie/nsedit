@@ -307,7 +307,7 @@ case "listslaves":
 
 case "listrecords":
     $zonedata = $api->loadzone($_GET['zoneid']);
-    $zone = new Zone()
+    $zone = new Zone();
     $zone->parse($zonedata);
     $records = $zone->rrsets2records();
     foreach ($records as &$record) {
