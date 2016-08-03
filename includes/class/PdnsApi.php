@@ -1,6 +1,6 @@
 <?php
 
-include_once('apihandler.php');
+include_once('ApiHandler.php');
 
 class PdnsAPI {
     public function __construct() {
@@ -84,7 +84,7 @@ class PdnsAPI {
         $ret = array();
         $api = clone $this->http;
         $api->method = 'GET';
-        $api->url = "/servers/localhost/zones/$zoneid/cryptokeys"
+        $api->url = "/servers/localhost/zones/$zoneid/cryptokeys";
 
         $api->call();
 

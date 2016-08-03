@@ -25,23 +25,28 @@ class Zone {
         $this->setaccount($data['account']);
         $this->setserial($data['serial']);
         $this->url = $data['url'];
-        $this->setsoaedit($data['soa_edit']);
-        $this->setsoaeditapi($data['soa_edit_api']);
+        if (isset($data['soa_edit']))
+            $this->setsoaedit($data['soa_edit']);
+        if (isset($data['soa_edit_api']))
+            $this->setsoaeditapi($data['soa_edit_api']);
 
         foreach ($data['masters'] as $master) {
             $this->addmaster($master);
         }
 
-        foreach ($data['rrsets'] as $rrset) {
-            $toadd = new RRSet($rrset['name'], $rrset['type']);
-            foreach ($rrset['comments'] as $comment) {
-                $toadd->addComment($comment['content'], $comment['account'], $comment['modified_at']);
+        if (isset($data['rrsets'])) {
+            foreach ($data['rrsets'] as $rrset) {
+                $toadd = new RRSet($rrset['name'], $rrset['type']);
+                foreach ($rrset['comments'] as $comment) {
+                    $toadd->addComment($comment['content'], $comment['account'], $comment['modified_at']);
+                }
+                foreach ($rrset['records'] as $record) {
+                    $toadd->addRecord($record['content'], $record['disabled']);
+                }
+                $toadd->setttl($rrset['ttl']);
+                array_push($this->rrsets, $toadd);
             }
-            foreach ($rrset['records'] as $record) {
-                $toadd->addRecord($record['content'], $record['disabled']);
-            }
-            $toadd->setttl($rrset['ttl']);
-            array_push($this->rrsets, $toadd);        }
+        }
     }
 
     public function setkeyinfo($info) {

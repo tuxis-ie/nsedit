@@ -1,6 +1,6 @@
 <?php
 
-include_once('../config.inc.php');
+include_once('includes/config.inc.php');
 
 class ApiHandler {
     public function __construct() {
@@ -89,11 +89,11 @@ class ApiHandler {
 
         curl_setopt($this->curlh, CURLOPT_URL, $this->baseurl().$this->url);
 
-        print "Here we go:\n";
-        print "Request: ".$this->method.' '.$this->baseurl().$this->url."\n";
-        if ($this->content != '') {
-            print "Content: ".$this->content."\n";
-        }
+        //print "Here we go:\n";
+        //print "Request: ".$this->method.' '.$this->baseurl().$this->url."\n";
+        //if ($this->content != '') {
+        //    print "Content: ".$this->content."\n";
+        //}
 
         $return = curl_exec($this->curlh);
         $code = curl_getinfo($this->curlh, CURLINFO_HTTP_CODE);

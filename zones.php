@@ -3,8 +3,8 @@
 include_once('includes/config.inc.php');
 include_once('includes/session.inc.php');
 include_once('includes/misc.inc.php');
-include_once('include/class/PdnsAPI.php');
-include_once('include/class/Zone.php');
+include_once('includes/class/PdnsApi.php');
+include_once('includes/class/Zone.php');
 
 if (!is_csrf_safe()) {
     header('Status: 403');
@@ -283,15 +283,18 @@ switch ($action) {
 
 case "list":
 case "listslaves":
+    $return = Array();
     $q = isset($_POST['domsearch']) ? $_POST['domsearch'] : false;
-    foreach ($api->listzones($q) as $zone) {
-        $zone->setaccount(get_zone_owner($zone['name'], 'admin'));
+    foreach ($api->listzones($q) as $sresult) {
+        $zone = new Zone();
+        $zone->parse($sresult);
+        $zone->setaccount(get_zone_owner($zone->name, 'admin'));
 
         if (!check_owner($zone))
             continue;
 
         if ($action == "listslaves" and $zone->kind == "Slave") {
-            array_push($return, $zone);
+            array_push($return, $zone->export());
         } elseif ($action == "list" and $zone->kind != "Slave") {
             if ($zone->dnssec) {
                 $zone->setkeyinfo($api->getzonekeys($zone->id));
