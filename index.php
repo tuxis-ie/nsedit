@@ -363,7 +363,7 @@ $(document).ready(function () {
                                 title: 'Records in ' + zone.record.name,
                                 openChildAsAccordion: true,
                                 actions: {
-                                    listAction: 'zones.php?action=listrecords&zoneurl=' + zone.record.url
+                                    listAction: 'zones.php?action=listrecords&zoneid=' + zone.record.id
                                 },
                                 fields: {
                                     name: {
@@ -552,10 +552,10 @@ $(document).ready(function () {
                                 pageSize: 20,
                                 openChildAsAccordion: true,
                                 actions: {
-                                    listAction: 'zones.php?action=listrecords&zoneurl=' + zone.record.url,
-                                    createAction: 'zones.php?action=createrecord&zoneurl=' + zone.record.url,
-                                    deleteAction: 'zones.php?action=deleterecord&zoneurl=' + zone.record.url,
-                                    updateAction: 'zones.php?action=editrecord&zoneurl=' + zone.record.url
+                                    listAction: 'zones.php?action=listrecords&zoneid=' + zone.record.id,
+                                    createAction: 'zones.php?action=createrecord&zoneid=' + zone.record.id,
+                                    deleteAction: 'zones.php?action=deleterecord&zoneid=' + zone.record.id,
+                                    updateAction: 'zones.php?action=editrecord&zoneid=' + zone.record.id
                                 },
                                 fields: {
                                     domid: {
