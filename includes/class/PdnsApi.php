@@ -79,6 +79,33 @@ class PdnsAPI {
 
         return $api->json;
     }
+
+    public function getzonekeys($zoneid) {
+        $ret = array();
+        $api = clone $this->http;
+        $api->method = 'GET';
+        $api->url = "/servers/localhost/zones/$zoneid/cryptokeys"
+
+        $api->call();
+
+        foreach ($api->json as $key) {
+            if (!isset($key['active']))
+                continue;
+
+            $key['dstxt'] = $zoneid . ' IN DNSKEY '.$key['dnskey']."\n\n";
+
+            if (isset($key['ds'])) {
+                foreach ($key['ds'] as $ds) {
+                    $key['dstxt'] .= $zoneid . ' IN DS '.$ds."\n";
+                }
+                unset($key['ds']);
+            }
+            array_push($ret, $key);
+        }
+
+        return $ret;
+    }
+
 }
 
 ?>
