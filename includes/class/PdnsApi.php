@@ -52,7 +52,7 @@ class PdnsAPI {
         unset($zonedata['url']);
         unset($zonedata['rrsets']);
 
-        if ($zone['serial'] == '') {
+        if (gettype($zone['serial']) != 'integer') {
             $api->method = 'POST';
             $api->url = '/servers/localhost/zones';
             $api->content = json_encode($zonedata);
@@ -66,9 +66,13 @@ class PdnsAPI {
         $api->call();
 
         // Then, update the rrsets
-        $api->method = 'PATCH';
-        $api->content = json_encode(Array('rrsets' => $zone['rrsets']));
-        $api->call();
+        if (count($zone['rrsets']) > 0) {
+            $api->method = 'PATCH';
+            $api->content = json_encode(Array('rrsets' => $zone['rrsets']));
+            $api->call();
+        }
+
+        return $this->loadzone($zone['id']);
     }
 
     public function deletezone($zoneid) {
