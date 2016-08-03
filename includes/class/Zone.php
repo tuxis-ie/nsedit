@@ -10,6 +10,7 @@ class Zone {
         $this->dnssec = '';
         $this->soa_edit = '';
         $this->soa_edit_api = '';
+        $this->keyinfo = '';
         $this->account = '';
         $this->nameservers = Array();
         $this->rrsets = Array();
@@ -41,6 +42,10 @@ class Zone {
             }
             $toadd->setttl($rrset['ttl']);
             array_push($this->rrsets, $toadd);        }
+    }
+
+    public function setkeyinfo($info) {
+        $this->keyinfo = $info;
     }
 
     public function addnameserver($nameserver) {
