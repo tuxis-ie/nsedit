@@ -12,6 +12,7 @@ class Zone {
         $this->soa_edit_api = '';
         $this->keyinfo = '';
         $this->account = '';
+        $this->zone = false;
         $this->nameservers = Array();
         $this->rrsets = Array();
         $this->masters = Array();
@@ -47,6 +48,10 @@ class Zone {
                 array_push($this->rrsets, $toadd);
             }
         }
+    }
+
+    public function importdata($data) {
+        $this->zone = $data;
     }
 
     public function setkeyinfo($info) {
@@ -162,21 +167,24 @@ class Zone {
     public function export() {
         $ret = Array();
         $ret['account'] = $this->account;
+        $ret['nameservers'] = $this->nameservers;
+        $ret['kind'] = $this->kind;
+        $ret['name'] = $this->name;
+        $ret['soa_edit'] = $this->soa_edit;
+        $ret['soa_edit_api'] = $this->soa_edit_api;
+        if ($this->zone) {
+            $ret['zone'] = $this->zone;
+            return $ret;
+        }
+
         $ret['dnssec'] = $this->dnssec;
         if ($this->dnssec) {
             $ret['keyinfo'] = $this->keyinfo;
         }
         $ret['id'] = $this->id;
-        $ret['kind'] = $this->kind;
         $ret['masters'] = $this->masters;
-        $ret['name'] = $this->name;
-        if (count($this->nameservers) > 0) {
-            $ret['nameservers'] = $this->nameservers;
-        }
         $ret['rrsets'] = $this->export_rrsets();
         $ret['serial'] = $this->serial;
-        $ret['soa_edit'] = $this->soa_edit;
-        $ret['soa_edit_api'] = $this->soa_edit_api;
         $ret['url'] = $this->url;
         
         return $ret;

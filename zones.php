@@ -318,6 +318,14 @@ case "listrecords":
     jtable_respond($records);
     break;
 
+case "delete":
+    $zone = $api->loadzone($_POST['id']);
+    $api->deletezone($_POST['id']);
+
+    delete_db_zone($zone['name']);
+    jtable_respond(null, 'delete');
+    break;
+
 
 case "create":
     $zonename = isset($_POST['name']) ? $_POST['name'] : '';
@@ -334,39 +342,29 @@ case "create":
         jtable_respond(null, 'error', "Not enough data");
     }
 
-    $createOptions = array(
-        'name' => $zonename,
-        'kind' => $zonekind,
-        );
-
-    $nameservers = array();
-    foreach($_POST['nameserver'] as $ns) {
-        if (isset($ns) && !empty($ns)) {
-            array_push($nameservers, $ns);
-        }
-    }
+    $zone = new Zone();
+    $zone->setkind($zonekind);
+    $zone->setname($zonename);
 
     if ($zonekind != "Slave") {
-        $createOptions['nameservers'] = $nameservers;
-        if (!isset($_POST['zone'])) {
-            if (0 == count($nameservers)) {
-                jtable_respond(null, 'error', "Require nameservers");
+        if (!isset($_POST['zone']) or isset($_POST['owns'])) {
+            foreach ($_POST['nameserver'] as $ns) {
+                $zone->addnameserver($ns);
             }
         } else {
-            $createOptions['zone'] = $_POST['zone'];
+            $zone->importdata($_POST['zone']);
         }
         if (isset($defaults['soa_edit_api'])) {
-            $createOptions['soa_edit_api'] = $defaults['soa_edit_api'];
+            $zone->setsoaeditapi($defaults['soa_edit_api']);
         }
         if (isset($defaults['soa_edit'])) {
-            $createOptions['soa_edit'] = $defaults['soa_edit'];
+            $zone->setsoaedit($defaults['soa_edit']);
         }
     } else { // Slave
         if (isset($_POST['masters'])) {
-            $createOptions['masters'] = preg_split('/[,;\s]+/', $_POST['masters'], null, PREG_SPLIT_NO_EMPTY);
-        }
-        if (0 == count($createOptions['masters'])) {
-            jtable_respond(null, 'error', "Slave requires master servers");
+            foreach (preg_split('/[,;\s]+/', $_POST['masters'], null, PREG_SPLIT_NO_EMPTY) as $master) {
+                $zone->addmaster($master);
+            }
         }
     }
 
@@ -376,8 +374,8 @@ case "create":
         jtable_respond(null, 'error', 'Zone already owned by someone else');
     }
 
-    $zone = zones_api_request($createOptions);
-    $zonename = $zone['name'];
+    $zone = $api->savezone($zone->export());
+    $zonename = $zone->name;
 
     if (is_adminuser() && isset($_POST['owner'])) {
         add_db_zone($zonename, $_POST['owner']);
@@ -452,14 +450,6 @@ case "update":
     unset($newZone['comments']);
 
     jtable_respond($newZone, 'single');
-    break;
-
-case "delete":
-    $zone = $api->loadzone($_POST['id']);
-    $api->deletezone($_POST['id']);
-
-    delete_db_zone($zone['name']);
-    jtable_respond(null, 'delete');
     break;
 
 case "createrecord":
