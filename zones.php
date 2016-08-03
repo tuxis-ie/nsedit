@@ -3,6 +3,8 @@
 include_once('includes/config.inc.php');
 include_once('includes/session.inc.php');
 include_once('includes/misc.inc.php');
+include_once('include/class/PdnsAPI.php');
+include_once('include/class/Zone.php');
 
 if (!is_csrf_safe()) {
     header('Status: 403');
