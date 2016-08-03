@@ -415,41 +415,30 @@ case "create":
     break;
 
 case "update":
-    $zone = get_zone_by_id(isset($_POST['id']) ? $_POST['id'] : '');
+    $zone = new Zone();
+    $zone->parse($api->loadzone($_POST['id']));
+    $zoneowner = isset($_POST['owner']) ? $_POST['owner'] : $zone->account;
 
-    $zoneowner = isset($_POST['owner']) ? $_POST['owner'] : $zone['owner'];
-
-    if ($zone['owner'] !== $zoneowner) {
+    if ($zone->account !== $zoneowner) {
         if (!is_adminuser()) {
             header("Status: 403 Access denied");
             jtable_respond(null, 'error', "Can't change owner");
         } else {
-            add_db_zone($zone['name'], $zoneowner);
-            $zone['owner'] = $zoneowner;
+            add_db_zone($zone->id, $zoneowner);
+            $zone->setaccount($zoneowner);
         }
     }
 
     $update = false;
 
     if (isset($_POST['masters'])) {
-        $zone['masters'] = preg_split('/[,;\s]+/', $_POST['masters'], null, PREG_SPLIT_NO_EMPTY);
-        $update = true;
+        $zone->erasemasters();
+        foreach(preg_split('/[,;\s]+/', $_POST['masters'], null, PREG_SPLIT_NO_EMPTY) as $master) {
+            $zone->addmaster($master);
+        }
     }
 
-    if ($update) {
-        $zoneUpdate = $zone;
-        unset($zoneUpdate['id']);
-        unset($zoneUpdate['url']);
-        unset($zoneUpdate['owner']);
-        $newZone = api_request($zone['url'], $zoneUpdate, 'PUT');
-        $newZone['owner'] = $zone['owner'];
-    } else {
-        $newZone = $zone;
-    }
-    unset($newZone['records']);
-    unset($newZone['comments']);
-
-    jtable_respond($newZone, 'single');
+    jtable_respond($api->savezone($zone->export()), 'single');
     break;
 
 case "createrecord":
