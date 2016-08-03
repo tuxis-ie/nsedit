@@ -152,8 +152,8 @@ class Zone {
                 $record['name'] = $rrset->name;
                 $record['ttl']  = $rrset->ttl;
                 $record['type'] = $rrset->type;
+                array_push($ret, $record);
             }
-            array_push($ret, $record);
         }
 
         return $ret;
