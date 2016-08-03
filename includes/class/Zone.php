@@ -108,6 +108,10 @@ class Zone {
         array_push($this->masters, $ip);
     }
 
+    public function erasemasters() {
+        $this->masters = Array();
+    }
+
     public function deleterrset($name, $type) {
         foreach ($this->rrsets as $rrset) {
             if ($rrset->name == $name and $rrset->type == $type) {
