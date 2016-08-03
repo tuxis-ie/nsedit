@@ -305,6 +305,20 @@ case "listslaves":
     jtable_respond($return);
     break;
 
+case "listrecords":
+    $zonedata = $api->loadzone($_GET['zoneid']);
+    $zone = new Zone()
+    $zone->parse($zonedata);
+    $records = $zone->rrsets2records();
+    foreach ($records as &$record) {
+        $record['id'] = json_encode($record);
+    }
+    unset($record);
+    usort($records, "record_compare");
+    jtable_respond($records);
+    break;
+
+
 case "create":
     $zonename = isset($_POST['name']) ? $_POST['name'] : '';
     $zonekind = isset($_POST['kind']) ? $_POST['kind'] : '';
@@ -446,19 +460,6 @@ case "delete":
     api_request($zone['url'], array(), 'DELETE');
     delete_db_zone($zone['name']);
     jtable_respond(null, 'delete');
-    break;
-
-case "listrecords":
-    $zone = get_zone_by_url(isset($_GET['zoneurl']) ? $_GET['zoneurl'] : '');
-
-    $a = api_request($zone['url']);
-    $records = $a['records'];
-    foreach ($records as &$record) {
-        $record['id'] = json_encode($record);
-    }
-    unset($record);
-    usort($records, "record_compare");
-    jtable_respond($records);
     break;
 
 case "createrecord":

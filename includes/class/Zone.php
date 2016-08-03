@@ -215,6 +215,21 @@ class RRSet {
         array_push($this->comments, $comment);
     }
 
+    public function rrsets2records() {
+        $ret = Array();
+
+        foreach ($this->rrsets as $rrset) {
+            foreach ($rrset->export_records() as $record) {
+                $record['name'] = $rrset['name'];
+                $record['ttl']  = $rrset['ttl'];
+                $record['type'] = $rrset['type'];
+            }
+            array_push($ret, $record);
+        }
+
+        return $ret;
+    }
+
     public function export() {
         $ret = Array();
         $ret['comments'] = $this->export_comments();
