@@ -10,174 +10,6 @@ if (!is_csrf_safe()) {
     jtable_respond(null, 'error', "Authentication required");
 }
 
-class ApiHandler {
-    public function __construct() {
-        global $apiip, $apiport, $apipass, $apiproto, $apisslverify;
-
-        $this->headers = Array();
-        $this->hostname = $apiip;
-        $this->port = $apiport;
-        $this->auth = $apipass;
-        $this->proto = $apiproto;
-        $this->sslverify = $apisslverify;
-        $this->curlh = curl_init();
-        $this->method = FALSE;
-        $this->content = FALSE;
-        $this->apiurl = '';
-    }
-
-    public function addheader($field, $content) {
-        $this->headers[$field] = $content;
-    }
-
-    private function authheaders() {
-        $this->addheader('X-API-Key', $this->auth);
-    }
-
-    private function apiurl() {
-        $tmp = new ApiHandler();
-
-        $tmp->url = '/api';
-        $tmp->go();
-
-        if ($tmp->json[0]['version'] <= 1) {
-            $this->apiurl = $tmp->json[0]['url'];
-        } else {
-            throw new Exception("Unsupported API version");
-        }
-
-    }
-
-    private function curlopts() {
-        $this->authheaders();
-        $this->addheader('Accept', 'application/json');
-
-        curl_setopt($this->curlh, CURLOPT_HTTPHEADER, Array());
-        curl_setopt($this->curlh, CURLOPT_RETURNTRANSFER, 1);
-
-        if (strcasecmp($this->proto, 'https')) {
-            curl_setopt($this->curlh, CURLOPT_SSL_VERIFYPEER, $this->sslverify);
-        }
-
-        $setheaders = Array();
-
-        foreach ($this->headers as $k => $v) {
-            array_push($setheaders, join(": ", Array($k, $v)));
-        }
-        curl_setopt($this->curlh, CURLOPT_HTTPHEADER, $setheaders);
-    }
-
-    private function baseurl() {
-        return $this->proto.'://'.$this->hostname.':'.$this->port.$this->apiurl;
-    }
-
-    private function go() {
-        if ($this->content) {
-            $this->addheader('Content-Type', 'application/json');
-            curl_setopt($this->curlh, CURLOPT_POST, 1);
-            curl_setopt($this->curlh, CURLOPT_POSTFIELDS, $this->content);
-        }
-
-        switch ($this->method) {
-            case 'DELETE':
-            case 'PATCH':
-            case 'PUT':
-                curl_setopt($this->curlh, CURLOPT_CUSTOMREQUEST, $this->method);
-                break;
-            case 'POST':
-                break;
-        }
-
-        curl_setopt($this->curlh, CURLOPT_URL, $this->baseurl().$this->url);
-
-        $this->curlopts();
-
-        $return = curl_exec($this->curlh);
-        $code = curl_getinfo($this->curlh, CURLINFO_HTTP_CODE);
-        $json = json_decode($return, 1);
-
-        if (isset($json['error'])) {
-            throw new Exception("API Error $code: ".$json['error']);
-        } elseif ($code < 200 || $code >= 300) {
-            if ($code == 401) {
-                throw new Exception("Authentication failed. Have you configured your authmethod correct?");
-            }
-            throw new Exception("Curl Error: $code ".curl_error($this->curlh));
-        }
-
-        $this->json = $json;
-    }
-
-    public function call() {
-        if (empty($this->apiurl) and substr($this->url, 0, 1) == '/') {
-            $this->apiurl();
-        } else {
-            $this->apiurl = '/';
-        }
-
-        $this->go();
-    }
-}
-
-
-function api_request($path, $opts = null, $type = null) {
-    try {
-        $myapi = new ApiHandler();
-        if ($type) {
-            $myapi->method = $type;
-        };
-        $myapi->url = $path;
-        if ($opts) {
-            $myapi->content = json_encode($opts);
-        }
-
-        $myapi->call();
-
-        return $myapi->json;
-    } catch (Exception $e) {
-        jtable_respond(null, 'error', $e->getMessage());
-    }
-}
-
-function zones_api_request($opts = null, $type = 'POST') {
-    global $apisid;
-
-    return api_request("/servers/${apisid}/zones", $opts, $type);
-}
-
-function get_all_zones() {
-    return zones_api_request();
-}
-
-function _get_zone_by_key($key, $value) {
-    if ($value !== '') {
-        foreach (get_all_zones() as $zone) {
-            if ($zone[$key] === $value) {
-                $zone['owner'] = get_zone_owner($zone['name'], 'admin');
-
-                if (!check_owner($zone)) {
-                    jtable_respond(null, 'error', 'Access denied');
-                }
-                return $zone;
-            }
-        }
-    }
-    header('Status: 404 Not found');
-    jtable_respond(null, 'error', "Zone not found");
-}
-
-function get_zone_by_url($zoneurl) {
-    return _get_zone_by_key('url', $zoneurl);
-}
-
-function get_zone_by_id($zoneid) {
-    return _get_zone_by_key('id', $zoneid);
-}
-
-function get_zone_by_name($zonename) {
-    return _get_zone_by_key('name', $zonename);
-}
-
 /* This function is taken from:
 http://pageconfig.com/post/how-to-validate-ascii-text-in-php and got fixed by
 #powerdns */
@@ -207,6 +39,7 @@ function make_record($zone, $input) {
         $name = $name . '.' . $zone['name'];
     }
 
+    $ttl = (int) ((isset($input['ttl']) && $input['ttl']) ? $input['ttl'] : $defaults['ttl']);
     $type = isset($input['type']) ? $input['type'] : '';
     $disabled = (bool) (isset($input['disabled']) && $input['disabled']);
 
@@ -234,6 +67,7 @@ function make_record($zone, $input) {
         'disabled' => $disabled,
         'type' => $type,
         'name' => $name,
+        'ttl'  => $ttl,
         'content'   => $content);
 }
 
@@ -258,7 +92,6 @@ function update_records($zone, $name_and_type, $inputs) {
         jtable_respond(null, 'error', "Please only use [a-z0-9_/.-]");
     }
 
-
     $patch = array(
         'rrsets' => array(array(
             'name' => $name,
@@ -273,13 +106,11 @@ function create_record($zone, $input) {
     $record = make_record($zone, $input);
     $records = get_records_by_name_type($zone, $record['name'], $record['type']);
     array_push($records, $record);
-    $ttl = (int) ((isset($input['ttl']) && $input['ttl']) ? $input['ttl'] : $defaults['ttl']);
 
     $patch = array(
         'rrsets' => array(array(
             'name' => $record['name'],
             'type' => $record['type'],
-            'ttl' => $ttl,
             'changetype' => 'REPLACE',
             'records' => $records)));
 
@@ -434,28 +265,8 @@ function get_zone_owner($zonename, $default) {
     return $default;
 }
 
-function get_zone_keys($zone) {
-    $ret = array();
-    foreach (api_request($zone['url'] . "/cryptokeys") as $key) {
-        if (!isset($key['active']))
-            continue;
-
-        $key['dstxt'] = $zone['name'] . ' IN DNSKEY '.$key['dnskey']."\n\n";
-
-        if (isset($key['ds'])) {
-            foreach ($key['ds'] as $ds) {
-                $key['dstxt'] .= $zone['name'] . ' IN DS '.$ds."\n";
-            }
-            unset($key['ds']);
-        }
-        $ret[] = $key;
-    }
-
-    return $ret;
-}
-
 function check_owner($zone) {
-    return is_adminuser() or ($zone['owner'] === get_sess_user());
+    return is_adminuser() or ($zone->account === get_sess_user());
 }
 
 if (isset($_GET['action'])) {
@@ -464,31 +275,28 @@ if (isset($_GET['action'])) {
     jtable_respond(null, 'error', 'No action given');
 }
 
+$api = new PdnsAPI;
+
 switch ($action) {
 
 case "list":
 case "listslaves":
-    $return = array();
     $q = isset($_POST['domsearch']) ? $_POST['domsearch'] : false;
-    foreach (get_all_zones() as $zone) {
-        $zone['owner'] = get_zone_owner($zone['name'], 'admin');
+    foreach ($api->listzones($q) as $zone) {
+        $zone->setaccount(get_zone_owner($zone['name'], 'admin'));
+
         if (!check_owner($zone))
             continue;
 
-        if ($q && !preg_match("/$q/", $zone['name'])) {
-            continue;
-        }
-
-        if ($action == "listslaves" and $zone['kind'] == "Slave") {
+        if ($action == "listslaves" and $zone->kind == "Slave") {
             array_push($return, $zone);
-        } elseif ($action == "list" and $zone['kind'] != "Slave") {
-            if ($zone['dnssec']) {
-                $zone['keyinfo'] = get_zone_keys($zone);
+        } elseif ($action == "list" and $zone->kind != "Slave") {
+            if ($zone->dnssec) {
+                $zone->setkeyinfo($api->getzonekeys($zone->id));
             }
-            array_push($return, $zone);
+            array_push($return, $zone->export());
         }
     }
-    usort($return, "zone_compare");
     jtable_respond($return);
     break;
 
