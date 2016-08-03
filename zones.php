@@ -455,9 +455,9 @@ case "update":
     break;
 
 case "delete":
-    $zone = get_zone_by_id(isset($_POST['id']) ? $_POST['id'] : '');
+    $zone = $api->loadzone($_POST['id']);
+    $api->deletezone($_POST['id']);
 
-    api_request($zone['url'], array(), 'DELETE');
     delete_db_zone($zone['name']);
     jtable_respond(null, 'delete');
     break;
