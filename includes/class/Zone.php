@@ -143,6 +143,9 @@ class Zone {
         $ret = Array();
         $ret['account'] = $this->account;
         $ret['dnssec'] = $this->dnssec;
+        if ($this->dnssec) {
+            $ret['keyinfo'] = $this->keyinfo;
+        }
         $ret['id'] = $this->id;
         $ret['kind'] = $this->kind;
         $ret['masters'] = $this->masters;
