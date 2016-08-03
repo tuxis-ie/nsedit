@@ -243,7 +243,7 @@ class RRSet {
         return $ret;
     }
 
-    private function export_records() {
+    public function export_records() {
         $ret = Array();
         foreach ($this->records as $record) {
             array_push($ret, $record->export());
@@ -252,7 +252,7 @@ class RRSet {
         return $ret;
     }
 
-    private function export_comments() {
+    public function export_comments() {
         $ret = Array();
         foreach ($this->comments as $comment) {
             array_push($ret, $comment->export());
