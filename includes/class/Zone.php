@@ -113,26 +113,22 @@ class Zone {
     }
 
     public function deleterrset($name, $type) {
-        foreach ($this->rrsets as $rrset) {
-            if ($rrset->name == $name and $rrset->type == $type) {
-                $rrset->delete();
-            }
+        $rrset = $this->getrrset($name, $type);
+        if ($rrset) {
+            $rrset->delete();
         }
     }
 
     public function setrrsetttl($name, $type, $ttl) {
-        foreach ($this->rrsets as $rrset) {
-            if ($rrset->name == $name and $rrset->type == $type) {
-                $rrset->setttl($ttl);
-            }
-        }   
+        $rrset = $this->getrrset($name, $type);
+        if ($rrset) {
+            $rrset->setttl($ttl);
+        }
     }
 
-    public function addrrset($name, $type, $content, $ttl = 3600) {
-        foreach ($this->rrsets as $rrset) {
-            if ($rrset->name == $name and $rrset->type == $type) {
-                throw new Exception("This rrset already exists.");
-            }
+    public function addrrset($name, $type, $content, $disbled, $ttl = 3600) {
+        if ($this->getrrset($name, $type) !== FALSE) {
+            throw new Exception("This rrset already exists.");
         }
         $rrset = new RRSet($name, $type, $content, $ttl);
         array_push($this->rrsets, $rrset);
@@ -141,16 +137,40 @@ class Zone {
     public function addrecord($name, $type, $content, $disabled = false, $ttl = 3600) {
         $found = FALSE;
 
-        foreach ($this->rrsets as $rrset) {
-            if ($rrset->name == $name and $rrset->type == $type) {
-                $rrset->addRecord($content, $disabled);
-                $found = TRUE;
+        $rrset = $this->getrrset($name, $type);
+
+        if ($rrset) {
+            $rrset->addRecord($content, $disabled);
+        } else {
+            $this->addrrset($name, $type, $content, $disabled, $ttl);
+        }
+
+        return $this->getrecord($name, $type, $content);
+    }
+
+    public function getrecord($name, $type, $content) {
+        $rrset = $this->getrrset($name, $type);
+        foreach ($rrset->export_records() as $record) {
+            if ($record['content'] == $content) {
+                $record['name'] = $rrset->name;
+                $record['ttl']  = $rrset->ttl;
+                $record['type'] = $rrset->type;
+                $id = json_encode($record);
+                $record['id']   = $id;
+                return $record;
             }
         }
 
-        if (!$found) {
-            throw new Exception("RRset does not exist for this record");
+    }
+
+    public function getrrset($name, $type) {
+        foreach ($this->rrsets as $rrset) {
+            if ($rrset->name == $name and $rrset->type = $type) {
+                return $rrset;
+            }
         }
+
+        return FALSE;
     }
 
     public function rrsets2records() {
@@ -161,6 +181,8 @@ class Zone {
                 $record['name'] = $rrset->name;
                 $record['ttl']  = $rrset->ttl;
                 $record['type'] = $rrset->type;
+                $id = json_encode($record);
+                $record['id']   = $id;
                 array_push($ret, $record);
             }
         }
