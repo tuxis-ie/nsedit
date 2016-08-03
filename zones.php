@@ -277,6 +277,7 @@ if (isset($_GET['action'])) {
     jtable_respond(null, 'error', 'No action given');
 }
 
+try {
 $api = new PdnsAPI;
 
 switch ($action) {
@@ -442,10 +443,11 @@ case "update":
     break;
 
 case "createrecord":
-    $zone = get_zone_by_url(isset($_GET['zoneurl']) ? $_GET['zoneurl'] : '');
-    $record = create_record($zone, $_POST);
+    $zone = new Zone();
+    $zone->parse($api->loadzone($_GET['zoneid']));
+    $record = $zone->addrecord($_POST['name'], $_POST['type'], $_POST['content'], $_POST['disabled'], $_POST['ttl']);
+    $api->savezone($zone->export());
 
-    $record['id'] = json_encode($record);
     jtable_respond($record, 'single');
     break;
 
@@ -523,4 +525,7 @@ case "getformnameservers":
 default:
     jtable_respond(null, 'error', 'No such action');
     break;
+}
+} catch (Exception $e) {
+    jtable_respond(null, 'error', $e->getMessage());
 }
