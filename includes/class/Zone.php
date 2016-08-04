@@ -95,7 +95,7 @@ class Zone {
         $this->dnssec = $dnssec;
     }
 
-    private function setId($id) {
+    public function setId($id) {
         $this->id = $id;
     }
 
@@ -230,6 +230,10 @@ class RRSet {
 
     public function setTtl($ttl) {
         $this->ttl = $ttl;
+    }
+
+    public function setName($name) {
+        $this->name = $name;
     }
 
     public function addRecord($content, $disabled = FALSE) {

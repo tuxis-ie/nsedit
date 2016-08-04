@@ -363,6 +363,34 @@ case "export":
     jtable_respond($api->exportzone($_GET['zoneid']), 'single');
     break;
 
+case "clone":
+    $name = $_POST['destname'];
+    $src  = $_POST['sourcename'];
+
+    if (!_valid_label($name)) {
+        jtable_respond(null, 'error', "Invalid destination zonename");
+    }
+
+    $srczone = new Zone();
+    $srczone->parse($api->loadzone($src));
+
+    $srczone->setId('');
+    $srczone->setName($name);
+    $srczone->setSerial('');
+    $zone = $api->savezone($srczone->export());
+
+    $srczone->parse($zone);
+
+    foreach ($srczone->rrsets as $rrset) {
+        $newname = $rrset->name;
+        $newname = preg_replace('/'.$src.'$/', $name, $newname);
+        $rrset->setName($newname);
+    }
+    $zone = $api->savezone($srczone->export());
+
+    jtable_respond($zone, 'single');
+    break;
+
 case "gettemplatenameservers":
     $ret = array();
     $type = $_GET['prisec'];
@@ -394,6 +422,19 @@ case "getformnameservers":
         }
     }
     break;
+case "formzonelist":
+    $zones = $api->listzones();
+    $ret = array();
+    foreach ($zones as $zone) {
+        if ($zone['kind'] == 'Slave')
+            continue;
+        array_push($ret, array(
+            'DisplayText' => $zone['name'],
+            'Value'       => $zone['id']));
+    }
+    jtable_respond($ret, 'options');
+    break;
+
 default:
     jtable_respond(null, 'error', 'No such action');
     break;

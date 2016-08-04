@@ -135,6 +135,7 @@ if ($blocklogin === TRUE) {
     <div id="zones">
         <?php if (is_adminuser() or $allowzoneadd === TRUE) { ?>
         <div style="visibility: hidden;" id="ImportZone"></div>
+        <div style="visibility: hidden;" id="CloneZone"></div>
         <?php } ?>
         <div class="tables" id="MasterZones">
             <div class="searchbar" id="searchbar">
@@ -428,15 +429,24 @@ $(document).ready(function () {
             hoverAnimation: true,
             hoverAnimationDuration: 60,
             hoverAnimationEasing: undefined,
-            items: [{
+            items: [
                 <?php if (is_adminuser() or $allowzoneadd === TRUE) { ?>
-                icon: 'jtable/lib/themes/metro/add.png',
-                text: 'Import a new zone',
-                click: function() {
-                    $('#ImportZone').jtable('showCreateForm');
-                }
+                {
+                    icon: 'jtable/lib/themes/metro/add.png',
+                    text: 'Import a new zone',
+                    click: function() {
+                        $('#ImportZone').jtable('showCreateForm');
+                    }
+                },
+                {
+                    icon: 'jtable/lib/themes/metro/add.png',
+                    text: 'Clone a zone',
+                    click: function() {
+                        $('#CloneZone').jtable('showCreateForm');
+                    }
+                },
                 <?php } ?>
-                }],
+                ],
         },
         sorting: false,
         openChildAsAccordion: true,
@@ -742,6 +752,51 @@ $(document).ready(function () {
         }
 
     });
+
+    $('#CloneZone').jtable({
+        title: 'Clone zone',
+        actions: {
+            createAction: 'zones.php?action=clone'
+        },
+        fields: {
+            id: {
+                key: true,
+                type: 'hidden'
+            },
+            sourcename: {
+                title: 'Source domain',
+                options: function(data) {
+                    return 'zones.php?action=formzonelist&e='+$epoch;
+                },
+                inputClass: 'sourcename'
+            },
+            destname: {
+                title: 'Domain',
+                inputClass: 'destname'
+            },
+            account: {
+                title: 'Account',
+                options: function(data) {
+                    return 'users.php?action=listoptions&e='+$epoch;
+                },
+                defaultValue: 'admin',
+                inputClass: 'account'
+            },
+            kind: {
+                title: 'Type',
+                options: {'Native': 'Native', 'Master': 'Master'},
+                defaultValue: '<?php echo $defaults['defaulttype']; ?>',
+                edit: false,
+                inputClass: 'type'
+            },
+        },
+        recordAdded: function() {
+            $("#MasterZones").jtable('load');
+            $("#SlaveZones").jtable('load');
+        }
+
+    });
+
     $('#domsearch').addClear({
         onClear: function() { $('#MasterZones').jtable('load'); }
     });
