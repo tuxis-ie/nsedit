@@ -21,7 +21,7 @@ function is_ascii($string) {
 }
 
 function _valid_label($name) {
-    return is_ascii($name) && ( bool ) preg_match("/^([-.a-z0-9_\/\*]+)?$/i", $name );
+    return is_ascii($name) && ( bool ) preg_match("/^([-.a-z0-9_\/\*]+)?.$/i", $name );
 }
 
 function decode_record_id($id) {
@@ -161,6 +161,7 @@ case "listslaves":
             array_push($return, $zone->export());
         }
     }
+    usort($return, "zone_compare");
     jtable_respond($return);
     break;
 
@@ -172,7 +173,6 @@ case "listrecords":
     foreach ($records as &$record) {
         $record['id'] = json_encode($record);
     }
-    unset($record);
     usort($records, "record_compare");
     jtable_respond($records);
     break;
@@ -297,7 +297,36 @@ case "update":
 case "createrecord":
     $zone = new Zone();
     $zone->parse($api->loadzone($_GET['zoneid']));
-    $record = $zone->addrecord($_POST['name'], $_POST['type'], $_POST['content'], $_POST['disabled'], $_POST['ttl']);
+
+    $name = isset($_POST['name']) ? $_POST['name'] : '';
+    $type = $_POST['type'];
+    $content = $_POST['content'];
+
+    if ('' == $name) {
+        $name = $zone->name;
+    } elseif (string_ends_with($name, '.')) {
+        # "absolute" name, shouldn't append zone[name] - but check.
+        $name = substr($name, 0, -1);
+        if (!string_ends_with($name, $zone->name)) {
+            jtable_respond(null, 'error', "Name $name not in zone ".$zone->name);
+        }
+    } else if (!string_ends_with($name, $zone->name)) {
+        $name = $name . '.' . $zone->name;
+    }
+
+
+    if (!_valid_label($name)) {
+        jtable_respond(null, 'error', "Please only use [a-z0-9_/.-]");
+    }
+    if (!$type) {
+        jtable_respond(null, 'error', "Require a type");
+    }
+    if (!is_ascii($content)) {
+        jtable_respond(null, 'error', "Please only use ASCII-characters in your fields");
+    }
+
+
+    $record = $zone->addrecord($name, $type, $content, $_POST['disabled'], $_POST['ttl']);
     $api->savezone($zone->export());
 
     jtable_respond($record, 'single');

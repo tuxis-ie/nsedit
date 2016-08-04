@@ -126,17 +126,15 @@ class Zone {
         }
     }
 
-    public function addrrset($name, $type, $content, $disbled, $ttl = 3600) {
+    public function addrrset($name, $type, $content, $disabled = FALSE, $ttl = 3600) {
         if ($this->getrrset($name, $type) !== FALSE) {
             throw new Exception("This rrset already exists.");
         }
-        $rrset = new RRSet($name, $type, $content, $ttl);
+        $rrset = new RRSet($name, $type, $content, $disabled, $ttl);
         array_push($this->rrsets, $rrset);
     }
 
     public function addrecord($name, $type, $content, $disabled = FALSE, $ttl = 3600) {
-        $found = FALSE;
-
         $rrset = $this->getrrset($name, $type);
 
         if ($rrset) {
@@ -227,7 +225,7 @@ class Zone {
 }
 
 class RRSet {
-    public function __construct($name = '', $type = '', $content = '', $ttl = 3600) {
+    public function __construct($name = '', $type = '', $content = '', $disabled = FALSE, $ttl = 3600) {
         $this->name = $name;
         $this->type = $type;
         $this->ttl  = $ttl;
@@ -236,7 +234,7 @@ class RRSet {
         $this->comments = Array();
 
         if (isset($content) and $content != '') {
-            $this->addRecord($content);
+            $this->addRecord($content, $disabled);
         }
     }
 
