@@ -43,10 +43,20 @@ class PdnsAPI {
         return $api->json;
     }
 
+    public function exportzone($zoneid) {
+        $api = clone $this->http;
+        $api->method = 'GET';
+        $api->url = "/servers/localhost/zones/$zoneid/export";
+        $api->call();
+
+        return $api->json;
+    }
+
     public function savezone($zone) {
         $api = clone $this->http;
         // We have to split up RRSets and Zoneinfo.
         // First, update the zone
+
         $zonedata = $zone;
         unset($zonedata['id']);
         unset($zonedata['url']);
