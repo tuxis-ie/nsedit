@@ -384,34 +384,37 @@ case "create":
         add_db_zone($zonename, get_sess_user());
     }
 
+    $rrset = $zone->getrrset($old_record['name'], $old_record['type']);
+    $rrset->deleteRecord($old_record['content']);
+    $zone->addrecord($_POST['name'], $_POST['type'], $_POST['content'], $_POST['disabled'], $_POST['ttl']);
+
+    $api->savezone($zone->export());
+
+    $record['id'] = json_encode($record);
+    jtable_respond($zone->getrecord($_POST['name'], $_POST['type'], $_POST['content']), 'single');
+    break;
+
     if (isset($_POST['template']) && $_POST['template'] != 'None') {
         foreach (user_template_list() as $template) {
             if ($template['name'] !== $_POST['template']) continue;
 
             foreach ($template['records'] as $record) {
-                if ($record['type'] == 'NS' and array_search($record['content'], $nameservers) !== FALSE) {
-                    continue;
+                $rrset = $zone->getrrset($record['label'], $record['type']);
+                if ($rrset) {
+                    $rrset->delete()
                 }
-                if (isset($record['label'])) {
-                    $record['name'] = $record['label'];
-                    unset($record['label']);
-                }
-                create_record($zone, $record);
             }
+            $zone = $api->savezone($zone->export());
+
+            foreach ($template['records'] as $record) {
+                $zone->addrecord($record['name'], $record['type'], $record['content']);
+            }
+
+            $zone = $api->savezone($zone->export());
             break;
         }
     }
 
-    if (isset($_POST['zone']) && isset($_POST['owns']) && $_POST['owns'] && count($nameservers)) {
-        $records = array();
-        foreach ($nameservers as $ns) {
-            array_push($records, array('type' => 'NS', 'content' => $ns));
-        }
-        update_records($zone, $records[0], $records);
-    }
-
-    unset($zone['records']);
-    unset($zone['comments']);
     jtable_respond($zone, 'single');
     break;
 
