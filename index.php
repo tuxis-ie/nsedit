@@ -305,16 +305,16 @@ $(document).ready(function () {
                 listClass: 'dnssec'
             },
             <?php if (is_adminuser()) { ?>
-            owner: {
-                title: 'Owner',
+            account: {
+                title: 'Account',
                 width: '8%',
-                display: displayContent('owner'),
+                display: displayContent('account'),
                 options: function(data) {
                     return 'users.php?action=listoptions&e='+$epoch;
                 },
                 defaultValue: 'admin',
-                inputClass: 'owner',
-                listClass: 'owner'
+                inputClass: 'account',
+                listClass: 'account'
             },
             <?php } ?>
             kind: {
@@ -472,16 +472,16 @@ $(document).ready(function () {
                 listClass: 'dnssec'
             },
             <?php if (is_adminuser()) { ?>
-            owner: {
-                title: 'Owner',
+            account: {
+                title: 'Account',
                 width: '8%',
-                display: displayContent('owner'),
+                display: displayContent('account'),
                 options: function(data) {
                     return 'users.php?action=listoptions&e='+$epoch;
                 },
                 defaultValue: 'admin',
-                inputClass: 'owner',
-                listClass: 'owner'
+                inputClass: 'account',
+                listClass: 'account'
             },
             <?php } ?>
             kind: {
@@ -695,13 +695,13 @@ $(document).ready(function () {
                 inputClass: 'domain'
             },
             <?php if (is_adminuser()) { ?>
-            owner: {
-                title: 'Owner',
+            account: {
+                title: 'Account',
                 options: function(data) {
                     return 'users.php?action=listoptions&e='+$epoch;
                 },
                 defaultValue: 'admin',
-                inputClass: 'owner'
+                inputClass: 'account'
             },
             <?php } ?>
             kind: {

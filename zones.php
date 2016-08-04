@@ -77,22 +77,22 @@ function record_compare($a, $b) {
     return 0;
 }
 
-function add_db_zone($zonename, $ownername) {
-    if (valid_user($ownername) === false) {
-        jtable_respond(null, 'error', "$ownername is not a valid username");
+function add_db_zone($zonename, $accountname) {
+    if (valid_user($accountname) === false) {
+        jtable_respond(null, 'error', "$accountname is not a valid username");
     }
     if (!_valid_label($zonename)) {
         jtable_respond(null, 'error', "$zonename is not a valid zonename");
     }
 
-    if (is_apiuser() && !user_exists($ownername)) {
-        add_user($ownername);
+    if (is_apiuser() && !user_exists($accountname)) {
+        add_user($accountname);
     }
 
     $db = get_db();
     $q = $db->prepare("INSERT OR REPLACE INTO zones (zone, owner) VALUES (?, (SELECT id FROM users WHERE emailaddress = ?))");
     $q->bindValue(1, $zonename, SQLITE3_TEXT);
-    $q->bindValue(2, $ownername, SQLITE3_TEXT);
+    $q->bindValue(2, $accountname, SQLITE3_TEXT);
     $q->execute();
     $db->close();
 }
@@ -108,7 +108,7 @@ function delete_db_zone($zonename) {
     $db->close();
 }
 
-function get_zone_owner($zonename, $default) {
+function get_zone_account($zonename, $default) {
     if (!_valid_label($zonename)) {
         jtable_respond(null, 'error', "$zonename is not a valid zonename");
     }
@@ -125,7 +125,7 @@ function get_zone_owner($zonename, $default) {
     return $default;
 }
 
-function check_owner($zone) {
+function check_account($zone) {
     return is_adminuser() or ($zone->account === get_sess_user());
 }
 
@@ -147,9 +147,9 @@ case "listslaves":
     foreach ($api->listzones($q) as $sresult) {
         $zone = new Zone();
         $zone->parse($sresult);
-        $zone->setaccount(get_zone_owner($zone->name, 'admin'));
+        $zone->setaccount(get_zone_account($zone->name, 'admin'));
 
-        if (!check_owner($zone))
+        if (!check_account($zone))
             continue;
 
         if ($action == "listslaves" and $zone->kind == "Slave") {
@@ -227,9 +227,9 @@ case "create":
         }
     }
 
-    // only admin user and original owner can "recreate" zones that are already
+    // only admin user and original account can "recreate" zones that are already
     // present in our own db but got lost in pdns.
-    if (!is_adminuser() && get_sess_user() !== get_zone_owner($zonename, get_sess_user())) {
+    if (!is_adminuser() && get_sess_user() !== get_zone_account($zonename, get_sess_user())) {
         jtable_respond(null, 'error', 'Zone already owned by someone else');
     }
 
@@ -237,10 +237,12 @@ case "create":
 
     $zonename = $zone->name;
 
-    if (is_adminuser() && isset($_POST['owner'])) {
-        add_db_zone($zonename, $_POST['owner']);
+    if (is_adminuser() && isset($_POST['account'])) {
+        add_db_zone($zonename, $_POST['account']);
+        $zone->setaccount($_POST['account']);
     } else {
         add_db_zone($zonename, get_sess_user());
+        $zone->setaccount(get_sess_user());
     }
 
     if (isset($_POST['template']) && $_POST['template'] != 'None') {
@@ -253,36 +255,34 @@ case "create":
                     $rrset->delete();
                 }
             }
-            $zone = $api->savezone($zone->export());
+            $api->savezone($zone->export());
 
             foreach ($template['records'] as $record) {
                 $zone->addrecord($record['name'], $record['type'], $record['content']);
             }
 
-            $zone = $api->savezone($zone->export());
             break;
         }
     }
 
+    $zone = $api->savezone($zone->export());
     jtable_respond($zone, 'single');
     break;
 
 case "update":
     $zone = new Zone();
     $zone->parse($api->loadzone($_POST['id']));
-    $zoneowner = isset($_POST['owner']) ? $_POST['owner'] : $zone->account;
+    $zoneaccount = isset($_POST['account']) ? $_POST['account'] : $zone->account;
 
-    if ($zone->account !== $zoneowner) {
+    if ($zone->account !== $zoneaccount) {
         if (!is_adminuser()) {
             header("Status: 403 Access denied");
-            jtable_respond(null, 'error', "Can't change owner");
+            jtable_respond(null, 'error', "Can't change account");
         } else {
-            add_db_zone($zone->id, $zoneowner);
-            $zone->setaccount($zoneowner);
+            add_db_zone($zone->name, $zoneaccount);
+            $zone->setaccount($zoneaccount);
         }
     }
-
-    $update = false;
 
     if (isset($_POST['masters'])) {
         $zone->erasemasters();
@@ -314,7 +314,6 @@ case "createrecord":
         $name = $name . '.' . $zone->name;
     }
 
-
     if (!_valid_label($name)) {
         jtable_respond(null, 'error', "Please only use [a-z0-9_/.-]");
     }
@@ -324,7 +323,6 @@ case "createrecord":
     if (!is_ascii($content)) {
         jtable_respond(null, 'error', "Please only use ASCII-characters in your fields");
     }
-
 
     $record = $zone->addrecord($name, $type, $content, $_POST['disabled'], $_POST['ttl']);
     $api->savezone($zone->export());
