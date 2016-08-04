@@ -252,7 +252,11 @@ function displayContent(fieldName, zone) {
             var zspan = $('<span class="lightgrey">').text(zone);
             return lspan.add(zspan);
         } else {
-            return $('<span>').text(data.record[fieldName]);
+            var text = data.record[fieldName];
+            if (typeof data.record[fieldName] == 'boolean') {
+                text == false ? text = 'No' : text = 'Yes';
+            }
+            return $('<span>').text(text);
         }
     }
 }
@@ -657,18 +661,33 @@ $(document).ready(function () {
                                         inputClass: 'ttl',
                                         listClass: 'ttl'
                                     },
+                                    setptr: {
+                                        title: 'Set PTR Record',
+                                        width: '2%',
+                                        list: false,
+                                        create: true,
+                                        defaultValue: 'false',
+                                        inputClass: 'setptr',
+                                        listClass: 'setptr',
+                                        options: function() {
+                                            return {
+                                                '0': 'No',
+                                                '1': 'Yes',
+                                            };
+                                        },
+                                    },
                                     disabled: {
                                         title: 'Disabled',
                                         width: '2%',
                                         create: true,
                                         display: displayContent('disabled'),
-                                        defaultValue: '<?php echo $defaults['disabled'] ? 'false' : 'true'; ?>',
+                                        defaultValue: '<?php echo $defaults['disabled'] ? 'No' : 'Yes'; ?>',
                                         inputClass: 'disabled',
                                         listClass: 'disabled',
                                         options: function() {
                                             return {
-                                                '0': 'false',
-                                                '1': 'true',
+                                                '0': 'No',
+                                                '1': 'Yes',
                                             };
                                         },
                                     },

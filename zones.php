@@ -324,7 +324,7 @@ case "createrecord":
         jtable_respond(null, 'error', "Please only use ASCII-characters in your fields");
     }
 
-    $record = $zone->addRecord($name, $type, $content, $_POST['disabled'], $_POST['ttl']);
+    $record = $zone->addRecord($name, $type, $content, $_POST['disabled'], $_POST['ttl'], $_POST['setptr']);
     $api->savezone($zone->export());
 
     jtable_respond($record, 'single');
@@ -338,7 +338,7 @@ case "editrecord":
 
     $rrset = $zone->getRRSet($old_record['name'], $old_record['type']);
     $rrset->deleteRecord($old_record['content']);
-    $zone->addRecord($_POST['name'], $_POST['type'], $_POST['content'], $_POST['disabled'], $_POST['ttl']);
+    $zone->addRecord($_POST['name'], $_POST['type'], $_POST['content'], $_POST['disabled'], $_POST['ttl'], $_POST['setptr']);
 
     $api->savezone($zone->export());
 

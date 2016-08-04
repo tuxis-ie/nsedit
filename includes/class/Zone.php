@@ -112,21 +112,21 @@ class Zone {
         $this->masters = Array();
     }
 
-    public function addRRSet($name, $type, $content, $disabled = FALSE, $ttl = 3600) {
+    public function addRRSet($name, $type, $content, $disabled = FALSE, $ttl = 3600, $setptr = FALSE) {
         if ($this->getRRSet($name, $type) !== FALSE) {
             throw new Exception("This rrset already exists.");
         }
-        $rrset = new RRSet($name, $type, $content, $disabled, $ttl);
+        $rrset = new RRSet($name, $type, $content, $disabled, $ttl, $setptr);
         array_push($this->rrsets, $rrset);
     }
 
-    public function addRecord($name, $type, $content, $disabled = FALSE, $ttl = 3600) {
+    public function addRecord($name, $type, $content, $disabled = FALSE, $ttl = 3600, $setptr = FALSE) {
         $rrset = $this->getRRSet($name, $type);
 
         if ($rrset) {
-            $rrset->addRecord($content, $disabled);
+            $rrset->addRecord($content, $disabled, $setptr);
         } else {
-            $this->addRRSet($name, $type, $content, $disabled, $ttl);
+            $this->addRRSet($name, $type, $content, $disabled, $ttl, $setptr);
         }
 
         return $this->getRecord($name, $type, $content);
@@ -211,7 +211,7 @@ class Zone {
 }
 
 class RRSet {
-    public function __construct($name = '', $type = '', $content = '', $disabled = FALSE, $ttl = 3600) {
+    public function __construct($name = '', $type = '', $content = '', $disabled = FALSE, $ttl = 3600, $setptr = FALSE) {
         $this->name = $name;
         $this->type = $type;
         $this->ttl  = $ttl;
@@ -220,7 +220,7 @@ class RRSet {
         $this->comments = Array();
 
         if (isset($content) and $content != '') {
-            $this->addRecord($content, $disabled);
+            $this->addRecord($content, $disabled, $setptr);
         }
     }
 
@@ -236,14 +236,14 @@ class RRSet {
         $this->name = $name;
     }
 
-    public function addRecord($content, $disabled = FALSE) {
+    public function addRecord($content, $disabled = FALSE, $setptr) {
         foreach ($this->records as $record) {
             if ($record->content == $content) {
                 throw Exception("Record already exists");
             }
         }
 
-        $record = new Record($content, $disabled);
+        $record = new Record($content, $disabled, $setptr);
         array_push($this->records, $record);
     }
 
@@ -275,6 +275,9 @@ class RRSet {
     public function exportRecords() {
         $ret = Array();
         foreach ($this->records as $record) {
+            if ($this->type != "A" and $this->type != "AAAA") {
+                $record->setptr = FALSE;
+            }
             array_push($ret, $record->export());
         }
 
@@ -293,9 +296,10 @@ class RRSet {
 }
 
 class Record {
-    public function __construct($content, $disabled = FALSE) {
+    public function __construct($content, $disabled = FALSE, $setptr = FALSE) {
         $this->content = $content;
         $this->disabled = $disabled;
+        $this->setptr = $setptr;
     }
 
     public function export() {
@@ -303,6 +307,9 @@ class Record {
 
         $ret['content'] = $this->content;
         $ret['disabled'] = ( bool ) $this->disabled;
+        if ($this->setptr) {
+            $ret['set-ptr'] = ( bool ) TRUE;
+        }
 
         return $ret;
     }
