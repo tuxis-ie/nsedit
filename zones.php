@@ -147,7 +147,7 @@ case "listslaves":
     foreach ($api->listzones($q) as $sresult) {
         $zone = new Zone();
         $zone->parse($sresult);
-        $zone->setaccount(get_zone_account($zone->name, 'admin'));
+        $zone->setAccount(get_zone_account($zone->name, 'admin'));
 
         if (!check_account($zone))
             continue;
@@ -156,7 +156,7 @@ case "listslaves":
             array_push($return, $zone->export());
         } elseif ($action == "list" and $zone->kind != "Slave") {
             if ($zone->dnssec) {
-                $zone->setkeyinfo($api->getzonekeys($zone->id));
+                $zone->setKeyinfo($api->getzonekeys($zone->id));
             }
             array_push($return, $zone->export());
         }
@@ -202,27 +202,27 @@ case "create":
     }
 
     $zone = new Zone();
-    $zone->setkind($zonekind);
-    $zone->setname($zonename);
+    $zone->setKind($zonekind);
+    $zone->setName($zonename);
 
     if ($zonekind != "Slave") {
         if (!isset($_POST['zone']) or isset($_POST['owns'])) {
             foreach ($_POST['nameserver'] as $ns) {
-                $zone->addnameserver($ns);
+                $zone->addNameserver($ns);
             }
         } else {
-            $zone->importdata($_POST['zone']);
+            $zone->importData($_POST['zone']);
         }
         if (isset($defaults['soa_edit_api'])) {
-            $zone->setsoaeditapi($defaults['soa_edit_api']);
+            $zone->setSoaEditApi($defaults['soa_edit_api']);
         }
         if (isset($defaults['soa_edit'])) {
-            $zone->setsoaedit($defaults['soa_edit']);
+            $zone->setSoaEdit($defaults['soa_edit']);
         }
     } else { // Slave
         if (isset($_POST['masters'])) {
             foreach (preg_split('/[,;\s]+/', $_POST['masters'], null, PREG_SPLIT_NO_EMPTY) as $master) {
-                $zone->addmaster($master);
+                $zone->addMaster($master);
             }
         }
     }
@@ -239,10 +239,10 @@ case "create":
 
     if (is_adminuser() && isset($_POST['account'])) {
         add_db_zone($zonename, $_POST['account']);
-        $zone->setaccount($_POST['account']);
+        $zone->setAccount($_POST['account']);
     } else {
         add_db_zone($zonename, get_sess_user());
-        $zone->setaccount(get_sess_user());
+        $zone->setAccount(get_sess_user());
     }
 
     if (isset($_POST['template']) && $_POST['template'] != 'None') {
@@ -250,7 +250,7 @@ case "create":
             if ($template['name'] !== $_POST['template']) continue;
 
             foreach ($template['records'] as $record) {
-                $rrset = $zone->getrrset($record['label'], $record['type']);
+                $rrset = $zone->getRRSet($record['label'], $record['type']);
                 if ($rrset) {
                     $rrset->delete();
                 }
@@ -258,7 +258,7 @@ case "create":
             $api->savezone($zone->export());
 
             foreach ($template['records'] as $record) {
-                $zone->addrecord($record['name'], $record['type'], $record['content']);
+                $zone->addRecord($record['name'], $record['type'], $record['content']);
             }
 
             break;
@@ -280,14 +280,14 @@ case "update":
             jtable_respond(null, 'error', "Can't change account");
         } else {
             add_db_zone($zone->name, $zoneaccount);
-            $zone->setaccount($zoneaccount);
+            $zone->setAccount($zoneaccount);
         }
     }
 
     if (isset($_POST['masters'])) {
-        $zone->erasemasters();
+        $zone->eraseMasters();
         foreach(preg_split('/[,;\s]+/', $_POST['masters'], null, PREG_SPLIT_NO_EMPTY) as $master) {
-            $zone->addmaster($master);
+            $zone->addMaster($master);
         }
     }
 
@@ -324,7 +324,7 @@ case "createrecord":
         jtable_respond(null, 'error', "Please only use ASCII-characters in your fields");
     }
 
-    $record = $zone->addrecord($name, $type, $content, $_POST['disabled'], $_POST['ttl']);
+    $record = $zone->addRecord($name, $type, $content, $_POST['disabled'], $_POST['ttl']);
     $api->savezone($zone->export());
 
     jtable_respond($record, 'single');
@@ -336,14 +336,14 @@ case "editrecord":
 
     $old_record = decode_record_id(isset($_POST['id']) ? $_POST['id'] : '');
 
-    $rrset = $zone->getrrset($old_record['name'], $old_record['type']);
+    $rrset = $zone->getRRSet($old_record['name'], $old_record['type']);
     $rrset->deleteRecord($old_record['content']);
-    $zone->addrecord($_POST['name'], $_POST['type'], $_POST['content'], $_POST['disabled'], $_POST['ttl']);
+    $zone->addRecord($_POST['name'], $_POST['type'], $_POST['content'], $_POST['disabled'], $_POST['ttl']);
 
     $api->savezone($zone->export());
 
     $record['id'] = json_encode($record);
-    jtable_respond($zone->getrecord($_POST['name'], $_POST['type'], $_POST['content']), 'single');
+    jtable_respond($zone->getRecord($_POST['name'], $_POST['type'], $_POST['content']), 'single');
     break;
 
 case "deleterecord":
@@ -351,7 +351,7 @@ case "deleterecord":
     $zone->parse($api->loadzone($_GET['zoneid']));
 
     $old_record = decode_record_id(isset($_POST['id']) ? $_POST['id'] : '');
-    $rrset = $zone->getrrset($old_record['name'], $old_record['type']);
+    $rrset = $zone->getRRSet($old_record['name'], $old_record['type']);
     $rrset->deleteRecord($old_record['content']);
 
     $api->savezone($zone->export());
