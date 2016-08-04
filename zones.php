@@ -452,43 +452,36 @@ case "createrecord":
     break;
 
 case "editrecord":
-    $zone = get_zone_by_url(isset($_GET['zoneurl']) ? $_GET['zoneurl'] : '');
+    $zone = new Zone();
+    $zone->parse($api->loadzone($_GET['zoneid']));
+
     $old_record = decode_record_id(isset($_POST['id']) ? $_POST['id'] : '');
 
-    $records = get_records_except($zone, $old_record);
+    $rrset = $zone->getrrset($old_record['name'], $old_record['type']);
+    $rrset->deleteRecord($old_record['content']);
+    $zone->addrecord($_POST['name'], $_POST['type'], $_POST['content'], $_POST['disabled'], $_POST['ttl']);
 
-    $record = make_record($zone, $_POST);
-
-    if ($record['name'] !== $old_record['name'] || $record['type'] !== $old_record['type']) {
-        # rename or retype:
-        $newRecords = get_records_by_name_type($zone, $record['name'], $record['type']);
-        array_push($newRecords, $record);
-        update_records($zone, $old_record, $records); # remove from old list
-        update_records($zone, $record, $newRecords); # add to new list
-    } else {
-        array_push($records, $record);
-        update_records($zone, $record, $records);
-    }
+    $api->savezone($zone->export());
 
     $record['id'] = json_encode($record);
-    jtable_respond($record, 'single');
+    jtable_respond($zone->getrecord($_POST['name'], $_POST['type'], $_POST['content']), 'single');
     break;
 
 case "deleterecord":
-    $zone = get_zone_by_url(isset($_GET['zoneurl']) ? $_GET['zoneurl'] : '');
+    $zone = new Zone();
+    $zone->parse($api->loadzone($_GET['zoneid']));
+
     $old_record = decode_record_id(isset($_POST['id']) ? $_POST['id'] : '');
+    $rrset = $zone->getrrset($old_record['name'], $old_record['type']);
+    $rrset->deleteRecord($old_record['content']);
 
-    $records = get_records_except($zone, $old_record);
+    $api->savezone($zone->export());
 
-    update_records($zone, $old_record, $records);
     jtable_respond(null, 'delete');
     break;
 
 case "export":
-    $zone = $_GET['zone'];
-    $export = api_request("/servers/${apisid}/zones/${zone}/export");
-
-    jtable_respond($export, 'single');
+    jtable_respond($api->exportzone($_GET['zoneid']), 'single');
     break;
 
 case "gettemplatenameservers":
