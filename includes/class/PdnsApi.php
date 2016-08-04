@@ -62,7 +62,7 @@ class PdnsAPI {
         unset($zonedata['url']);
         unset($zonedata['rrsets']);
 
-        if (gettype($zone['serial']) != 'integer') {
+        if (!isset($zone['serial']) or gettype($zone['serial']) != 'integer') {
             $api->method = 'POST';
             $api->url = '/servers/localhost/zones';
             $api->content = json_encode($zonedata);

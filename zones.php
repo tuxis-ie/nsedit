@@ -233,7 +233,8 @@ case "create":
         jtable_respond(null, 'error', 'Zone already owned by someone else');
     }
 
-    $zone = $api->savezone($zone->export());
+    $api->savezone($zone->export());
+
     $zonename = $zone->name;
 
     if (is_adminuser() && isset($_POST['owner'])) {
@@ -241,16 +242,6 @@ case "create":
     } else {
         add_db_zone($zonename, get_sess_user());
     }
-
-    $rrset = $zone->getrrset($old_record['name'], $old_record['type']);
-    $rrset->deleteRecord($old_record['content']);
-    $zone->addrecord($_POST['name'], $_POST['type'], $_POST['content'], $_POST['disabled'], $_POST['ttl']);
-
-    $api->savezone($zone->export());
-
-    $record['id'] = json_encode($record);
-    jtable_respond($zone->getrecord($_POST['name'], $_POST['type'], $_POST['content']), 'single');
-    break;
 
     if (isset($_POST['template']) && $_POST['template'] != 'None') {
         foreach (user_template_list() as $template) {
