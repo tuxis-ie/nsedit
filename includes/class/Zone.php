@@ -12,7 +12,7 @@ class Zone {
         $this->soa_edit_api = '';
         $this->keyinfo = '';
         $this->account = '';
-        $this->zone = false;
+        $this->zone = FALSE;
         $this->nameservers = Array();
         $this->rrsets = Array();
         $this->masters = Array();
@@ -134,7 +134,7 @@ class Zone {
         array_push($this->rrsets, $rrset);
     }
 
-    public function addrecord($name, $type, $content, $disabled = false, $ttl = 3600) {
+    public function addrecord($name, $type, $content, $disabled = FALSE, $ttl = 3600) {
         $found = FALSE;
 
         $rrset = $this->getrrset($name, $type);
@@ -165,7 +165,7 @@ class Zone {
 
     public function getrrset($name, $type) {
         foreach ($this->rrsets as $rrset) {
-            if ($rrset->name == $name and $rrset->type = $type) {
+            if ($rrset->name == $name and $rrset->type == $type) {
                 return $rrset;
             }
         }
@@ -248,7 +248,7 @@ class RRSet {
         $this->ttl = $ttl;
     }
 
-    public function addRecord($content, $disabled = false) {
+    public function addRecord($content, $disabled = FALSE) {
         foreach ($this->records as $record) {
             if ($record->content == $content) {
                 throw Exception("Record already exists");
@@ -259,7 +259,14 @@ class RRSet {
         array_push($this->records, $record);
     }
 
-    public function addComment($content, $account, $modified_at = false) {
+    public function deleteRecord($content) {
+        foreach ($this->records as $idx => $record) {
+            if ($record->content == $content) {
+                unset($this->records[$idx]);
+            }
+        }
+    }
+    public function addComment($content, $account, $modified_at = FALSE) {
         $comment = new Comment($content, $account, $modified_at);
         array_push($this->comments, $comment);
     }
@@ -307,7 +314,7 @@ class Record {
         $ret;
 
         $ret['content'] = $this->content;
-        $ret['disabled'] = $this->disabled;
+        $ret['disabled'] = ( bool ) $this->disabled;
 
         return $ret;
     }
