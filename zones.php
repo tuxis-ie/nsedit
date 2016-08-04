@@ -259,7 +259,7 @@ case "create":
             foreach ($template['records'] as $record) {
                 $rrset = $zone->getrrset($record['label'], $record['type']);
                 if ($rrset) {
-                    $rrset->delete()
+                    $rrset->delete();
                 }
             }
             $zone = $api->savezone($zone->export());
