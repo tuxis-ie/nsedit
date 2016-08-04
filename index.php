@@ -224,7 +224,7 @@ function displayDnssecIcon(zone) {
 function displayExportIcon(zone) {
     var $img = $('<img class="list clickme" src="img/export.png" title="Export zone" />');
     $img.click(function () {
-        var $zexport = $.getJSON("zones.php?zone="+zone.record.name+"&action=export", function(data) {
+        var $zexport = $.getJSON("zones.php?zoneid="+zone.record.id+"&action=export", function(data) {
             blob = new Blob([data.Record.zone], { type: 'text/plain' });
             var dl = document.createElement('a');
             dl.addEventListener('click', function(ev) {
