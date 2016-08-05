@@ -56,6 +56,23 @@ Installing
 
 Have fun ;)
 
+Configuring PowerDNS
+====================
+Minimal cofiguration of PowerDNS for supporting nsedit has to include 3 directives:
+```
+webserver=yes
+api=yes
+api-key=SomeRandomString
+```
+
+Special note for Ubuntu Xenial Xerus 16.04 users:
+Default `pdns` package included in Ubuntu repositories has the version of 4.0.0-alpha2 and *nsedit v1.0* doesn't work with it due to API incompatibility.
+
+If your PowerDNS version is not the latest one, please consider adding PowerDNS repository to your system.
+
+Detailed instructions for adding repository are available at http://repo.powerdns.com/
+
+
 Screenshots
 ===========
 
