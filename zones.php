@@ -70,10 +70,28 @@ function rrtype_compare($a, $b) {
     }
 }
 
-function record_compare($a, $b) {
+function record_compare_default($a, $b) {
     if ($cmp = compareName($a['name'], $b['name'])) return $cmp;
     if ($cmp = rrtype_compare($a['type'], $b['type'])) return $cmp;
     if ($cmp = strnatcasecmp($a['content'], $b['content'])) return $cmp;
+    return 0;
+}
+
+function record_compare_name($a, $b) {
+    return record_compare_default($a, $b);
+}
+
+function record_compare_type($a, $b) {
+    if ($cmp = rrtype_compare($a['type'], $b['type'])) return $cmp;
+    if ($cmp = compareName($a['name'], $b['name'])) return $cmp;
+    if ($cmp = strnatcasecmp($a['content'], $b['content'])) return $cmp;
+    return 0;
+}
+
+function record_compare_content($a, $b) {
+    if ($cmp = strnatcasecmp($a['content'], $b['content'])) return $cmp;
+    if ($cmp = compareName($a['name'], $b['name'])) return $cmp;
+    if ($cmp = rrtype_compare($a['type'], $b['type'])) return $cmp;
     return 0;
 }
 
@@ -173,7 +191,25 @@ case "listrecords":
     foreach ($records as &$record) {
         $record['id'] = json_encode($record);
     }
-    usort($records, "record_compare");
+    if (isset($_GET['jtSorting'])) {
+        list($scolumn, $sorder) = preg_split("/ /", $_GET['jtSorting']);
+        switch ($scolumn) {
+            case "type":
+                usort($records, "record_compare_type");
+                break;
+            case "content":
+                usort($records, "record_compare_content");
+                break;
+            default:
+                usort($records, "record_compare_name");
+                break;
+        }
+        if ($sorder == "DESC") {
+            $records = array_reverse($records);
+        }
+    } else {
+        usort($records, "record_compare_name");
+    }
     jtable_respond($records);
     break;
 

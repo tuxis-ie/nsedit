@@ -563,6 +563,7 @@ $(document).ready(function () {
                                     noDataAvailable: 'No records for ' + zone.record.name
                                 },
                                 paging: true,
+                                sorting: true,
                                 pageSize: 20,
                                 openChildAsAccordion: true,
                                 actions: {
@@ -592,6 +593,7 @@ $(document).ready(function () {
                                     name: {
                                         title: 'Label',
                                         width: '7%',
+                                        sorting: true,
                                         create: true,
                                         display: displayContent('name', zone.record.name),
                                         inputClass: 'name',
@@ -648,6 +650,7 @@ $(document).ready(function () {
                                         title: 'Content',
                                         width: '30%',
                                         create: true,
+                                        sorting: true,
                                         display: displayContent('content'),
                                         inputClass: 'content',
                                         listClass: 'content'
@@ -656,6 +659,7 @@ $(document).ready(function () {
                                         title: 'TTL',
                                         width: '2%',
                                         create: true,
+                                        sorting: false,
                                         display: displayContent('ttl'),
                                         defaultValue: '<?php echo $defaults['ttl']; ?>',
                                         inputClass: 'ttl',
@@ -680,6 +684,7 @@ $(document).ready(function () {
                                         title: 'Disabled',
                                         width: '2%',
                                         create: true,
+                                        sorting: false,
                                         display: displayContent('disabled'),
                                         defaultValue: '<?php echo $defaults['disabled'] ? 'No' : 'Yes'; ?>',
                                         inputClass: 'disabled',
