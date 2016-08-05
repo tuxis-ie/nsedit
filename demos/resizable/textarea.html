@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>jQuery UI Resizable - Textarea</title>
+	<link rel="stylesheet" href="../../themes/base/all.css">
+	<script src="../../external/jquery/jquery.js"></script>
+	<script src="../../ui/core.js"></script>
+	<script src="../../ui/widget.js"></script>
+	<script src="../../ui/mouse.js"></script>
+	<script src="../../ui/resizable.js"></script>
+	<link rel="stylesheet" href="../demos.css">
+	<style>
+	.ui-resizable-se {
+		bottom: 17px;
+	}
+	</style>
+	<script>
+	$(function() {
+		$( "#resizable" ).resizable({
+			handles: "se"
+		});
+	});
+	</script>
+</head>
+<body>
+
+<textarea id="resizable" rows="5" cols="20"></textarea>
+
+<div class="demo-description">
+<p>Resizable can be applied to a textarea. This allows the user to make the textarea bigger to type longer prose.</p>
+</div>
+</body>
+</html>
