@@ -23,6 +23,10 @@ if (!isset($_GET['action'])) {
 switch ($_GET['action']) {
 
 case "list":
+    global $logging;
+    if ($logging !== TRUE)
+        jtable_respond(null, 'error', 'Logging is disabled');
+
     jtable_respond(getlogs());
     break;
 

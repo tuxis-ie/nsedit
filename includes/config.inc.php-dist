@@ -3,10 +3,10 @@
 $apipass = '';           # The PowerDNS API-key
 $apiip   = '';           # The IP of the PowerDNS API
 $apiport = '8081';       # The port of the PowerDNS API
-$apisid  = 'localhost';  # PowerDNS's :server_id
 $apiproto      = 'http'; # http | https
 $apisslverify  = FALSE;  # Verify SSL Certificate if using https for apiproto
 $allowzoneadd  = FALSE;  # Allow normal users to add zones
+$logging = TRUE;
 
 
 # If you configure this, nsedit will try to authenticate via WeFact too.
@@ -41,8 +41,8 @@ $templates[] = array(
 $defaults['soa_edit']    = 'INCEPTION-INCREMENT';
 $defaults['soa_edit_api'] = 'INCEPTION-INCREMENT';
 $defaults['defaulttype'] = 'Master';                    # Choose between 'Native' or 'Master'
-$defaults['ns'][0] = 'unconfigured.primaryns';          # The value of the first NS-record
-$defaults['ns'][1] = 'unconfigured.secondaryns';        # The value of the second NS-record
+$defaults['ns'][0] = 'unconfigured.primaryns.';         # The value of the first NS-record
+$defaults['ns'][1] = 'unconfigured.secondaryns.';       # The value of the second NS-record
 $defaults['ttl']   = 3600;                              # Default TTL for records
 $defaults['disabled'] = false;                          # Default disabled state
 

@@ -252,6 +252,10 @@ function user_template_names() {
 }
 
 function getlogs() {
+    global $logging;
+    if ($logging !== TRUE)
+        return;
+
     $db = get_db();
     $r = $db->query('SELECT * FROM logs ORDER BY timestamp DESC');
     $ret = array();
@@ -263,6 +267,10 @@ function getlogs() {
 }
 
 function clearlogs() {
+    global $logging;
+    if ($logging !== TRUE)
+        return;
+
     $db = get_db();
     $q = $db->query('DELETE FROM logs;');
     $db->close();
@@ -270,6 +278,10 @@ function clearlogs() {
 }
 
 function writelog($line) {
+    global $logging;
+    if ($logging !== TRUE)
+        return;
+
     try {
         $db = get_db();
         $q = $db->prepare('CREATE TABLE IF NOT EXISTS logs (
