@@ -113,6 +113,9 @@ if ($blocklogin === TRUE) {
 <div id="wrap">
     <div id="dnssecinfo">
     </div>
+    <div id="clearlogs" style="display: none;">
+        Are you sure you want to clear all the logs? Maybe save them first?
+    </div>
     <div id="menu" class="jtable-main-container <?php if ($menutype === 'horizontal') { ?>horizontal<?php } ?>">
         <div class="jtable-title menu-title">
             <div class="jtable-title-text">
@@ -123,6 +126,7 @@ if ($blocklogin === TRUE) {
             <li><a href="#" id="zoneadmin">Zones</a></li>
             <?php if (is_adminuser()) { ?>
                 <li><a href="#" id="useradmin">Users</a></li>
+                <li><a href="#" id="logadmin">Logs</a></li>
             <?php } ?>
             <li><a href="#" id="aboutme">About me</a></li>
             <li><a href="index.php?logout=1">Logout</a></li>
@@ -147,6 +151,9 @@ if ($blocklogin === TRUE) {
     <?php if (is_adminuser()) { ?>
     <div id="users">
         <div class="tables" id="Users"></div>
+    </div>
+    <div id="logs">
+        <div class="tables" id="Logs"></div>
     </div>
     <?php } ?>
 
@@ -847,25 +854,38 @@ $(document).ready(function () {
     });
 
     <?php if (is_adminuser()) { ?>
+    $('#Logs').hide();
     $('#Users').hide();
     $('#AboutMe').hide();
     $('#aboutme').click(function () {
+        $('#Logs').hide();
         $('#Users').hide();
         $('#MasterZones').hide();
         $('#SlaveZones').hide();
         $('#AboutMe').show();
     });
     $('#useradmin').click(function () {
-        $('#Users').show();
+        $('#Logs').hide();
         $('#MasterZones').hide();
         $('#SlaveZones').hide();
         $('#AboutMe').hide();
+        $('#Users').jtable('load');
+        $('#Users').show();
     });
     $('#zoneadmin').click(function () {
+        $('#Logs').hide();
         $('#Users').hide();
         $('#AboutMe').hide();
         $('#MasterZones').show();
         $('#SlaveZones').show();
+    });
+    $('#logadmin').click(function () {
+        $('#Users').hide();
+        $('#AboutMe').hide();
+        $('#MasterZones').hide();
+        $('#SlaveZones').hide();
+        $('#Logs').jtable('load');
+        $('#Logs').show();
     });
     $('#Users').jtable({
         title: 'Users',
@@ -910,7 +930,92 @@ $(document).ready(function () {
             $("#SlaveZones").jtable('reload');
         }
     });
-    $('#Users').jtable('load');
+
+    $('#Logs').jtable({
+        title: 'Logs',
+        paging: true,
+        pageSize: 20,
+        sorting: false,
+        actions: {
+            listAction: 'logs.php?action=list',
+            deleteAction: 'logs.php?action=delete',
+        },
+        messages: {
+            deleteConfirmation: 'This entry will be deleted. Are you sure?'
+        },
+        toolbar: {
+            hoverAnimation: true,
+            hoverAnimationDuration: 60,
+            hoverAnimationEasing: undefined,
+            items: [
+                {
+                    icon: 'img/delete_inverted.png',
+                    text: 'Clear logs',
+                    click: function() {
+                        $("#clearlogs").dialog({
+                            modal: true,
+                            title: "Clear all logs",
+                            width: 'auto',
+                            buttons: {
+                                Ok: function() {
+                                    $.get("logs.php?action=clear");
+                                    $( this ).dialog( "close" );
+                                    $('#Logs').jtable('load');
+                                },
+                                Cancel: function() {
+                                    $( this ).dialog( "close" );
+                                    return false;
+                                }
+                            }
+                        });
+                    }
+                },
+                {
+                    icon: 'img/export.png',
+                    text: 'Save logs',
+                    click: function () {
+                        var $zexport = $.get("logs.php?action=export", function(data) {
+                            console.log(data);
+                            blob = new Blob([data], { type: 'text/plain' });
+                            var dl = document.createElement('a');
+                            dl.addEventListener('click', function(ev) {
+                                dl.href = URL.createObjectURL(blob);
+                                dl.download = 'nseditlogs.txt';
+                            }, false);
+
+                            if (document.createEvent) {
+                                var event = document.createEvent("MouseEvents");
+                                event.initEvent("click", true, true);
+                                dl.dispatchEvent(event);
+                            }
+                        });
+                    }
+                }
+                ],
+        },
+        fields: {
+            id: {
+                title: 'key',
+                key: true,
+                type: 'hidden'
+            },
+            user: {
+                title: 'User',
+                width: '10%',
+                display: displayContent('user'),
+            },
+            log: {
+                title: 'Log',
+                width: '80%',
+                display: displayContent('log'),
+            },
+            timestamp: {
+                title: 'Timestamp',
+                width: '10%',
+                display: displayContent('timestamp')
+            }
+        }
+    });
     <?php } ?>
     $('#MasterZones').jtable('load');
     $('#SlaveZones').jtable('load');

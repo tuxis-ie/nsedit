@@ -128,6 +128,7 @@ function do_db_auth($u, $p) {
     $db->close();
 
     if ($userinfo and $userinfo['password'] and (crypt($p, $userinfo['password']) === $userinfo['password'])) {
+        writelog('Succesful login.');
         return TRUE;
     }
 
@@ -151,6 +152,11 @@ function add_user($username, $isadmin = FALSE, $password = '') {
     $ret = $q->execute();
     $db->close();
 
+    if ($isadmin) {
+        writelog("Added user $username as admin.");
+    } else {
+        writelog("Added user $username.");
+    }
     return $ret;
 }
 
@@ -166,11 +172,13 @@ function update_user($username, $isadmin, $password) {
         $q = $db->prepare('UPDATE users SET isadmin = ?, password = ? WHERE emailaddress = ?');
         $q->bindValue(1, (int)(bool)$isadmin, SQLITE3_INTEGER);
         $q->bindValue(2, $password, SQLITE3_TEXT);
-        $q->bindValue(3, $username, SQLITE3_TEXT); 
+        $q->bindValue(3, $username, SQLITE3_TEXT);
+        writelog("Updating password and/or settings for $username. Admin: ".(int)(bool)$isadmin);
     } else {
         $q = $db->prepare('UPDATE users SET isadmin = ? WHERE emailaddress = ?');
         $q->bindValue(1, (int)(bool)$isadmin, SQLITE3_INTEGER);
         $q->bindValue(2, $username, SQLITE3_TEXT); 
+        writelog("Updating settings for $username. Admin: ".(int)(bool)$isadmin);
     }
     $ret = $q->execute();
     $db->close();
@@ -178,13 +186,14 @@ function update_user($username, $isadmin, $password) {
     return $ret;
 }
 
-function delete_user($id) {
+function delete_user($username) {
     $db = get_db();
     $q = $db->prepare('DELETE FROM users WHERE id = ?');
     $q->bindValue(1, $id, SQLITE3_INTEGER);
     $ret = $q->execute();
     $db->close();
 
+    writelog("Deleted user $username.");
     return $ret;
 }
 
@@ -242,7 +251,43 @@ function user_template_names() {
     return $templatenames;
 }
 
+function getlogs() {
+    $db = get_db();
+    $r = $db->query('SELECT * FROM logs ORDER BY timestamp DESC');
+    $ret = array();
+    while ($row = $r->fetchArray(SQLITE3_ASSOC)) {
+        array_push($ret, $row);
+    }
 
+    return $ret;
+}
+
+function clearlogs() {
+    $db = get_db();
+    $q = $db->query('DELETE FROM logs;');
+    $db->close();
+    writelog("Logtable truncated.");
+}
+
+function writelog($line) {
+    try {
+        $db = get_db();
+        $q = $db->prepare('CREATE TABLE IF NOT EXISTS logs (
+            id INTEGER PRIMARY KEY,
+            user TEXT NOT NULL,
+            log TEXT NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);');
+        $ret = $q->execute();
+
+        $q = $db->prepare('INSERT INTO logs (user, log) VALUES (:user, :log)');
+        $q->bindValue(':user', get_sess_user(), SQLITE3_TEXT);
+        $q->bindValue(':log', $line, SQLITE3_TEXT);
+        $q->execute();
+        $db->close();
+    } catch (Exception $e) {
+        return jtable_respond(null, 'error', $e->getMessage());
+    }
+}
 
 /* This function was taken from https://gist.github.com/rsky/5104756 to make
 it available on older php versions. Thanks! */

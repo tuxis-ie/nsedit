@@ -188,9 +188,6 @@ case "listrecords":
     $zone = new Zone();
     $zone->parse($zonedata);
     $records = $zone->rrsets2records();
-    foreach ($records as &$record) {
-        $record['id'] = json_encode($record);
-    }
     if (isset($_GET['jtSorting'])) {
         list($scolumn, $sorder) = preg_split("/ /", $_GET['jtSorting']);
         switch ($scolumn) {
@@ -218,6 +215,7 @@ case "delete":
     $api->deletezone($_POST['id']);
 
     delete_db_zone($zone['name']);
+    writelog("Deleted zone ".$zone['name']);
     jtable_respond(null, 'delete');
     break;
 
@@ -302,6 +300,7 @@ case "create":
     }
 
     $zone = $api->savezone($zone->export());
+    writelog("Created zone ".$zone['name']);
     jtable_respond($zone, 'single');
     break;
 
@@ -327,6 +326,7 @@ case "update":
         }
     }
 
+    writelog("Updated zone ".$zone->name);
     jtable_respond($api->savezone($zone->export()), 'single');
     break;
 
@@ -363,6 +363,7 @@ case "createrecord":
     $record = $zone->addRecord($name, $type, $content, $_POST['disabled'], $_POST['ttl'], $_POST['setptr']);
     $api->savezone($zone->export());
 
+    writelog("Created record: ".$record['id']);
     jtable_respond($record, 'single');
     break;
 
@@ -378,8 +379,9 @@ case "editrecord":
 
     $api->savezone($zone->export());
 
-    $record['id'] = json_encode($record);
-    jtable_respond($zone->getRecord($_POST['name'], $_POST['type'], $_POST['content']), 'single');
+    $record = $zone->getRecord($_POST['name'], $_POST['type'], $_POST['content']);
+    writelog("Updated record ".$_POST['id']." to ".$record['id']);
+    jtable_respond($record, 'single');
     break;
 
 case "deleterecord":
@@ -392,16 +394,22 @@ case "deleterecord":
 
     $api->savezone($zone->export());
 
+    writelog("Deleted record ".$_POST['id']);
     jtable_respond(null, 'delete');
     break;
 
 case "export":
+    writelog("Exported zone ".$_GET['zoneid']);
     jtable_respond($api->exportzone($_GET['zoneid']), 'single');
     break;
 
 case "clone":
     $name = $_POST['destname'];
     $src  = $_POST['sourcename'];
+
+    if (!string_ends_with($name, '.')) {
+        $name = $name.".";
+    }
 
     if (!_valid_label($name)) {
         jtable_respond(null, 'error', "Invalid destination zonename");
@@ -424,6 +432,7 @@ case "clone":
     }
     $zone = $api->savezone($srczone->export());
 
+    writelog("Cloned zone $src into $name");
     jtable_respond($zone, 'single');
     break;
 
