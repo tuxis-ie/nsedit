@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Add Clear - jQuery Plugin - Demo</title>
+	<meta name="author" content="Stephen Korecky">
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+	<script type="text/javascript" src="addclear.js"></script>
+	<script type="text/javascript" charset="utf-8">
+	  $(function(){
+	    $("input").addClear();
+	  });
+	</script>
+	<style type="text/css" media="screen">
+
+	body {
+	  font:normal 16px/1.5 "Helvetica Neue", Helvetica, sans-serif;
+	}
+
+	 #wrapper {
+	   margin:100px auto 0;
+	   width:500px;
+	 }
+
+	 #wrapper h1 {
+     border-bottom:1px solid #EEE;
+     color:#666;
+	   font-size:28px;
+	 }
+
+	 #wrapper #search {
+	   background:#F5F5F5;
+ 	   border-radius: 2px;
+ 	   font-weight:bold;
+ 	   padding:10px;
+ 	 }
+
+	 #wrapper #search label {
+     color:#999;
+	   font-weight:bold;
+	   margin:0 5px;
+	 }
+
+	 #wrapper #search input {
+     font-size: 18px;
+	   width:200px;
+	 }
+
+	 #wrapper #search span.note {
+     color:#CCC;
+     display:block;
+	   font-size:12px;
+	   font-weight:normal;
+     margin:5px 0 0 ;
+	 }
+	</style>
+</head>
+<body>
+  <div id="wrapper">
+    <h1>Add Clear - jQuery Plugin</h1>
+    <p id="search">
+      <label for="search_input">Search</label>
+      <input type="text" name="search" value="" id="search_input">
+      <span class="note">When you type something in this box, the clear button will appear.</span>
+    </p>
+    <p><a href="http://github.com/skorecky/Add-Clear">Github Project Page</a> | <a href="http://twitter.com/skorecky">@skorecky</a></p>
+  </div>
+</body>
+</html>
