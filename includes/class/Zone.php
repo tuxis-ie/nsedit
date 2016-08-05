@@ -236,7 +236,7 @@ class RRSet {
         $this->name = $name;
     }
 
-    public function addRecord($content, $disabled = FALSE, $setptr) {
+    public function addRecord($content, $disabled = FALSE, $setptr = FALSE) {
         foreach ($this->records as $record) {
             if ($record->content == $content) {
                 throw Exception("Record already exists");
