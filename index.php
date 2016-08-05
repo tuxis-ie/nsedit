@@ -883,12 +883,9 @@ $(document).ready(function () {
             deleteConfirmation: 'This user will be deleted. Are you sure?'
         },
         fields: {
-            id: {
-                key: true,
-                type: 'hidden'
-            },
             emailaddress: {
                 title: 'User',
+                key: true,
                 display: displayContent('emailaddress'),
                 inputClass: 'emailaddress',
                 listClass: 'emailaddress'
