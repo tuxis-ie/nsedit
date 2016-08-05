@@ -10,8 +10,10 @@ Features
 ========
 * Import BIND- or AXFR-style dumps of your existing zones
 * Add/remove zones and records
+* Clone zones
 * Show the DNSsec details of a zone
-* Multiple user support 
+* Multiple user support
+* Allow logging of all actions in NSEdit, including exporting the log in JSON-format
 * [experimental] nsedit API, to create zones from another system
 
 User support
@@ -32,7 +34,7 @@ Requirements
 * php sqlite3
 * php curl
 * php with openssl support
-* PowerDNS with the experimental JSON-api enabled (3.4.0 should do. For Pdns > 4.0.0 you ***NEED*** v1.0 of NSEdit)
+* PowerDNS with the JSON-api enabled. Version 4.0.0 or greater
 
 Installing
 ==========
@@ -41,8 +43,8 @@ Installing
     -  Run git clone in the directory where you want to run nsedit from
     : ```git clone https://github.com/tuxis-ie/nsedit.git```
 
-    - Select tag v0.9 or skip this if you want to run from master
-    : ```git checkout tags/v0.9```
+    - Select tag v1.0 or skip this if you want to run from master
+    : ```git checkout tags/v1.0```
 * Via releases
     - Download the zip-file from [Releases](https://github.com/tuxis-ie/nsedit/releases)
 

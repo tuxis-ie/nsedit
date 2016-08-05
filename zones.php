@@ -3,122 +3,13 @@
 include_once('includes/config.inc.php');
 include_once('includes/session.inc.php');
 include_once('includes/misc.inc.php');
+include_once('includes/class/PdnsApi.php');
+include_once('includes/class/Zone.php');
 
 if (!is_csrf_safe()) {
     header('Status: 403');
     header('Location: ./index.php');
     jtable_respond(null, 'error', "Authentication required");
-}
-
-function api_request($path, $opts = null, $type = null) {
-    global $apiproto, $apisslverify, $apisid, $apiuser, $apipass, $apiip, $apiport, $authmethod, $apipath;
-
-    $url = "$apiproto://$apiip:$apiport${apipath}${path}";
-
-    if ($authmethod == "auto") {
-        $ad = curl_init();
-
-        if ( strcasecmp( $apiproto, 'https' ) == 0 ) {
-            curl_setopt($ad, CURLOPT_SSL_VERIFYPEER, $apisslverify);
-        }
-
-        curl_setopt($ad, CURLOPT_HTTPHEADER, array('X-API-Key: '.$apipass));
-        curl_setopt($ad, CURLOPT_URL, "$apiproto://$apiip:$apiport/servers/localhost/statistics");
-        curl_setopt($ad, CURLOPT_RETURNTRANSFER, 1);
-        curl_exec($ad);
-        if (curl_getinfo($ad, CURLINFO_HTTP_CODE) == 401) {
-            $authmethod = 'userpass';
-        } else {
-            $authmethod = 'xapikey';
-        }
-    }
-
-    $headers = array();
-    array_push($headers, 'Accept: application/json');
-    $ch = curl_init();
-    if ($authmethod == "xapikey") {
-        array_push($headers, 'X-API-Key: '.$apipass);
-    } else {
-        curl_setopt($ch, CURLOPT_USERPWD, "$apiuser:$apipass");
-    }
-    if ( strcasecmp( $apiproto, 'https' ) == 0 ) {
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $apisslverify);
-    }
-    curl_setopt($ch, CURLOPT_URL, $url); 
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
-    if ($opts) {
-        if (!$type) {
-            $type = 'POST';
-        }
-        $postdata = json_encode($opts);
-        array_push($headers, 'Content-Type: application/json');
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata);
-    }
-
-    switch ($type) {
-    case 'DELETE':
-    case 'PATCH':
-    case 'PUT':
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $type);
-        break;
-    case 'POST':
-        break;
-    }
-
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    $return = curl_exec($ch);
-    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $json = json_decode($return, 1);
-
-    if (isset($json['error'])) {
-        jtable_respond(null, 'error', "API Error $code: ".$json['error']);
-    } elseif ($code < 200 || $code >= 300) {
-        if ($code == 401) {
-            $code = "Authentication failed. Have you configured your authmethod correct?";
-        }
-        jtable_respond(null, 'error', "API Error: $code");
-    }
-    return $json;
-}
-
-function zones_api_request($opts = null, $type = 'POST') {
-    global $apisid;
-
-    return api_request("/servers/${apisid}/zones", $opts, $type);
-}
-
-function get_all_zones() {
-    return zones_api_request();
-}
-
-function _get_zone_by_key($key, $value) {
-    if ($value !== '') {
-        foreach (get_all_zones() as $zone) {
-            if ($zone[$key] === $value) {
-                $zone['owner'] = get_zone_owner($zone['name'], 'admin');
-
-                if (!check_owner($zone)) {
-                    jtable_respond(null, 'error', 'Access denied');
-                }
-                return $zone;
-            }
-        }
-    }
-    header('Status: 404 Not found');
-    jtable_respond(null, 'error', "Zone not found");
-}
-
-function get_zone_by_url($zoneurl) {
-    return _get_zone_by_key('url', $zoneurl);
-}
-
-function get_zone_by_id($zoneid) {
-    return _get_zone_by_key('id', $zoneid);
-}
-
-function get_zone_by_name($zonename) {
-    return _get_zone_by_key('name', $zonename);
 }
 
 /* This function is taken from:
@@ -130,116 +21,7 @@ function is_ascii($string) {
 }
 
 function _valid_label($name) {
-    return is_ascii($name) && ( bool ) preg_match("/^([-.a-z0-9_\/\*]+)?$/i", $name );
-}
-
-function make_record($zone, $input) {
-    global $defaults;
-
-    $name = isset($input['name']) ? $input['name'] : '';
-
-    if ('' == $name) {
-        $name = $zone['name'];
-    } elseif (string_ends_with($name, '.')) {
-        # "absolute" name, shouldn't append zone[name] - but check.
-        $name = substr($name, 0, -1);
-        if (!string_ends_with($name, $zone['name'])) {
-            jtable_respond(null, 'error', "Name $name not in zone ".$zone['name']);
-        }
-    } else if (!string_ends_with($name, $zone['name'])) {
-        $name = $name . '.' . $zone['name'];
-    }
-
-    $ttl = (int) ((isset($input['ttl']) && $input['ttl']) ? $input['ttl'] : $defaults['ttl']);
-    $type = isset($input['type']) ? $input['type'] : '';
-    $disabled = (bool) (isset($input['disabled']) && $input['disabled']);
-
-    $content = isset($input['content']) ? $input['content'] : '';
-
-    if ($type === 'TXT') {
-        # empty TXT records are ok, otherwise require surrounding quotes: "..."
-        if (strlen($content) == 1 || substr($content, 0, 1) !== '"' || substr($content, -1) !== '"') {
-            # fix quoting: first escape all \, then all ", then surround with quotes.
-            $content = '"'.str_replace('"', '\\"', str_replace('\\', '\\\\', $content)).'"';
-        }
-    }
-
-    if (!_valid_label($name)) {
-        jtable_respond(null, 'error', "Please only use [a-z0-9_/.-]");
-    }
-    if (!$type) {
-        jtable_respond(null, 'error', "Require a type");
-    }
-    if (!is_ascii($content)) {
-        jtable_respond(null, 'error', "Please only use ASCII-characters in your fields");
-    }
-
-    return array(
-        'disabled' => $disabled,
-        'type' => $type,
-        'name' => $name,
-        'ttl'  => $ttl,
-        'content'   => $content);
-}
-
-function update_records($zone, $name_and_type, $inputs) {
-    # need one "record" to extract name and type, in case we have no inputs
-    # (deletion of all records)
-    $name_and_type = make_record($zone, $name_and_type);
-    $name = $name_and_type['name'];
-    $type = $name_and_type['type'];
-
-    $records = array();
-    foreach ($inputs as $input) {
-        $record = make_record($zone, $input);
-        if ($record['name'] !== $name || $record['type'] !== $type) {
-            jtable_respond(null, 'error', "Records not matching");
-        }
-
-        array_push($records, $record);
-    }
-
-    if (!_valid_label($name)) {
-        jtable_respond(null, 'error', "Please only use [a-z0-9_/.-]");
-    }
-
-    $patch = array(
-        'rrsets' => array(array(
-            'name' => $name,
-            'type' => $type,
-            'changetype' => count($records) ? 'REPLACE' : 'DELETE',
-            'records' => $records)));
-
-    api_request($zone['url'], $patch, 'PATCH');
-}
-
-function create_record($zone, $input) {
-    $record = make_record($zone, $input);
-    $records = get_records_by_name_type($zone, $record['name'], $record['type']);
-    array_push($records, $record);
-
-    $patch = array(
-        'rrsets' => array(array(
-            'name' => $record['name'],
-            'type' => $record['type'],
-            'changetype' => 'REPLACE',
-            'records' => $records)));
-
-    api_request($zone['url'], $patch, 'PATCH');
-
-    return $record;
-}
-
-function get_records_by_name_type($zone, $name, $type) {
-    $zone = api_request($zone['url']);
-    $records = array();
-    foreach ($zone['records'] as $record) {
-        if ($record['name'] == $name and $record['type'] == $type) {
-            array_push($records, $record);
-        }
-    }
-
-    return $records;
+    return is_ascii($name) && ( bool ) preg_match("/^([-.a-z0-9_\/\*]+)?.$/i", $name );
 }
 
 function decode_record_id($id) {
@@ -253,39 +35,6 @@ function decode_record_id($id) {
         jtable_respond(null, 'error', "Invalid record id");
     }
     return $record;
-}
-
-# get all records with same name and type but different id (content)
-# requires records with id to be present
-# SOA records match always, regardless of content.
-function get_records_except($zone, $exclude) {
-    $is_soa = ($exclude['type'] == 'SOA');
-
-    $found = false;
-    $zone = api_request($zone['url']);
-    $records = array();
-    foreach ($zone['records'] as $record) {
-        if ($record['name'] == $exclude['name'] and $record['type'] == $exclude['type']) {
-            if ($is_soa) {
-                # SOA changes all the time (serial); we can't match it in a sane way.
-                # OTOH we know it is unique anyway - just pretend we found a match.
-                $found = true;
-            } elseif ($record['content'] != $exclude['content']
-                or $record['ttl']        != $exclude['ttl']
-                or $record['disabled']   != $exclude['disabled']) {
-                array_push($records, $record);
-            } else {
-                $found = true;
-            }
-        }
-    }
-
-    if (!$found) {
-        header("Status: 404 Not Found");
-        jtable_respond(null, 'error', "Didn't find record with id");
-    }
-
-    return $records;
 }
 
 function compareName($a, $b) {
@@ -321,29 +70,47 @@ function rrtype_compare($a, $b) {
     }
 }
 
-function record_compare($a, $b) {
+function record_compare_default($a, $b) {
     if ($cmp = compareName($a['name'], $b['name'])) return $cmp;
     if ($cmp = rrtype_compare($a['type'], $b['type'])) return $cmp;
     if ($cmp = strnatcasecmp($a['content'], $b['content'])) return $cmp;
     return 0;
 }
 
-function add_db_zone($zonename, $ownername) {
-    if (valid_user($ownername) === false) {
-        jtable_respond(null, 'error', "$ownername is not a valid username");
+function record_compare_name($a, $b) {
+    return record_compare_default($a, $b);
+}
+
+function record_compare_type($a, $b) {
+    if ($cmp = rrtype_compare($a['type'], $b['type'])) return $cmp;
+    if ($cmp = compareName($a['name'], $b['name'])) return $cmp;
+    if ($cmp = strnatcasecmp($a['content'], $b['content'])) return $cmp;
+    return 0;
+}
+
+function record_compare_content($a, $b) {
+    if ($cmp = strnatcasecmp($a['content'], $b['content'])) return $cmp;
+    if ($cmp = compareName($a['name'], $b['name'])) return $cmp;
+    if ($cmp = rrtype_compare($a['type'], $b['type'])) return $cmp;
+    return 0;
+}
+
+function add_db_zone($zonename, $accountname) {
+    if (valid_user($accountname) === false) {
+        jtable_respond(null, 'error', "$accountname is not a valid username");
     }
     if (!_valid_label($zonename)) {
         jtable_respond(null, 'error', "$zonename is not a valid zonename");
     }
 
-    if (is_apiuser() && !user_exists($ownername)) {
-        add_user($ownername);
+    if (is_apiuser() && !user_exists($accountname)) {
+        add_user($accountname);
     }
 
     $db = get_db();
     $q = $db->prepare("INSERT OR REPLACE INTO zones (zone, owner) VALUES (?, (SELECT id FROM users WHERE emailaddress = ?))");
     $q->bindValue(1, $zonename, SQLITE3_TEXT);
-    $q->bindValue(2, $ownername, SQLITE3_TEXT);
+    $q->bindValue(2, $accountname, SQLITE3_TEXT);
     $q->execute();
     $db->close();
 }
@@ -359,7 +126,7 @@ function delete_db_zone($zonename) {
     $db->close();
 }
 
-function get_zone_owner($zonename, $default) {
+function get_zone_account($zonename, $default) {
     if (!_valid_label($zonename)) {
         jtable_respond(null, 'error', "$zonename is not a valid zonename");
     }
@@ -376,28 +143,8 @@ function get_zone_owner($zonename, $default) {
     return $default;
 }
 
-function get_zone_keys($zone) {
-    $ret = array();
-    foreach (api_request($zone['url'] . "/cryptokeys") as $key) {
-        if (!isset($key['active']))
-            continue;
-
-        $key['dstxt'] = $zone['name'] . ' IN DNSKEY '.$key['dnskey']."\n\n";
-
-        if (isset($key['ds'])) {
-            foreach ($key['ds'] as $ds) {
-                $key['dstxt'] .= $zone['name'] . ' IN DS '.$ds."\n";
-            }
-            unset($key['ds']);
-        }
-        $ret[] = $key;
-    }
-
-    return $ret;
-}
-
-function check_owner($zone) {
-    return is_adminuser() or ($zone['owner'] === get_sess_user());
+function check_account($zone) {
+    return is_adminuser() or ($zone->account === get_sess_user());
 }
 
 if (isset($_GET['action'])) {
@@ -406,33 +153,72 @@ if (isset($_GET['action'])) {
     jtable_respond(null, 'error', 'No action given');
 }
 
+try {
+$api = new PdnsAPI;
+
 switch ($action) {
 
 case "list":
 case "listslaves":
-    $return = array();
+    $return = Array();
     $q = isset($_POST['domsearch']) ? $_POST['domsearch'] : false;
-    foreach (get_all_zones() as $zone) {
-        $zone['owner'] = get_zone_owner($zone['name'], 'admin');
-        if (!check_owner($zone))
+    foreach ($api->listzones($q) as $sresult) {
+        $zone = new Zone();
+        $zone->parse($sresult);
+        $zone->setAccount(get_zone_account($zone->name, 'admin'));
+
+        if (!check_account($zone))
             continue;
 
-        if ($q && !preg_match("/$q/", $zone['name'])) {
-            continue;
-        }
-
-        if ($action == "listslaves" and $zone['kind'] == "Slave") {
-            array_push($return, $zone);
-        } elseif ($action == "list" and $zone['kind'] != "Slave") {
-            if ($zone['dnssec']) {
-                $zone['keyinfo'] = get_zone_keys($zone);
+        if ($action == "listslaves" and $zone->kind == "Slave") {
+            array_push($return, $zone->export());
+        } elseif ($action == "list" and $zone->kind != "Slave") {
+            if ($zone->dnssec) {
+                $zone->setKeyinfo($api->getzonekeys($zone->id));
             }
-            array_push($return, $zone);
+            array_push($return, $zone->export());
         }
     }
     usort($return, "zone_compare");
     jtable_respond($return);
     break;
+
+case "listrecords":
+    $zonedata = $api->loadzone($_GET['zoneid']);
+    $zone = new Zone();
+    $zone->parse($zonedata);
+    $records = $zone->rrsets2records();
+    if (isset($_GET['jtSorting'])) {
+        list($scolumn, $sorder) = preg_split("/ /", $_GET['jtSorting']);
+        switch ($scolumn) {
+            case "type":
+                usort($records, "record_compare_type");
+                break;
+            case "content":
+                usort($records, "record_compare_content");
+                break;
+            default:
+                usort($records, "record_compare_name");
+                break;
+        }
+        if ($sorder == "DESC") {
+            $records = array_reverse($records);
+        }
+    } else {
+        usort($records, "record_compare_name");
+    }
+    jtable_respond($records);
+    break;
+
+case "delete":
+    $zone = $api->loadzone($_POST['id']);
+    $api->deletezone($_POST['id']);
+
+    delete_db_zone($zone['name']);
+    writelog("Deleted zone ".$zone['name']);
+    jtable_respond(null, 'delete');
+    break;
+
 
 case "create":
     $zonename = isset($_POST['name']) ? $_POST['name'] : '';
@@ -449,55 +235,50 @@ case "create":
         jtable_respond(null, 'error', "Not enough data");
     }
 
-    $createOptions = array(
-        'name' => $zonename,
-        'kind' => $zonekind,
-        );
-
-    $nameservers = array();
-    foreach($_POST['nameserver'] as $ns) {
-        if (isset($ns) && !empty($ns)) {
-            array_push($nameservers, $ns);
-        }
-    }
+    $zone = new Zone();
+    $zone->setKind($zonekind);
+    $zone->setName($zonename);
 
     if ($zonekind != "Slave") {
-        $createOptions['nameservers'] = $nameservers;
-        if (!isset($_POST['zone'])) {
-            if (0 == count($nameservers)) {
-                jtable_respond(null, 'error', "Require nameservers");
+        if (!isset($_POST['zone']) or isset($_POST['owns'])) {
+            foreach ($_POST['nameserver'] as $ns) {
+                $zone->addNameserver($ns);
             }
         } else {
-            $createOptions['zone'] = $_POST['zone'];
+            $zone->importData($_POST['zone']);
         }
         if (isset($defaults['soa_edit_api'])) {
-            $createOptions['soa_edit_api'] = $defaults['soa_edit_api'];
+            $zone->setSoaEditApi($defaults['soa_edit_api']);
         }
         if (isset($defaults['soa_edit'])) {
-            $createOptions['soa_edit'] = $defaults['soa_edit'];
+            $zone->setSoaEdit($defaults['soa_edit']);
         }
     } else { // Slave
         if (isset($_POST['masters'])) {
-            $createOptions['masters'] = preg_split('/[,;\s]+/', $_POST['masters'], null, PREG_SPLIT_NO_EMPTY);
-        }
-        if (0 == count($createOptions['masters'])) {
-            jtable_respond(null, 'error', "Slave requires master servers");
+            foreach (preg_split('/[,;\s]+/', $_POST['masters'], null, PREG_SPLIT_NO_EMPTY) as $master) {
+                $zone->addMaster($master);
+            }
         }
     }
 
-    // only admin user and original owner can "recreate" zones that are already
+    // only admin user and original account can "recreate" zones that are already
     // present in our own db but got lost in pdns.
-    if (!is_adminuser() && get_sess_user() !== get_zone_owner($zonename, get_sess_user())) {
+    if (!is_adminuser() && get_sess_user() !== get_zone_account($zonename, get_sess_user())) {
         jtable_respond(null, 'error', 'Zone already owned by someone else');
     }
 
-    $zone = zones_api_request($createOptions);
-    $zonename = $zone['name'];
+    $api->savezone($zone->export());
 
-    if (is_adminuser() && isset($_POST['owner'])) {
-        add_db_zone($zonename, $_POST['owner']);
+    $zone = new Zone();
+    $zone->parse($api->loadzone($zonename));
+    $zonename = $zone->name;
+
+    if (is_adminuser() && isset($_POST['account'])) {
+        add_db_zone($zonename, $_POST['account']);
+        $zone->setAccount($_POST['account']);
     } else {
         add_db_zone($zonename, get_sess_user());
+        $zone->setAccount(get_sess_user());
     }
 
     if (isset($_POST['template']) && $_POST['template'] != 'None') {
@@ -505,137 +286,156 @@ case "create":
             if ($template['name'] !== $_POST['template']) continue;
 
             foreach ($template['records'] as $record) {
-                if ($record['type'] == 'NS' and array_search($record['content'], $nameservers) !== FALSE) {
-                    continue;
+                $rrset = $zone->getRRSet($record['label'], $record['type']);
+                if ($rrset) {
+                    $rrset->delete();
                 }
-                if (isset($record['label'])) {
-                    $record['name'] = $record['label'];
-                    unset($record['label']);
-                }
-                create_record($zone, $record);
             }
+            $api->savezone($zone->export());
+
+            foreach ($template['records'] as $record) {
+                $zone->addRecord($record['name'], $record['type'], $record['content']);
+            }
+
             break;
         }
     }
 
-    if (isset($_POST['zone']) && isset($_POST['owns']) && $_POST['owns'] && count($nameservers)) {
-        $records = array();
-        foreach ($nameservers as $ns) {
-            array_push($records, array('type' => 'NS', 'content' => $ns));
-        }
-        update_records($zone, $records[0], $records);
-    }
-
-    unset($zone['records']);
-    unset($zone['comments']);
+    $zone = $api->savezone($zone->export());
+    writelog("Created zone ".$zone['name']);
     jtable_respond($zone, 'single');
     break;
 
 case "update":
-    $zone = get_zone_by_id(isset($_POST['id']) ? $_POST['id'] : '');
+    $zone = new Zone();
+    $zone->parse($api->loadzone($_POST['id']));
+    $zoneaccount = isset($_POST['account']) ? $_POST['account'] : $zone->account;
 
-    $zoneowner = isset($_POST['owner']) ? $_POST['owner'] : $zone['owner'];
-
-    if ($zone['owner'] !== $zoneowner) {
+    if ($zone->account !== $zoneaccount) {
         if (!is_adminuser()) {
             header("Status: 403 Access denied");
-            jtable_respond(null, 'error', "Can't change owner");
+            jtable_respond(null, 'error', "Can't change account");
         } else {
-            add_db_zone($zone['name'], $zoneowner);
-            $zone['owner'] = $zoneowner;
+            add_db_zone($zone->name, $zoneaccount);
+            $zone->setAccount($zoneaccount);
         }
     }
 
-    $update = false;
-
     if (isset($_POST['masters'])) {
-        $zone['masters'] = preg_split('/[,;\s]+/', $_POST['masters'], null, PREG_SPLIT_NO_EMPTY);
-        $update = true;
+        $zone->eraseMasters();
+        foreach(preg_split('/[,;\s]+/', $_POST['masters'], null, PREG_SPLIT_NO_EMPTY) as $master) {
+            $zone->addMaster($master);
+        }
     }
 
-    if ($update) {
-        $zoneUpdate = $zone;
-        unset($zoneUpdate['id']);
-        unset($zoneUpdate['url']);
-        unset($zoneUpdate['owner']);
-        $newZone = api_request($zone['url'], $zoneUpdate, 'PUT');
-        $newZone['owner'] = $zone['owner'];
-    } else {
-        $newZone = $zone;
-    }
-    unset($newZone['records']);
-    unset($newZone['comments']);
-
-    jtable_respond($newZone, 'single');
-    break;
-
-case "delete":
-    $zone = get_zone_by_id(isset($_POST['id']) ? $_POST['id'] : '');
-
-    api_request($zone['url'], array(), 'DELETE');
-    delete_db_zone($zone['name']);
-    jtable_respond(null, 'delete');
-    break;
-
-case "listrecords":
-    $zone = get_zone_by_url(isset($_GET['zoneurl']) ? $_GET['zoneurl'] : '');
-
-    $a = api_request($zone['url']);
-    $records = $a['records'];
-    foreach ($records as &$record) {
-        $record['id'] = json_encode($record);
-    }
-    unset($record);
-    usort($records, "record_compare");
-    jtable_respond($records);
+    writelog("Updated zone ".$zone->name);
+    jtable_respond($api->savezone($zone->export()), 'single');
     break;
 
 case "createrecord":
-    $zone = get_zone_by_url(isset($_GET['zoneurl']) ? $_GET['zoneurl'] : '');
-    $record = create_record($zone, $_POST);
+    $zone = new Zone();
+    $zone->parse($api->loadzone($_GET['zoneid']));
 
-    $record['id'] = json_encode($record);
+    $name = isset($_POST['name']) ? $_POST['name'] : '';
+    $type = $_POST['type'];
+    $content = $_POST['content'];
+
+    if ('' == $name) {
+        $name = $zone->name;
+    } elseif (string_ends_with($name, '.')) {
+        # "absolute" name, shouldn't append zone[name] - but check.
+        $name = substr($name, 0, -1);
+        if (!string_ends_with($name, $zone->name)) {
+            jtable_respond(null, 'error', "Name $name not in zone ".$zone->name);
+        }
+    } else if (!string_ends_with($name, $zone->name)) {
+        $name = $name . '.' . $zone->name;
+    }
+
+    if (!_valid_label($name)) {
+        jtable_respond(null, 'error', "Please only use [a-z0-9_/.-]");
+    }
+    if (!$type) {
+        jtable_respond(null, 'error', "Require a type");
+    }
+    if (!is_ascii($content)) {
+        jtable_respond(null, 'error', "Please only use ASCII-characters in your fields");
+    }
+
+    $record = $zone->addRecord($name, $type, $content, $_POST['disabled'], $_POST['ttl'], $_POST['setptr']);
+    $api->savezone($zone->export());
+
+    writelog("Created record: ".$record['id']);
     jtable_respond($record, 'single');
     break;
 
 case "editrecord":
-    $zone = get_zone_by_url(isset($_GET['zoneurl']) ? $_GET['zoneurl'] : '');
+    $zone = new Zone();
+    $zone->parse($api->loadzone($_GET['zoneid']));
+
     $old_record = decode_record_id(isset($_POST['id']) ? $_POST['id'] : '');
 
-    $records = get_records_except($zone, $old_record);
+    $rrset = $zone->getRRSet($old_record['name'], $old_record['type']);
+    $rrset->deleteRecord($old_record['content']);
+    $zone->addRecord($_POST['name'], $_POST['type'], $_POST['content'], $_POST['disabled'], $_POST['ttl'], $_POST['setptr']);
 
-    $record = make_record($zone, $_POST);
+    $api->savezone($zone->export());
 
-    if ($record['name'] !== $old_record['name'] || $record['type'] !== $old_record['type']) {
-        # rename or retype:
-        $newRecords = get_records_by_name_type($zone, $record['name'], $record['type']);
-        array_push($newRecords, $record);
-        update_records($zone, $old_record, $records); # remove from old list
-        update_records($zone, $record, $newRecords); # add to new list
-    } else {
-        array_push($records, $record);
-        update_records($zone, $record, $records);
-    }
-
-    $record['id'] = json_encode($record);
+    $record = $zone->getRecord($_POST['name'], $_POST['type'], $_POST['content']);
+    writelog("Updated record ".$_POST['id']." to ".$record['id']);
     jtable_respond($record, 'single');
     break;
 
 case "deleterecord":
-    $zone = get_zone_by_url(isset($_GET['zoneurl']) ? $_GET['zoneurl'] : '');
+    $zone = new Zone();
+    $zone->parse($api->loadzone($_GET['zoneid']));
+
     $old_record = decode_record_id(isset($_POST['id']) ? $_POST['id'] : '');
+    $rrset = $zone->getRRSet($old_record['name'], $old_record['type']);
+    $rrset->deleteRecord($old_record['content']);
 
-    $records = get_records_except($zone, $old_record);
+    $api->savezone($zone->export());
 
-    update_records($zone, $old_record, $records);
+    writelog("Deleted record ".$_POST['id']);
     jtable_respond(null, 'delete');
     break;
 
 case "export":
-    $zone = $_GET['zone'];
-    $export = api_request("/servers/${apisid}/zones/${zone}/export");
+    writelog("Exported zone ".$_GET['zoneid']);
+    jtable_respond($api->exportzone($_GET['zoneid']), 'single');
+    break;
 
-    jtable_respond($export, 'single');
+case "clone":
+    $name = $_POST['destname'];
+    $src  = $_POST['sourcename'];
+
+    if (!string_ends_with($name, '.')) {
+        $name = $name.".";
+    }
+
+    if (!_valid_label($name)) {
+        jtable_respond(null, 'error', "Invalid destination zonename");
+    }
+
+    $srczone = new Zone();
+    $srczone->parse($api->loadzone($src));
+
+    $srczone->setId('');
+    $srczone->setName($name);
+    $srczone->setSerial('');
+    $zone = $api->savezone($srczone->export());
+
+    $srczone->parse($zone);
+
+    foreach ($srczone->rrsets as $rrset) {
+        $newname = $rrset->name;
+        $newname = preg_replace('/'.$src.'$/', $name, $newname);
+        $rrset->setName($newname);
+    }
+    $zone = $api->savezone($srczone->export());
+
+    writelog("Cloned zone $src into $name");
+    jtable_respond($zone, 'single');
     break;
 
 case "gettemplatenameservers":
@@ -669,7 +469,23 @@ case "getformnameservers":
         }
     }
     break;
+case "formzonelist":
+    $zones = $api->listzones();
+    $ret = array();
+    foreach ($zones as $zone) {
+        if ($zone['kind'] == 'Slave')
+            continue;
+        array_push($ret, array(
+            'DisplayText' => $zone['name'],
+            'Value'       => $zone['id']));
+    }
+    jtable_respond($ret, 'options');
+    break;
+
 default:
     jtable_respond(null, 'error', 'No such action');
     break;
+}
+} catch (Exception $e) {
+    jtable_respond(null, 'error', $e->getMessage());
 }
