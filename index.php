@@ -453,6 +453,159 @@ $(document).ready(function () {
                 ],
         },
         sorting: false,
+        selecting: true,
+        selectOnRowClick: true,
+        selectionChanged: function (data) {
+            var $selectedRows = $('#MasterZones').jtable('selectedRows');
+            $selectedRows.each(function () {
+                var zone = $(this).data('record');
+                $('#MasterZones').jtable('openChildTable',
+                    $(this).closest('tr'), {
+                        title: 'Records in ' + zone.name,
+                        messages: {
+                            addNewRecord: 'Add to ' + zone.name,
+                            noDataAvailable: 'No records for ' + zone.name
+                        },
+                        paging: true,
+                        sorting: true,
+                        pageSize: 20,
+                        openChildAsAccordion: true,
+                        actions: {
+                            listAction: 'zones.php?action=listrecords&zoneid=' + zone.id,
+                            createAction: 'zones.php?action=createrecord&zoneid=' + zone.id,
+                            deleteAction: 'zones.php?action=deleterecord&zoneid=' + zone.id,
+                            updateAction: 'zones.php?action=editrecord&zoneid=' + zone.id
+                        },
+                        fields: {
+                            domid: {
+                                create: true,
+                                type: 'hidden',
+                                defaultValue: zone.id
+                            },
+                            id: {
+                                key: true,
+                                type: 'hidden',
+                                create: false,
+                                edit: false,
+                                list: false
+                            },
+                            domain: {
+                                create: true,
+                                type: 'hidden',
+                                defaultValue: zone.name
+                            },
+                            name: {
+                                title: 'Label',
+                                width: '7%',
+                                sorting: true,
+                                create: true,
+                                display: displayContent('name', zone.name),
+                                inputClass: 'name',
+                                listClass: 'name'
+                            },
+                            type: {
+                                title: 'Type',
+                                width: '2%',
+                                options: function() {
+                                    zonename = new String(zone.name);
+                                    if (zonename.match(/(\.in-addr|\.ip6)\.arpa/)) {
+                                        return {
+                                            'PTR': 'PTR',
+                                            'NS': 'NS',
+                                            'MX': 'MX',
+                                            'TXT': 'TXT',
+                                            'SOA': 'SOA',
+                                            'A': 'A',
+                                            'AAAA': 'AAAA',
+                                            'CERT': 'CERT',
+                                            'CNAME': 'CNAME',
+                                            'LOC': 'LOC',
+                                            'NAPTR': 'NAPTR',
+                                            'SPF': 'SPF',
+                                            'SRV': 'SRV',
+                                            'SSHFP': 'SSHFP',
+                                            'TLSA': 'TLSA',
+                                        };
+                                    }
+                                    return {
+                                        'A': 'A',
+                                        'AAAA': 'AAAA',
+                                        'CERT': 'CERT',
+                                        'CNAME': 'CNAME',
+                                        'LOC': 'LOC',
+                                        'MX': 'MX',
+                                        'NAPTR': 'NAPTR',
+                                        'NS': 'NS',
+                                        'PTR': 'PTR',
+                                        'SOA': 'SOA',
+                                        'SPF': 'SPF',
+                                        'SRV': 'SRV',
+                                        'SSHFP': 'SSHFP',
+                                        'TLSA': 'TLSA',
+                                        'TXT': 'TXT',
+                                    };
+                                },
+                                display: displayContent('type'),
+                                create: true,
+                                inputClass: 'type',
+                                listClass: 'type'
+                            },
+                            content: {
+                                title: 'Content',
+                                width: '30%',
+                                create: true,
+                                sorting: true,
+                                display: displayContent('content'),
+                                inputClass: 'content',
+                                listClass: 'content'
+                            },
+                            ttl: {
+                                title: 'TTL',
+                                width: '2%',
+                                create: true,
+                                sorting: false,
+                                display: displayContent('ttl'),
+                                defaultValue: '<?php echo $defaults['ttl']; ?>',
+                                inputClass: 'ttl',
+                                listClass: 'ttl'
+                            },
+                            setptr: {
+                                title: 'Set PTR Record',
+                                width: '2%',
+                                list: false,
+                                create: true,
+                                defaultValue: 'false',
+                                inputClass: 'setptr',
+                                listClass: 'setptr',
+                                options: function() {
+                                    return {
+                                        '0': 'No',
+                                        '1': 'Yes',
+                                    };
+                                },
+                            },
+                            disabled: {
+                                title: 'Disabled',
+                                width: '2%',
+                                create: true,
+                                sorting: false,
+                                display: displayContent('disabled'),
+                                defaultValue: '<?php echo $defaults['disabled'] ? 'No' : 'Yes'; ?>',
+                                inputClass: 'disabled',
+                                listClass: 'disabled',
+                                options: function() {
+                                    return {
+                                        '0': 'No',
+                                        '1': 'Yes',
+                                    };
+                                },
+                            },
+                        }
+                    }, function (data) {
+                        data.childTable.jtable('load');
+                    });
+            });
+        },
         openChildAsAccordion: true,
         actions: {
             listAction: 'zones.php?action=list',
@@ -546,163 +699,6 @@ $(document).ready(function () {
                 edit: false,
                 inputClass: 'serial',
                 listClass: 'serial'
-            },
-            records: {
-                width: '5%',
-                title: 'Records',
-                edit: false,
-                create: false,
-                display: function (zone) {
-                    var $img = $('<img class="list" src="img/list.png" title="Records" />');
-                    $img.click(function () {
-                        $('#MasterZones').jtable('openChildTable',
-                            $img.closest('tr'), {
-                                title: 'Records in ' + zone.record.name,
-                                messages: {
-                                    addNewRecord: 'Add to ' + zone.record.name,
-                                    noDataAvailable: 'No records for ' + zone.record.name
-                                },
-                                paging: true,
-                                sorting: true,
-                                pageSize: 20,
-                                openChildAsAccordion: true,
-                                actions: {
-                                    listAction: 'zones.php?action=listrecords&zoneid=' + zone.record.id,
-                                    createAction: 'zones.php?action=createrecord&zoneid=' + zone.record.id,
-                                    deleteAction: 'zones.php?action=deleterecord&zoneid=' + zone.record.id,
-                                    updateAction: 'zones.php?action=editrecord&zoneid=' + zone.record.id
-                                },
-                                fields: {
-                                    domid: {
-                                        create: true,
-                                        type: 'hidden',
-                                        defaultValue: zone.record.id
-                                    },
-                                    id: {
-                                        key: true,
-                                        type: 'hidden',
-                                        create: false,
-                                        edit: false,
-                                        list: false
-                                    },
-                                    domain: {
-                                        create: true,
-                                        type: 'hidden',
-                                        defaultValue: zone.record.name
-                                    },
-                                    name: {
-                                        title: 'Label',
-                                        width: '7%',
-                                        sorting: true,
-                                        create: true,
-                                        display: displayContent('name', zone.record.name),
-                                        inputClass: 'name',
-                                        listClass: 'name'
-                                    },
-                                    type: {
-                                        title: 'Type',
-                                        width: '2%',
-                                        options: function() {
-                                            zonename = new String(zone.record.name);
-                                            if (zonename.match(/(\.in-addr|\.ip6)\.arpa/)) {
-                                                return {
-                                                    'PTR': 'PTR',
-                                                    'NS': 'NS',
-                                                    'MX': 'MX',
-                                                    'TXT': 'TXT',
-                                                    'SOA': 'SOA',
-                                                    'A': 'A',
-                                                    'AAAA': 'AAAA',
-                                                    'CERT': 'CERT',
-                                                    'CNAME': 'CNAME',
-                                                    'LOC': 'LOC',
-                                                    'NAPTR': 'NAPTR',
-                                                    'SPF': 'SPF',
-                                                    'SRV': 'SRV',
-                                                    'SSHFP': 'SSHFP',
-                                                    'TLSA': 'TLSA',
-                                                };
-                                            }
-                                            return {
-                                                'A': 'A',
-                                                'AAAA': 'AAAA',
-                                                'CERT': 'CERT',
-                                                'CNAME': 'CNAME',
-                                                'LOC': 'LOC',
-                                                'MX': 'MX',
-                                                'NAPTR': 'NAPTR',
-                                                'NS': 'NS',
-                                                'PTR': 'PTR',
-                                                'SOA': 'SOA',
-                                                'SPF': 'SPF',
-                                                'SRV': 'SRV',
-                                                'SSHFP': 'SSHFP',
-                                                'TLSA': 'TLSA',
-                                                'TXT': 'TXT',
-                                            };
-                                        },
-                                        display: displayContent('type'),
-                                        create: true,
-                                        inputClass: 'type',
-                                        listClass: 'type'
-                                    },
-                                    content: {
-                                        title: 'Content',
-                                        width: '30%',
-                                        create: true,
-                                        sorting: true,
-                                        display: displayContent('content'),
-                                        inputClass: 'content',
-                                        listClass: 'content'
-                                    },
-                                    ttl: {
-                                        title: 'TTL',
-                                        width: '2%',
-                                        create: true,
-                                        sorting: false,
-                                        display: displayContent('ttl'),
-                                        defaultValue: '<?php echo $defaults['ttl']; ?>',
-                                        inputClass: 'ttl',
-                                        listClass: 'ttl'
-                                    },
-                                    setptr: {
-                                        title: 'Set PTR Record',
-                                        width: '2%',
-                                        list: false,
-                                        create: true,
-                                        defaultValue: 'false',
-                                        inputClass: 'setptr',
-                                        listClass: 'setptr',
-                                        options: function() {
-                                            return {
-                                                '0': 'No',
-                                                '1': 'Yes',
-                                            };
-                                        },
-                                    },
-                                    disabled: {
-                                        title: 'Disabled',
-                                        width: '2%',
-                                        create: true,
-                                        sorting: false,
-                                        display: displayContent('disabled'),
-                                        defaultValue: '<?php echo $defaults['disabled'] ? 'No' : 'Yes'; ?>',
-                                        inputClass: 'disabled',
-                                        listClass: 'disabled',
-                                        options: function() {
-                                            return {
-                                                '0': 'No',
-                                                '1': 'Yes',
-                                            };
-                                        },
-                                    },
-                                }
-                            }, function (data) {
-                                data.childTable.jtable('load');
-                            })
-                    });
-                    return $img;
-                }
             },
             exportzone: {
                 title: '',
