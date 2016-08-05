@@ -269,6 +269,8 @@ case "create":
 
     $api->savezone($zone->export());
 
+    $zone = new Zone();
+    $zone->parse($api->loadzone($zonename));
     $zonename = $zone->name;
 
     if (is_adminuser() && isset($_POST['account'])) {

@@ -39,7 +39,7 @@ if (is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "cha
     <?php if ($menutype === 'horizontal') { ?>
     <link href="css/horizontal-menu.css" rel="stylesheet" type="text/css"/>
     <?php } ?>
-    <script src="jquery-ui/ui/jquery-1-7.js" type="text/javascript"></script>
+    <script src="jquery-ui/external/jquery/jquery.js" type="text/javascript"></script>
     <script src="jquery-ui/ui/core.js" type="text/javascript"></script>
     <script src="jquery-ui/ui/widget.js" type="text/javascript"></script>
     <script src="jquery-ui/ui/mouse.js" type="text/javascript"></script>
