@@ -33,21 +33,21 @@ if (is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "cha
 <html>
 <head>
     <title>NSEdit!</title>
-    <link href="jquery-ui/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css"/>
+    <link href="jquery-ui/themes/base/all.css" rel="stylesheet" type="text/css"/>
     <link href="jtable/lib/themes/metro/blue/jtable.min.css" rel="stylesheet" type="text/css"/>
     <link href="css/base.css" rel="stylesheet" type="text/css"/>
     <?php if ($menutype === 'horizontal') { ?>
     <link href="css/horizontal-menu.css" rel="stylesheet" type="text/css"/>
     <?php } ?>
-    <script src="jquery-ui/jquery-1.10.2.js" type="text/javascript"></script>
-    <script src="jquery-ui/ui/jquery.ui.core.js" type="text/javascript"></script>
-    <script src="jquery-ui/ui/jquery.ui.widget.js" type="text/javascript"></script>
-    <script src="jquery-ui/ui/jquery.ui.mouse.js" type="text/javascript"></script>
-    <script src="jquery-ui/ui/jquery.ui.draggable.js" type="text/javascript"></script>
-    <script src="jquery-ui/ui/jquery.ui.position.js" type="text/javascript"></script>
-    <script src="jquery-ui/ui/jquery.ui.button.js" type="text/javascript"></script>
-    <script src="jquery-ui/ui/jquery.ui.resizable.js" type="text/javascript"></script>
-    <script src="jquery-ui/ui/jquery.ui.dialog.js" type="text/javascript"></script>
+    <script src="jquery-ui/ui/jquery-1-7.js" type="text/javascript"></script>
+    <script src="jquery-ui/ui/core.js" type="text/javascript"></script>
+    <script src="jquery-ui/ui/widget.js" type="text/javascript"></script>
+    <script src="jquery-ui/ui/mouse.js" type="text/javascript"></script>
+    <script src="jquery-ui/ui/draggable.js" type="text/javascript"></script>
+    <script src="jquery-ui/ui/position.js" type="text/javascript"></script>
+    <script src="jquery-ui/ui/button.js" type="text/javascript"></script>
+    <script src="jquery-ui/ui/resizable.js" type="text/javascript"></script>
+    <script src="jquery-ui/ui/dialog.js" type="text/javascript"></script>
     <script src="jtable/lib/jquery.jtable.min.js" type="text/javascript"></script>
     <script src="js/addclear/addclear.js" type="text/javascript"></script>
 </head>
