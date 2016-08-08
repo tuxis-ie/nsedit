@@ -125,6 +125,7 @@ class Zone {
 
         if ($rrset) {
             $rrset->addRecord($content, $disabled, $setptr);
+            $rrset->setTtl($ttl);
         } else {
             $this->addRRSet($name, $type, $content, $disabled, $ttl, $setptr);
         }
