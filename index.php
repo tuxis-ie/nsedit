@@ -908,6 +908,7 @@ $(document).ready(function () {
                 key: true,
                 display: displayContent('emailaddress'),
                 inputClass: 'emailaddress',
+                create: true,
                 listClass: 'emailaddress'
             },
             password: {
