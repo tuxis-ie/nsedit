@@ -240,7 +240,7 @@ class RRSet {
     public function addRecord($content, $disabled = FALSE, $setptr = FALSE) {
         foreach ($this->records as $record) {
             if ($record->content == $content) {
-                throw Exception("Record already exists");
+                throw new Exception($this->name."/".$this->type." has duplicate records.");
             }
         }
 
