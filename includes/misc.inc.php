@@ -128,7 +128,6 @@ function do_db_auth($u, $p) {
     $db->close();
 
     if ($userinfo and $userinfo['password'] and (crypt($p, $userinfo['password']) === $userinfo['password'])) {
-        writelog('Succesful login.');
         return TRUE;
     }
 
@@ -277,10 +276,14 @@ function clearlogs() {
     writelog("Logtable truncated.");
 }
 
-function writelog($line) {
+function writelog($line, $user=False) {
     global $logging;
     if ($logging !== TRUE)
         return;
+
+    if ($user === False) {
+        $user = get_sess_user();
+    }
 
     try {
         $db = get_db();
@@ -292,7 +295,7 @@ function writelog($line) {
         $ret = $q->execute();
 
         $q = $db->prepare('INSERT INTO logs (user, log) VALUES (:user, :log)');
-        $q->bindValue(':user', get_sess_user(), SQLITE3_TEXT);
+        $q->bindValue(':user', $user, SQLITE3_TEXT);
         $q->bindValue(':log', $line, SQLITE3_TEXT);
         $q->execute();
         $db->close();

@@ -150,6 +150,7 @@ function _try_login($username, $password) {
     global $wefactapiurl, $wefactapikey;
 
     if (!valid_user($username)) {
+        writelog("Illegal username at login!", $username);
         return false;
     }
 
@@ -158,6 +159,7 @@ function _try_login($username, $password) {
     if (isset($wefactapiurl) && isset($wefactapikey)) {
         $wefact = do_wefact_auth($username, $password);
         if (false === $wefact ) {
+            writelog("Failed Wefact login!", $username);
             return false;
         }
         if (-1 !== $wefact) {
@@ -166,11 +168,13 @@ function _try_login($username, $password) {
     }
 
     if ($do_local_auth && !do_db_auth($username, $password)) {
+        writelog("Failed login!", $username);
         return false;
     }
 
     $user = get_user_info($username);
     if (!$user) {
+        writelog("Failed to find user!", $username);
         return false;
     } else {
         _set_current_user($username, (bool) $user['isadmin']);
