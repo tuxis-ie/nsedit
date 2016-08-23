@@ -506,7 +506,7 @@ $(document).ready(function () {
                         toolbar: {
                             items: [
                                 {
-                                    text: 'Search Zone',
+                                    text: 'Search zone',
                                     click: function() {
                                         $("#searchzone").dialog({
                                             modal: true,
@@ -1016,7 +1016,7 @@ $(document).ready(function () {
             hoverAnimationEasing: undefined,
             items: [
                 {
-                    text: 'Search Logs',
+                    text: 'Search logs',
                     click: function() {
                         $("#searchlogs").dialog({
                             modal: true,
