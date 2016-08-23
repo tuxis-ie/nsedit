@@ -188,6 +188,31 @@ case "listrecords":
     $zone = new Zone();
     $zone->parse($zonedata);
     $records = $zone->rrsets2records();
+
+    if(!empty($_POST['label'])) {
+        $records=array_filter($records,
+            function ($val) {
+                return(stripos($val['name'], $_POST['label']) !== FALSE);
+            }
+        );
+    }
+
+    if(!empty($_POST['type'])) {
+        $records=array_filter($records,
+            function ($val) {
+                return($val['type'] == $_POST['type']);
+            }
+        );
+    }
+
+    if(!empty($_POST['content'])) {
+        $records=array_filter($records,
+            function ($val) {
+                return(stripos($val['content'], $_POST['content']) !== FALSE);
+            }
+        );
+    }
+
     if (isset($_GET['jtSorting'])) {
         list($scolumn, $sorder) = preg_split("/ /", $_GET['jtSorting']);
         switch ($scolumn) {
