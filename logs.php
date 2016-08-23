@@ -27,7 +27,25 @@ case "list":
     if ($logging !== TRUE)
         jtable_respond(null, 'error', 'Logging is disabled');
 
-    jtable_respond(getlogs());
+    $entries=getlogs();
+
+    if(!empty($_POST['user'])) {
+        $entries=array_filter($entries,
+            function ($val) {
+                return(stripos($val['user'], $_POST['user']) !== FALSE);
+            }
+        );
+    }
+
+    if(!empty($_POST['entry'])) {
+        $entries=array_filter($entries,
+            function ($val) {
+                return(stripos($val['log'], $_POST['entry']) !== FALSE);
+            }
+        );
+    }
+
+    jtable_respond($entries);
     break;
 
 case "delete":

@@ -116,6 +116,36 @@ if ($blocklogin === TRUE) {
     <div id="clearlogs" style="display: none;">
         Are you sure you want to clear all the logs? Maybe save them first?
     </div>
+    <div id="searchlogs" style="display: none; text-align: right;">
+        <table border="0">
+        <tr><td>User:</td><td><input type="text" id ="searchlogs-user"><br></td></tr>
+        <tr><td>Log Entry:</td><td><input type="text" id ="searchlogs-entry"></td></tr>
+        </table>
+    </div>
+    <div id="searchzone" style="display: none; text-align: right;">
+        <table border="0">
+        <tr><td>Label:</td><td><input type="text" id ="searchzone-label"><br></td></tr>
+        <tr><td>Type:</td><td style="text-align: left;"><select id="searchzone-type">
+            <option value=""></option>
+            <option value="A">A</option>
+            <option value="AAAA">AAAA</option>
+            <option value="CERT">CERT</option>
+            <option value="CNAME">CNAME</option>
+            <option value="LOC">LOC</option>
+            <option value="MX">MX</option>
+            <option value="NAPTR">NAPTR</option>
+            <option value="NS">NS</option>
+            <option value="PTR">PTR</option>
+            <option value="SOA">SOA</option>
+            <option value="SPF">SPF</option>
+            <option value="SRV">SRV</option>
+            <option value="SSHFP">SSHFP</option>
+            <option value="TLSA">TLSA</option>
+            <option value="TXT">TXT</option>
+        </select><br></td></tr>
+        <tr><td>Content:</td><td><input type="text" id ="searchzone-content"></td></tr>
+        </table>
+    </div>
     <div id="menu" class="jtable-main-container <?php if ($menutype === 'horizontal') { ?>horizontal<?php } ?>">
         <div class="jtable-title menu-title">
             <div class="jtable-title-text">
@@ -473,6 +503,40 @@ $(document).ready(function () {
                             addNewRecord: 'Add to ' + zone.name,
                             noDataAvailable: 'No records for ' + zone.name
                         },
+                        toolbar: {
+                            items: [
+                                {
+                                    text: 'Search zone',
+                                    click: function() {
+                                        $("#searchzone").dialog({
+                                            modal: true,
+                                            title: "Search zone for ...",
+                                            width: 'auto',
+                                            buttons: {
+                                                Search: function() {
+                                                    $( this ).dialog( 'close' );
+                                                    opentable.find('.jtable-title-text').text(opentableTitle + " (filtered)");
+                                                    opentable.jtable('load', {
+                                                        label: $('#searchzone-label').val(),
+                                                        type: $('#searchzone-type').val(),
+                                                        content: $('#searchzone-content').val()
+                                                    });
+                                                },
+                                                Reset: function() {
+                                                    $('#searchzone-label').val('');
+                                                    $('#searchzone-type').val('');
+                                                    $('#searchzone-content').val('');
+                                                    $( this ).dialog( 'close' );
+                                                    opentable.find('.jtable-title-text').text(opentableTitle);
+                                                    opentable.jtable('load');
+                                                    return false;
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            ],
+                        },
                         paging: true,
                         sorting: true,
                         pageSize: 20,
@@ -609,6 +673,8 @@ $(document).ready(function () {
                             },
                         }
                     }, function (data) {
+                        opentable=data.childTable;
+                        opentableTitle=opentable.find('.jtable-title-text').text();
                         data.childTable.jtable('load');
                     });
             });
@@ -949,6 +1015,34 @@ $(document).ready(function () {
             hoverAnimationDuration: 60,
             hoverAnimationEasing: undefined,
             items: [
+                {
+                    text: 'Search logs',
+                    click: function() {
+                        $("#searchlogs").dialog({
+                            modal: true,
+                            title: "Search logs for ...",
+                            width: 'auto',
+                            buttons: {
+                                Search: function() {
+                                    $( this ).dialog( 'close' );
+                                    $('#Logs').find('.jtable-title-text').text('Logs (filtered)');
+                                    $('#Logs').jtable('load', {
+                                        user: $('#searchlogs-user').val(),
+                                        entry: $('#searchlogs-entry').val()
+                                    });
+                                },
+                                Reset: function() {
+                                    $('#searchlogs-user').val('');
+                                    $('#searchlogs-entry').val('');
+                                    $( this ).dialog( 'close' );
+                                    $('#Logs').find('.jtable-title-text').text('Logs');
+                                    $('#Logs').jtable('load');
+                                    return false;
+                                }
+                            }
+                        });
+                    }
+                },
                 {
                     icon: 'img/delete_inverted.png',
                     text: 'Clear logs',
