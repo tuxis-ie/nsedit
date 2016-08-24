@@ -168,8 +168,8 @@ if ($blocklogin === TRUE) {
     ?>
     <div id="zones">
         <?php if (is_adminuser() or $allowzoneadd === TRUE) { ?>
-        <div style="visibility: hidden;" id="ImportZone"></div>
-        <div style="visibility: hidden;" id="CloneZone"></div>
+        <div style="display: none;" id="ImportZone"></div>
+        <div style="display: none;" id="CloneZone"></div>
         <?php } ?>
         <div class="tables" id="MasterZones">
             <div class="searchbar" id="searchbar">
