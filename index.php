@@ -114,7 +114,9 @@ if ($blocklogin === TRUE) {
     <div id="dnssecinfo">
     </div>
     <div id="clearlogs" style="display: none;">
-        Are you sure you want to clear all the logs? Maybe save them first?
+        Are you sure you want to clear all the logs? Maybe download them
+        first<?php if($allowrotatelogs) { ?>, or use "Rotate logs" to save
+        them on the server<?php } ?>?
     </div>
     <div id="rotatelogs" style="display: none;">
         Are you sure you want to rotate the logs?
@@ -1048,7 +1050,6 @@ $(document).ready(function () {
                 },
                 <?php if($allowrotatelogs === TRUE) { ?>
                 {
-                    icon: 'img/export.png',
                     text: 'Rotate logs',
                     click: function() {
                         $("#rotatelogs").dialog({
@@ -1096,7 +1097,7 @@ $(document).ready(function () {
                 <?php } ?>
                 {
                     icon: 'img/export.png',
-                    text: 'Save logs',
+                    text: 'Download logs',
                     click: function () {
                         var $zexport = $.get("logs.php?action=export", function(data) {
                             console.log(data);
