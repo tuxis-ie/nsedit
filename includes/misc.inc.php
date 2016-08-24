@@ -308,6 +308,27 @@ function rotatelogs() {
 
 }
 
+function listrotatedlogs() {
+    global $logging, $logsdirectory;
+    if ($logging !== TRUE)
+        return FALSE;
+
+    $list = scandir($logsdirectory,SCANDIR_SORT_DESCENDING);
+
+    if($list === FALSE) {
+      writelog("Logs directory cannot read.");
+      return FALSE;
+    }
+
+    $list=array_filter($list,
+        function ($val) {
+            return(preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6}\.json/',$val) == 1);
+        }
+    );
+
+    return $list;
+}
+
 function writelog($line) {
     global $logging;
     if ($logging !== TRUE)

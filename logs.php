@@ -24,10 +24,21 @@ switch ($_GET['action']) {
 
 case "list":
     global $logging;
-    if ($logging !== TRUE)
+    if ($logging !== TRUE) {
         jtable_respond(null, 'error', 'Logging is disabled');
+        break;
+    }
 
-    $entries=getlogs();
+    if(!empty($_POST['logfile'])) {
+        if(preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6}\.json/',$_POST['logfile']) == 1) {
+            $entries=json_decode(file_get_contents($logsdirectory . "/" . $_POST['logfile']),true);
+        } else {
+            jtable_respond(null, 'error', "Can't find log file");
+            break;
+        }
+    } else {
+        $entries=getlogs();
+    }
 
     if(!empty($_POST['user'])) {
         $entries=array_filter($entries,

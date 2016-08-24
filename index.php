@@ -189,6 +189,21 @@ if ($blocklogin === TRUE) {
     </div>
     <div id="logs">
         <div class="tables" id="Logs"></div>
+        <?php if($allowrotatelogs) { ?>
+        <br>Log entries being viewed:
+        <select id="logfile">
+        <option value="">(Current logs)</option>
+        <?php
+            $logfiles=listrotatedlogs();
+            if($logfiles !== FALSE) {
+                foreach ($logfiles as $filename) {
+                    echo '<option value="' . $filename . '">' . str_replace(".json","",$filename) . "</option>\n";
+                }
+            }
+        ?></select>
+        <?php } else { ?>
+        <input type="hidden" id="logfile" value="">
+        <?php } ?>
     </div>
     <?php } ?>
 
@@ -925,18 +940,18 @@ $(document).ready(function () {
     });
 
     <?php if (is_adminuser()) { ?>
-    $('#Logs').hide();
+    $('#logs').hide();
     $('#Users').hide();
     $('#AboutMe').hide();
     $('#aboutme').click(function () {
-        $('#Logs').hide();
+        $('#logs').hide();
         $('#Users').hide();
         $('#MasterZones').hide();
         $('#SlaveZones').hide();
         $('#AboutMe').show();
     });
     $('#useradmin').click(function () {
-        $('#Logs').hide();
+        $('#logs').hide();
         $('#MasterZones').hide();
         $('#SlaveZones').hide();
         $('#AboutMe').hide();
@@ -944,7 +959,7 @@ $(document).ready(function () {
         $('#Users').show();
     });
     $('#zoneadmin').click(function () {
-        $('#Logs').hide();
+        $('#logs').hide();
         $('#Users').hide();
         $('#AboutMe').hide();
         $('#MasterZones').show();
@@ -955,8 +970,10 @@ $(document).ready(function () {
         $('#AboutMe').hide();
         $('#MasterZones').hide();
         $('#SlaveZones').hide();
-        $('#Logs').jtable('load');
-        $('#Logs').show();
+        $('#Logs').jtable('load', {
+            logfile: $('#logfile').val()
+        });
+        $('#logs').show();
     });
     $('#Users').jtable({
         title: 'Users',
@@ -1032,6 +1049,7 @@ $(document).ready(function () {
                                     $( this ).dialog( 'close' );
                                     $('#Logs').find('.jtable-title-text').text('Logs (filtered)');
                                     $('#Logs').jtable('load', {
+                                        logfile: $('#logfile').val(),
                                         user: $('#searchlogs-user').val(),
                                         entry: $('#searchlogs-entry').val()
                                     });
@@ -1041,7 +1059,9 @@ $(document).ready(function () {
                                     $('#searchlogs-entry').val('');
                                     $( this ).dialog( 'close' );
                                     $('#Logs').find('.jtable-title-text').text('Logs');
-                                    $('#Logs').jtable('load');
+                                    $('#Logs').jtable('load', {
+                                        logfile: $('#logfile').val()
+                                    });
                                     return false;
                                 }
                             }
@@ -1060,6 +1080,7 @@ $(document).ready(function () {
                                 Ok: function() {
                                     $.get("logs.php?action=rotate");
                                     $( this ).dialog( "close" );
+                                    $('#logfile').val('');
                                     $('#Logs').jtable('load');
                                 },
                                 Cancel: function() {
@@ -1084,6 +1105,7 @@ $(document).ready(function () {
                                 Ok: function() {
                                     $.get("logs.php?action=clear");
                                     $( this ).dialog( "close" );
+                                    $('#logfile').val('');
                                     $('#Logs').jtable('load');
                                 },
                                 Cancel: function() {
@@ -1141,6 +1163,15 @@ $(document).ready(function () {
             }
         }
     });
+
+    $('#logfile').change(function () {
+        $('#Logs').jtable('load', {
+            logfile: $('#logfile').val(),
+            user: $('#searchlogs-user').val(),
+            entry: $('#searchlogs-entry').val()
+        });
+    });
+
     <?php } ?>
     $('#MasterZones').jtable('load');
     $('#SlaveZones').jtable('load');
