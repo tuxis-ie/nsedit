@@ -11,6 +11,6 @@ if(php_sapi_name() !== 'cli') {
         $current_user['username']='<system>';
         rotatelogs();
     } else {
-        jtable_respond(null, 'error', 'Invalid action');
+        echo "Rotating logs has been disabled."
     }
 }
