@@ -7,7 +7,12 @@ $apiproto      = 'http'; # http | https
 $apisslverify  = FALSE;  # Verify SSL Certificate if using https for apiproto
 $allowzoneadd  = FALSE;  # Allow normal users to add zones
 $logging = TRUE;
+$allowclearlogs = TRUE;  # Allow clearing of log entries
+$allowrotatelogs = FALSE;# Allow rotation to text file on server
 
+# Log directory - if allowrotatelogs is set, this is where the logs will
+# be written. It must be writeable by the web server user.
+$logsdirectory = "../etc";
 
 # If you configure this, nsedit will try to authenticate via WeFact too.
 # Debtors will be added to the sqlitedatabase with their crypted password.

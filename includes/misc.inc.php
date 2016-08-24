@@ -277,6 +277,37 @@ function clearlogs() {
     writelog("Logtable truncated.");
 }
 
+function rotatelogs() {
+    global $logging, $logsdirectory;
+    if ($logging !== TRUE)
+        return FALSE;
+
+    if(!is_dir($logsdirectory) || !is_writable($logsdirectory)) {
+      writelog("Logs directory cannot be written to.");
+      return FALSE;
+    }
+
+    date_default_timezone_set('UTC');
+    $filename = date("Y-m-d-His") . ".json";
+    $file = fopen($logsdirectory . "/" . $filename, "x");
+
+    if($file === FALSE) {
+      writelog("Can't create file for log rotation.");
+      return FALSE;
+    }
+
+    if(fwrite($file,json_encode(getlogs())) === FALSE) {
+        writelog("Can't write to file for log rotation.");
+        fclose($file);
+        return FALSE;
+    } else {
+        fclose($file);
+        clearlogs();
+        return $filename;
+    }
+
+}
+
 function writelog($line) {
     global $logging;
     if ($logging !== TRUE)

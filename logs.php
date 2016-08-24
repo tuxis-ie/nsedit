@@ -61,7 +61,18 @@ case "export":
     break;
 
 case "clear":
-    clearlogs();
+    if($allowclearlogs === TRUE) {
+        clearlogs();
+    } else {
+        jtable_respond(null, 'error', 'Invalid action');
+    }
+    break;
+case "rotate":
+    if($allowrotatelogs === TRUE) {
+        rotatelogs();
+    } else {
+        jtable_respond(null, 'error', 'Invalid action');
+    }
     break;
 default:
     jtable_respond(null, 'error', 'Invalid action');

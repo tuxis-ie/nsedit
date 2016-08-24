@@ -116,6 +116,9 @@ if ($blocklogin === TRUE) {
     <div id="clearlogs" style="display: none;">
         Are you sure you want to clear all the logs? Maybe save them first?
     </div>
+    <div id="rotatelogs" style="display: none;">
+        Are you sure you want to rotate the logs?
+    </div>
     <div id="searchlogs" style="display: none; text-align: right;">
         <table border="0">
         <tr><td>User:</td><td><input type="text" id ="searchlogs-user"><br></td></tr>
@@ -1043,6 +1046,31 @@ $(document).ready(function () {
                         });
                     }
                 },
+                <?php if($allowrotatelogs === TRUE) { ?>
+                {
+                    icon: 'img/export.png',
+                    text: 'Rotate logs',
+                    click: function() {
+                        $("#rotatelogs").dialog({
+                            modal: true,
+                            title: "Rotate logs",
+                            width: 'auto',
+                            buttons: {
+                                Ok: function() {
+                                    $.get("logs.php?action=rotate");
+                                    $( this ).dialog( "close" );
+                                    $('#Logs').jtable('load');
+                                },
+                                Cancel: function() {
+                                    $( this ).dialog( "close" );
+                                    return false;
+                                }
+                            }
+                        });
+                    }
+                },
+                <?php } ?>
+                <?php if($allowclearlogs === TRUE) { ?>
                 {
                     icon: 'img/delete_inverted.png',
                     text: 'Clear logs',
@@ -1065,6 +1093,7 @@ $(document).ready(function () {
                         });
                     }
                 },
+                <?php } ?>
                 {
                     icon: 'img/export.png',
                     text: 'Save logs',
