@@ -114,7 +114,7 @@ if ($blocklogin === TRUE) {
     <div id="dnssecinfo">
     </div>
     <div id="clearlogs" style="display: none;">
-        Are you sure you want to clear all the logs? Maybe download them
+        Are you sure you want to clear the current logs? Maybe download them
         first<?php if($allowrotatelogs) { ?>, or use "Rotate logs" to save
         them on the server<?php } ?>?
     </div>
@@ -1121,13 +1121,13 @@ $(document).ready(function () {
                     icon: 'img/export.png',
                     text: 'Download logs',
                     click: function () {
-                        var $zexport = $.get("logs.php?action=export", function(data) {
+                        var $zexport = $.get("logs.php?action=export&logfile=" + $('#logfile').val(), function(data) {
                             console.log(data);
                             blob = new Blob([data], { type: 'text/plain' });
                             var dl = document.createElement('a');
                             dl.addEventListener('click', function(ev) {
                                 dl.href = URL.createObjectURL(blob);
-                                dl.download = 'nseditlogs.txt';
+                                dl.download = $('#logfile').val() == "" ? 'nseditlogs.txt':$('#logfile').val() + ".txt";
                             }, false);
 
                             if (document.createEvent) {
