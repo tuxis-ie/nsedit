@@ -1026,8 +1026,7 @@ $(document).ready(function () {
         pageSize: 20,
         sorting: false,
         actions: {
-            listAction: 'logs.php?action=list',
-            deleteAction: 'logs.php?action=delete',
+            listAction: 'logs.php?action=list'
         },
         messages: {
             deleteConfirmation: 'This entry will be deleted. Are you sure?'
