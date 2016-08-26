@@ -44,7 +44,11 @@ class ApiHandler {
         $this->authheaders();
         $this->addheader('Accept', 'application/json');
 
-        curl_reset($this->curlh);
+        if(defined('curl_reset')) {
+            curl_reset($this->curlh);
+        } else {
+            $this->curlh = curl_init();
+        }
         curl_setopt($this->curlh, CURLOPT_HTTPHEADER, Array());
         curl_setopt($this->curlh, CURLOPT_RETURNTRANSFER, 1);
 
