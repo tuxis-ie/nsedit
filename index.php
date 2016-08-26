@@ -119,7 +119,7 @@ if ($blocklogin === TRUE) {
         them on the server<?php } ?>?
     </div>
     <div id="rotatelogs" style="display: none;">
-        Are you sure you want to rotate the logs?
+        Are you sure you want to rotate the current logs?
     </div>
     <div id="searchlogs" style="display: none; text-align: right;">
         <table border="0">
