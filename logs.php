@@ -68,7 +68,11 @@ if ($logging !== TRUE) {
             $entries=getlogs();
         }
 
-        print json_encode($entries,JSON_PRETTY_PRINT);
+        if(defined('JSON_PRETTY_PRINT')) {
+            print json_encode($entries,JSON_PRETTY_PRINT);
+        } else {
+            print json_encode($entries);
+        }
         break;
 
     case "clear":
