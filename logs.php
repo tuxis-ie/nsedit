@@ -20,50 +20,77 @@ if (!isset($_GET['action'])) {
     jtable_respond(null, 'error', 'No action given');
 }
 
-switch ($_GET['action']) {
-
-case "list":
-    global $logging;
-    if ($logging !== TRUE)
-        jtable_respond(null, 'error', 'Logging is disabled');
-
-    $entries=getlogs();
-
-    if(!empty($_POST['user'])) {
-        $entries=array_filter($entries,
-            function ($val) {
-                return(stripos($val['user'], $_POST['user']) !== FALSE);
+if ($logging !== TRUE) {
+    jtable_respond(null, 'error', 'Logging is disabled');
+} else {
+    switch ($_GET['action']) {
+    
+    case "list":
+        if(!empty($_POST['logfile'])) {
+            if(preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6}\.json/',$_POST['logfile']) == 1) {
+                $entries=json_decode(file_get_contents($logsdirectory . "/" . $_POST['logfile']),true);
+            } else {
+                jtable_respond(null, 'error', "Can't find log file");
+                break;
             }
-        );
-    }
+        } else {
+            $entries=getlogs();
+        }
 
-    if(!empty($_POST['entry'])) {
-        $entries=array_filter($entries,
-            function ($val) {
-                return(stripos($val['log'], $_POST['entry']) !== FALSE);
+        if(!empty($_POST['user'])) {
+            $entries=array_filter($entries,
+                function ($val) {
+                    return(stripos($val['user'], $_POST['user']) !== FALSE);
+                }
+            );
+        }
+
+        if(!empty($_POST['entry'])) {
+            $entries=array_filter($entries,
+                function ($val) {
+                    return(stripos($val['log'], $_POST['entry']) !== FALSE);
+                }
+            );
+        }
+
+        jtable_respond($entries);
+        break;
+    
+    case "export":
+        if(!empty($_GET['logfile'])) {
+            if(preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6}\.json/',$_GET['logfile']) == 1) {
+                $entries=json_decode(file_get_contents($logsdirectory . "/" . $_GET['logfile']),true);
+            } else {
+                jtable_respond(null, 'error', "Can't find log file");
+                break;
             }
-        );
+        } else {
+            $entries=getlogs();
+        }
+
+        if(defined('JSON_PRETTY_PRINT')) {
+            print json_encode($entries,JSON_PRETTY_PRINT);
+        } else {
+            print json_encode($entries);
+        }
+        break;
+
+    case "clear":
+        if($allowclearlogs === TRUE) {
+            clearlogs();
+        } else {
+            jtable_respond(null, 'error', 'Invalid action');
+        }
+        break;
+    case "rotate":
+        if($allowrotatelogs === TRUE) {
+            rotatelogs();
+        } else {
+            jtable_respond(null, 'error', 'Invalid action');
+        }
+        break;
+    default:
+        jtable_respond(null, 'error', 'Invalid action');
+        break;
     }
-
-    jtable_respond($entries);
-    break;
-
-case "delete":
-    if ($emailaddress != '' and delete_user($emailaddress) !== FALSE) {
-        jtable_respond(null, 'delete');
-    } else {
-        jtable_respond(null, 'error', 'Could not delete user');
-    }
-    break;
-
-case "export":
-    print json_encode(getlogs());
-    break;
-
-case "clear":
-    clearlogs();
-    break;
-default:
-    jtable_respond(null, 'error', 'Invalid action');
-    break;
 }

@@ -114,7 +114,12 @@ if ($blocklogin === TRUE) {
     <div id="dnssecinfo">
     </div>
     <div id="clearlogs" style="display: none;">
-        Are you sure you want to clear all the logs? Maybe save them first?
+        Are you sure you want to clear the current logs? Maybe download them
+        first<?php if($allowrotatelogs) { ?>, or use "Rotate logs" to save
+        them on the server<?php } ?>?
+    </div>
+    <div id="rotatelogs" style="display: none;">
+        Are you sure you want to rotate the current logs?
     </div>
     <div id="searchlogs" style="display: none; text-align: right;">
         <table border="0">
@@ -184,6 +189,21 @@ if ($blocklogin === TRUE) {
     </div>
     <div id="logs">
         <div class="tables" id="Logs"></div>
+        <?php if($allowrotatelogs) { ?>
+        <br>Log entries being viewed:
+        <select id="logfile">
+        <option value="">(Current logs)</option>
+        <?php
+            $logfiles=listrotatedlogs();
+            if($logfiles !== FALSE) {
+                foreach ($logfiles as $filename) {
+                    echo '<option value="' . $filename . '">' . str_replace(".json","",$filename) . "</option>\n";
+                }
+            }
+        ?></select>
+        <?php } else { ?>
+        <input type="hidden" id="logfile" value="">
+        <?php } ?>
     </div>
     <?php } ?>
 
@@ -920,18 +940,18 @@ $(document).ready(function () {
     });
 
     <?php if (is_adminuser()) { ?>
-    $('#Logs').hide();
+    $('#logs').hide();
     $('#Users').hide();
     $('#AboutMe').hide();
     $('#aboutme').click(function () {
-        $('#Logs').hide();
+        $('#logs').hide();
         $('#Users').hide();
         $('#MasterZones').hide();
         $('#SlaveZones').hide();
         $('#AboutMe').show();
     });
     $('#useradmin').click(function () {
-        $('#Logs').hide();
+        $('#logs').hide();
         $('#MasterZones').hide();
         $('#SlaveZones').hide();
         $('#AboutMe').hide();
@@ -939,7 +959,7 @@ $(document).ready(function () {
         $('#Users').show();
     });
     $('#zoneadmin').click(function () {
-        $('#Logs').hide();
+        $('#logs').hide();
         $('#Users').hide();
         $('#AboutMe').hide();
         $('#MasterZones').show();
@@ -950,8 +970,10 @@ $(document).ready(function () {
         $('#AboutMe').hide();
         $('#MasterZones').hide();
         $('#SlaveZones').hide();
-        $('#Logs').jtable('load');
-        $('#Logs').show();
+        $('#Logs').jtable('load', {
+            logfile: $('#logfile').val()
+        });
+        $('#logs').show();
     });
     $('#Users').jtable({
         title: 'Users',
@@ -1004,8 +1026,7 @@ $(document).ready(function () {
         pageSize: 20,
         sorting: false,
         actions: {
-            listAction: 'logs.php?action=list',
-            deleteAction: 'logs.php?action=delete',
+            listAction: 'logs.php?action=list'
         },
         messages: {
             deleteConfirmation: 'This entry will be deleted. Are you sure?'
@@ -1027,6 +1048,7 @@ $(document).ready(function () {
                                     $( this ).dialog( 'close' );
                                     $('#Logs').find('.jtable-title-text').text('Logs (filtered)');
                                     $('#Logs').jtable('load', {
+                                        logfile: $('#logfile').val(),
                                         user: $('#searchlogs-user').val(),
                                         entry: $('#searchlogs-entry').val()
                                     });
@@ -1036,13 +1058,40 @@ $(document).ready(function () {
                                     $('#searchlogs-entry').val('');
                                     $( this ).dialog( 'close' );
                                     $('#Logs').find('.jtable-title-text').text('Logs');
-                                    $('#Logs').jtable('load');
+                                    $('#Logs').jtable('load', {
+                                        logfile: $('#logfile').val()
+                                    });
                                     return false;
                                 }
                             }
                         });
                     }
                 },
+                <?php if($allowrotatelogs === TRUE) { ?>
+                {
+                    text: 'Rotate logs',
+                    click: function() {
+                        $("#rotatelogs").dialog({
+                            modal: true,
+                            title: "Rotate logs",
+                            width: 'auto',
+                            buttons: {
+                                Ok: function() {
+                                    $.get("logs.php?action=rotate");
+                                    $( this ).dialog( "close" );
+                                    $('#logfile').val('');
+                                    $('#Logs').jtable('load');
+                                },
+                                Cancel: function() {
+                                    $( this ).dialog( "close" );
+                                    return false;
+                                }
+                            }
+                        });
+                    }
+                },
+                <?php } ?>
+                <?php if($allowclearlogs === TRUE) { ?>
                 {
                     icon: 'img/delete_inverted.png',
                     text: 'Clear logs',
@@ -1055,6 +1104,7 @@ $(document).ready(function () {
                                 Ok: function() {
                                     $.get("logs.php?action=clear");
                                     $( this ).dialog( "close" );
+                                    $('#logfile').val('');
                                     $('#Logs').jtable('load');
                                 },
                                 Cancel: function() {
@@ -1065,17 +1115,18 @@ $(document).ready(function () {
                         });
                     }
                 },
+                <?php } ?>
                 {
                     icon: 'img/export.png',
-                    text: 'Save logs',
+                    text: 'Download logs',
                     click: function () {
-                        var $zexport = $.get("logs.php?action=export", function(data) {
+                        var $zexport = $.get("logs.php?action=export&logfile=" + $('#logfile').val(), function(data) {
                             console.log(data);
                             blob = new Blob([data], { type: 'text/plain' });
                             var dl = document.createElement('a');
                             dl.addEventListener('click', function(ev) {
                                 dl.href = URL.createObjectURL(blob);
-                                dl.download = 'nseditlogs.txt';
+                                dl.download = $('#logfile').val() == "" ? 'nseditlogs.txt':$('#logfile').val() + ".txt";
                             }, false);
 
                             if (document.createEvent) {
@@ -1111,6 +1162,15 @@ $(document).ready(function () {
             }
         }
     });
+
+    $('#logfile').change(function () {
+        $('#Logs').jtable('load', {
+            logfile: $('#logfile').val(),
+            user: $('#searchlogs-user').val(),
+            entry: $('#searchlogs-entry').val()
+        });
+    });
+
     <?php } ?>
     $('#MasterZones').jtable('load');
     $('#SlaveZones').jtable('load');

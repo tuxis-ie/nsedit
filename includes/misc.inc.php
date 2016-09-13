@@ -276,6 +276,58 @@ function clearlogs() {
     writelog("Logtable truncated.");
 }
 
+function rotatelogs() {
+    global $logging, $logsdirectory;
+    if ($logging !== TRUE)
+        return FALSE;
+
+    if(!is_dir($logsdirectory) || !is_writable($logsdirectory)) {
+      writelog("Logs directory cannot be written to.");
+      return FALSE;
+    }
+
+    date_default_timezone_set('UTC');
+    $filename = date("Y-m-d-His") . ".json";
+    $file = fopen($logsdirectory . "/" . $filename, "x");
+
+    if($file === FALSE) {
+      writelog("Can't create file for log rotation.");
+      return FALSE;
+    }
+
+    if(fwrite($file,json_encode(getlogs())) === FALSE) {
+        writelog("Can't write to file for log rotation.");
+        fclose($file);
+        return FALSE;
+    } else {
+        fclose($file);
+        clearlogs();
+        return $filename;
+    }
+
+}
+
+function listrotatedlogs() {
+    global $logging, $logsdirectory;
+    if ($logging !== TRUE)
+        return FALSE;
+
+    $list = scandir($logsdirectory,SCANDIR_SORT_DESCENDING);
+
+    if($list === FALSE) {
+      writelog("Logs directory cannot read.");
+      return FALSE;
+    }
+
+    $list=array_filter($list,
+        function ($val) {
+            return(preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6}\.json/',$val) == 1);
+        }
+    );
+
+    return $list;
+}
+
 function writelog($line, $user=False) {
     global $logging;
     if ($logging !== TRUE)
