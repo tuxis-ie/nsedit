@@ -85,6 +85,8 @@ case "update":
     break;
 
 case "delete":
+    $emailaddress = isset($_POST['emailaddress']) ? $_POST['emailaddress'] : '';
+
     if ($emailaddress != '' and delete_user($emailaddress) !== FALSE) {
         jtable_respond(null, 'delete');
     } else {
