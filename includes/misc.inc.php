@@ -159,7 +159,7 @@ function add_user($username, $isadmin = FALSE, $password = '') {
     return $ret;
 }
 
-function update_user($username, $isadmin, $password) {
+function update_user($id, $isadmin, $password) {
     if ($password && !preg_match('/\$6\$/', $password)) {
         $salt = bin2hex(openssl_random_pseudo_bytes(16));
         $password = crypt($password, '$6$'.$salt);
@@ -167,16 +167,23 @@ function update_user($username, $isadmin, $password) {
 
     $db = get_db();
 
+    $q = $db->prepare('SELECT * FROM users WHERE id = ?');
+    $q->bindValue(1, $id, SQLITE3_INTEGER);
+    $result = $q->execute();
+    $userinfo = $result->fetchArray(SQLITE3_ASSOC);
+    $q->close();
+    $username = $userinfo['emailaddress'];
+
     if ($password) {
-        $q = $db->prepare('UPDATE users SET isadmin = ?, password = ? WHERE emailaddress = ?');
+        $q = $db->prepare('UPDATE users SET isadmin = ?, password = ? WHERE id = ?');
         $q->bindValue(1, (int)(bool)$isadmin, SQLITE3_INTEGER);
         $q->bindValue(2, $password, SQLITE3_TEXT);
-        $q->bindValue(3, $username, SQLITE3_TEXT);
+        $q->bindValue(3, $id, SQLITE3_INTEGER);
         writelog("Updating password and/or settings for $username. Admin: ".(int)(bool)$isadmin);
     } else {
-        $q = $db->prepare('UPDATE users SET isadmin = ? WHERE emailaddress = ?');
+        $q = $db->prepare('UPDATE users SET isadmin = ? WHERE id = ?');
         $q->bindValue(1, (int)(bool)$isadmin, SQLITE3_INTEGER);
-        $q->bindValue(2, $username, SQLITE3_TEXT); 
+        $q->bindValue(2, $id, SQLITE3_INTEGER); 
         writelog("Updating settings for $username. Admin: ".(int)(bool)$isadmin);
     }
     $ret = $q->execute();
@@ -185,15 +192,26 @@ function update_user($username, $isadmin, $password) {
     return $ret;
 }
 
-function delete_user($username) {
+function delete_user($id) {
     $db = get_db();
-    $q = $db->prepare('DELETE FROM users WHERE id = ?');
-    $q->bindValue(1, $id, SQLITE3_INTEGER);
-    $ret = $q->execute();
-    $db->close();
 
-    writelog("Deleted user $username.");
-    return $ret;
+    $q = $db->prepare('SELECT * FROM users WHERE id = ?');
+    $q->bindValue(1, $id, SQLITE3_INTEGER);
+    $result = $q->execute();
+    $userinfo = $result->fetchArray(SQLITE3_ASSOC);
+    $q->close();
+
+    if($userinfo) {
+        $q = $db->prepare('DELETE FROM users WHERE id = ?');
+        $q->bindValue(1, $id, SQLITE3_INTEGER);
+        $ret = $q->execute();
+        $db->close();
+
+        writelog("Deleted user " . $userinfo['emailaddress'] . ".");
+        return $ret;
+    } else {
+        return false;
+    }
 }
 
 function valid_user($name) {

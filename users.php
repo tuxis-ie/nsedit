@@ -64,20 +64,13 @@ case "create":
     break;
 
 case "update":
+    $id = isset($_POST['id']) ? intval($_POST['id']) : '';
     $emailaddress = isset($_POST['emailaddress']) ? $_POST['emailaddress'] : '';
     $isadmin = isset($_POST['isadmin']) ? $_POST['isadmin'] : '0';
     $password = isset($_POST['password']) ? $_POST['password'] : '';
 
-    if (!valid_user($emailaddress)) {
-        jtable_respond(null, 'error', "Please only use ^[a-z0-9@_.-]+$ for usernames");
-    }
-
-    if (!user_exists($emailaddress)) {
-        jtable_respond(null, 'error', 'Cannot update not existing user');
-    }
-
-    if (update_user($emailaddress, $isadmin, $password)) {
-        $result = array('emailaddress' => $emailaddress, 'isadmin' => $isadmin);
+    if ($id != '' and update_user($id, $isadmin, $password)) {
+        $result = array('isadmin' => $isadmin);
         jtable_respond($result, 'single');
     } else {
         jtable_respond(null, 'error', 'Could not update user');
@@ -85,9 +78,9 @@ case "update":
     break;
 
 case "delete":
-    $emailaddress = isset($_POST['emailaddress']) ? $_POST['emailaddress'] : '';
+    $id = isset($_POST['id']) ? intval($_POST['id']) : '';
 
-    if ($emailaddress != '' and delete_user($emailaddress) !== FALSE) {
+    if ($id != '' and delete_user($id) !== FALSE) {
         jtable_respond(null, 'delete');
     } else {
         jtable_respond(null, 'error', 'Could not delete user');
