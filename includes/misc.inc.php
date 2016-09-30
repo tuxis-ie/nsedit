@@ -219,6 +219,10 @@ function valid_user($name) {
 }
 
 function jtable_respond($records, $method = 'multiple', $msg = 'Undefined errormessage') {
+    if($records == null) {
+      $records=array();
+    }
+
     $jTableResult = array();
     if ($method == 'error') {
         $jTableResult['Result'] = "ERROR";
