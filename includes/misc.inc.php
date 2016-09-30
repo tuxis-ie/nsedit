@@ -1,6 +1,6 @@
 <?php
 
-include('config.inc.php');
+include_once('config.inc.php');
 
 $blocklogin = FALSE;
 
@@ -457,5 +457,8 @@ if (!function_exists('hash_pbkdf2')) {
         return $derivedKey;
     }
 }
+
+// Include functions for group management
+include_once('groups.inc.php');
 
 ?>

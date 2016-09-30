@@ -160,7 +160,7 @@ if ($blocklogin === TRUE) {
         <ul>
             <li><a href="#" id="zoneadmin">Zones</a></li>
             <?php if (is_adminuser()) { ?>
-                <li><a href="#" id="useradmin">Users</a></li>
+                <li><a href="#" id="useradmin">Users/Groups</a></li>
                 <li><a href="#" id="logadmin">Logs</a></li>
             <?php } ?>
             <li><a href="#" id="aboutme">About me</a></li>
@@ -186,6 +186,7 @@ if ($blocklogin === TRUE) {
     <?php if (is_adminuser()) { ?>
     <div id="users">
         <div class="tables" id="Users"></div>
+        <div class="tables" id="Groups"></div>
     </div>
     <div id="logs">
         <div class="tables" id="Logs"></div>
@@ -941,11 +942,11 @@ $(document).ready(function () {
 
     <?php if (is_adminuser()) { ?>
     $('#logs').hide();
-    $('#Users').hide();
+    $('#users').hide();
     $('#AboutMe').hide();
     $('#aboutme').click(function () {
         $('#logs').hide();
-        $('#Users').hide();
+        $('#users').hide();
         $('#MasterZones').hide();
         $('#SlaveZones').hide();
         $('#AboutMe').show();
@@ -956,17 +957,18 @@ $(document).ready(function () {
         $('#SlaveZones').hide();
         $('#AboutMe').hide();
         $('#Users').jtable('load');
-        $('#Users').show();
+        $('#Groups').jtable('load');
+        $('#users').show();
     });
     $('#zoneadmin').click(function () {
         $('#logs').hide();
-        $('#Users').hide();
+        $('#users').hide();
         $('#AboutMe').hide();
         $('#MasterZones').show();
         $('#SlaveZones').show();
     });
     $('#logadmin').click(function () {
-        $('#Users').hide();
+        $('#users').hide();
         $('#AboutMe').hide();
         $('#MasterZones').hide();
         $('#SlaveZones').hide();
@@ -1014,6 +1016,43 @@ $(document).ready(function () {
                 values: {'0': 'No', '1': 'Yes'},
                 inputClass: 'isadmin',
                 listClass: 'isadmin'
+            }
+        },
+        recordAdded: function() {
+            $epoch = getEpoch();
+            $("#MasterZones").jtable('reload');
+            $("#SlaveZones").jtable('reload');
+        }
+    });
+
+    $('#Groups').jtable({
+        title: 'Groups',
+        paging: true,
+        pageSize: 20,
+        sorting: false,
+        actions: {
+            listAction: 'groups.php?action=list',
+            createAction: 'groups.php?action=create',
+            deleteAction: 'groups.php?action=delete',
+            updateAction: 'groups.php?action=update'
+        },
+        messages: {
+            addNewRecord: 'Add new group',
+            deleteConfirmation: 'This group will be deleted. Are you sure?'
+        },
+        fields: {
+            id: {
+                key: true,
+                type: 'hidden'
+            },
+            name: {
+                title: 'Group name',
+                display: displayContent('name'),
+                edit: true
+            },
+            desc: {
+                title: 'Description',
+                display: displayContent('desc')
             }
         },
         recordAdded: function() {
