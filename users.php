@@ -38,6 +38,12 @@ case "listoptions":
     jtable_respond($retusers, 'options');
     break;
 
+case "autocomplete":
+    $term = isset($_GET['term']) ? $_GET['term'] : '';
+    $users=get_usernames_filtered($term);
+    print json_encode($users);
+    break;
+
 case "create":
     $emailaddress = isset($_POST['emailaddress']) ? $_POST['emailaddress'] : '';
     $isadmin = isset($_POST['isadmin']) ? $_POST['isadmin'] : '0';

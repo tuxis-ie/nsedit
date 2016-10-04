@@ -48,6 +48,8 @@ if (is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "cha
     <script src="jquery-ui/ui/button.js" type="text/javascript"></script>
     <script src="jquery-ui/ui/resizable.js" type="text/javascript"></script>
     <script src="jquery-ui/ui/dialog.js" type="text/javascript"></script>
+    <script src="jquery-ui/ui/menu.js" type="text/javascript"></script>
+    <script src="jquery-ui/ui/autocomplete.js" type="text/javascript"></script>
     <script src="jtable/lib/jquery.jtable.min.js" type="text/javascript"></script>
     <script src="js/addclear/addclear.js" type="text/javascript"></script>
 </head>
@@ -1030,6 +1032,7 @@ $(document).ready(function () {
         paging: true,
         pageSize: 20,
         sorting: false,
+        openChildAsAccordion: true,
         actions: {
             listAction: 'groups.php?action=list',
             createAction: 'groups.php?action=create',
@@ -1053,6 +1056,45 @@ $(document).ready(function () {
             desc: {
                 title: 'Description',
                 display: displayContent('desc')
+            },
+            members: {
+                width: '5%',
+                title: 'Members',
+                sorting: false,
+                edit: false,
+                create: false,
+                display: function (data) {
+                    var $img = $('<img class="list" src="img/list.png" title="Edit Members">');
+                    $img.click(function() {
+                        $('#Groups').jtable('openChildTable',
+                        $img.closest('tr'), {
+                            title: 'Members of ' + data.record.name,
+                            actions: {
+                                listAction: 'groups.php?action=listmembers&groupid=' + data.record.id,
+                                createAction: 'groups.php?action=addmember&groupid=' + data.record.id
+                            },
+                            fields: {
+                                id: {
+                                    key: true,
+                                    type: 'hidden'
+                                },
+                                user: {
+                                    title: 'Username',
+                                    inputClass: "userlist",
+                                    display: displayContent('user')
+                                }
+                            },
+                            formCreated: function(event, data) {
+                                $( ".userlist" ).autocomplete({
+                                    source: "users.php?action=autocomplete"
+                                });
+                            }
+                        }, function (data) { //opened handler
+                            data.childTable.jtable('load');
+                        });
+                    });
+                    return $img;
+                }
             }
         },
         recordAdded: function() {

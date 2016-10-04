@@ -81,6 +81,39 @@ case "delete":
     }
     break;
 
+case "listmembers":
+    $groupid = isset($_GET['groupid']) ? intval($_GET['groupid']) : '';
+
+    if ($groupid != '') {
+        $groups = get_group_members($groupid);
+        jtable_respond($groups);
+    } else {
+        jtable_respond(null, 'error', 'Could not list group members');
+    }
+    break;
+
+case "addmember":
+    $groupid = isset($_GET['groupid']) ? intval($_GET['groupid']) : '';
+    $user = isset($_POST['user']) ? $_POST['user'] : '';
+
+    if ($groupid != '') {
+        if (user_exists($user)) {
+            if(is_group_member($groupid,$user)) {
+                jtable_respond(null, 'error', "User already a member of the group");
+            } elseif(add_group_member($groupid,$user)) {
+                $entry = array('user' => $user);
+                jtable_respond($entry, 'single');
+            } else {
+                jtable_respond(null, 'error', "Failed to add user to group");
+            }
+        } else {
+            jtable_respond(null, 'error', "User doesn't exist");
+        }
+    } else {
+        jtable_respond(null, 'error', 'Group not specified');
+    }
+    break;
+
 default:
     jtable_respond(null, 'error', 'Invalid action');
     break;

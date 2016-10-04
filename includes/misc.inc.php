@@ -104,6 +104,26 @@ function get_all_users() {
     return $ret;
 }
 
+/* Fetches a list of usernames from the DB for autocomplete.
+ * Restricts list by $term which can appear anywhere in the username
+ * Restricts results to $num responses
+ */
+function get_usernames_filtered($term, $num = 10) {
+    $db = get_db();
+    $q = $db->prepare("SELECT emailaddress FROM users WHERE emailaddress LIKE ? ORDER BY emailaddress LIMIT 0, ?");
+    $q->bindValue(1, "%" . $term . "%", SQLITE3_TEXT);
+    $q->bindValue(2, $num, SQLITE3_INTEGER);
+    $r = $q->execute();
+
+    $ret = array();
+    while ($row = $r->fetchArray(SQLITE3_NUM)) {
+        array_push($ret, $row[0]);
+    }
+    $db->close();
+
+    return $ret;
+}
+
 function get_user_info($u) {
     $db = get_db();
     $q = $db->prepare('SELECT * FROM users WHERE emailaddress = ?');
