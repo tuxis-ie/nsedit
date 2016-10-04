@@ -1069,9 +1069,14 @@ $(document).ready(function () {
                         $('#Groups').jtable('openChildTable',
                         $img.closest('tr'), {
                             title: 'Members of ' + data.record.name,
+                            messages: {
+                                addNewRecord: 'Add group member',
+                                deleteConfirmation: 'This user will be removed from the group. Are you sure?'
+                            },
                             actions: {
                                 listAction: 'groups.php?action=listmembers&groupid=' + data.record.id,
-                                createAction: 'groups.php?action=addmember&groupid=' + data.record.id
+                                createAction: 'groups.php?action=addmember&groupid=' + data.record.id,
+                                deleteAction: 'groups.php?action=removemember&groupid=' + data.record.id
                             },
                             fields: {
                                 id: {

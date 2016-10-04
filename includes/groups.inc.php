@@ -24,7 +24,7 @@ function get_group_info($name) {
 
 function get_group_name($id) {
     $db = get_db();
-    $q = $db->prepare('SELECT * FROM groups WHERE id = ?');
+    $q = $db->prepare('SELECT name FROM groups WHERE id = ?');
     $q->bindValue(1, $id, SQLITE3_INTEGER);
     $r = $q->execute();
     $ret = $r->fetchArray(SQLITE3_NUM);
@@ -142,12 +142,36 @@ function add_group_member($id,$user) {
     $q->bindValue(1, $id, SQLITE3_INTEGER);
     $q->bindValue(2, $userid, SQLITE3_INTEGER);
     $ret = $q->execute();
-    $db->close();
 
     if($ret) {
         writelog("Added user $user to group " . get_group_name($id) . ".");
+        return $db->lastInsertRowID();
     } else {
         writelog("Failed to add user $user to group " . get_group_name($id) . ".");
+        return null;
+    }
+}
+
+function remove_group_member($id) {
+    $db = get_db();
+
+    $q = $db->prepare('SELECT groups.name,users.emailaddress FROM groupmembers,users,groups WHERE groupmembers.id=? AND groupmembers.user=users.id AND groupmembers."group"=groups.id');
+    $q->bindValue(1, $id, SQLITE3_INTEGER);
+    $r = $q->execute();
+    $ret = $r->fetchArray(SQLITE3_NUM);
+    $group=$ret[0];
+    $user=$ret[1];
+    $q->close();
+
+    $q = $db->prepare('DELETE FROM groupmembers WHERE id=?');
+    $q->bindValue(1, $id, SQLITE3_INTEGER);
+    $ret = $q->execute();
+    $db->close();
+
+    if($ret) {
+        writelog("Removed user $user from group $group.");
+    } else {
+        writelog("Failed to remove user $user from group $group.");
     }
     return $ret;
 }

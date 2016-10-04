@@ -100,8 +100,8 @@ case "addmember":
         if (user_exists($user)) {
             if(is_group_member($groupid,$user)) {
                 jtable_respond(null, 'error', "User already a member of the group");
-            } elseif(add_group_member($groupid,$user)) {
-                $entry = array('user' => $user);
+            } elseif(!is_null($id=add_group_member($groupid,$user))) {
+                $entry = array('id' => $id,'user' => $user);
                 jtable_respond($entry, 'single');
             } else {
                 jtable_respond(null, 'error', "Failed to add user to group");
@@ -111,6 +111,20 @@ case "addmember":
         }
     } else {
         jtable_respond(null, 'error', 'Group not specified');
+    }
+    break;
+
+case "removemember":
+    $id = isset($_POST['id']) ? $_POST['id'] : '';
+
+    if ($id != '') {
+        if(remove_group_member($id)) {
+            jtable_respond(null, 'delete');
+        } else {
+            jtable_respond(null, 'error', "Failed to delete user from group");
+        }
+    } else {
+        jtable_respond(null, 'error', 'ID not specified');
     }
     break;
 
