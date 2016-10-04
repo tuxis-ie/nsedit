@@ -1049,11 +1049,13 @@ $(document).ready(function () {
                 type: 'hidden'
             },
             name: {
+                width: '25%',
                 title: 'Group name',
                 display: displayContent('name'),
                 edit: true
             },
             desc: {
+                width: '70%',
                 title: 'Description',
                 display: displayContent('desc')
             },
