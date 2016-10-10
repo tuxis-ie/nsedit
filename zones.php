@@ -387,6 +387,14 @@ case "createrecord":
         jtable_respond(null, 'error', "Please only use ASCII-characters in your fields");
     }
 
+    if ($type === 'TXT') {
+        # empty TXT records are ok, otherwise require surrounding quotes: "..."
+        if (strlen($content) == 1 || substr($content, 0, 1) !== '"' || substr($content, -1) !== '"') {
+            # fix quoting: first escape all \, then all ", then surround with quotes.
+            $content = '"'.str_replace('"', '\\"', str_replace('\\', '\\\\', $content)).'"';
+        }
+    }
+
     $record = $zone->addRecord($name, $type, $content, $_POST['disabled'], $_POST['ttl'], $_POST['setptr']);
     $api->savezone($zone->export());
 
