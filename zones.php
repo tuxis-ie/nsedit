@@ -319,7 +319,7 @@ case "create":
             $api->savezone($zone->export());
 
             foreach ($template['records'] as $record) {
-                $zone->addRecord($record['name'], $record['type'], $record['content']);
+                $zone->addRecord($record['name'].$zonename, $record['type'], $record['content']);
             }
 
             break;
@@ -369,7 +369,6 @@ case "createrecord":
         $name = $zone->name;
     } elseif (string_ends_with($name, '.')) {
         # "absolute" name, shouldn't append zone[name] - but check.
-        $name = substr($name, 0, -1);
         if (!string_ends_with($name, $zone->name)) {
             jtable_respond(null, 'error', "Name $name not in zone ".$zone->name);
         }
