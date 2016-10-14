@@ -319,7 +319,8 @@ case "create":
             $api->savezone($zone->export());
 
             foreach ($template['records'] as $record) {
-                $zone->addRecord(join(Array($record['name'],'.',$zonename)), $record['type'], $record['content']);
+                $name = $record['name'] != '' ? join(Array($record['name'],'.',$zonename)) : $zonename;
+                $zone->addRecord($name, $record['type'], $record['content']);
             }
 
             break;
