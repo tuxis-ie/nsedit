@@ -85,10 +85,12 @@ function string_ends_with($string, $suffix)
 }
 
 function get_db() {
-    global $authdb;
+    global $authdb, $db;
 
-    $db = new SQLite3($authdb, SQLITE3_OPEN_READWRITE);
-    $db->exec('PRAGMA foreign_keys = 1');
+    if (!isset($db)) {
+        $db = new SQLite3($authdb, SQLITE3_OPEN_READWRITE);
+        $db->exec('PRAGMA foreign_keys = 1');
+    }
 
     return $db;
 }
@@ -110,7 +112,6 @@ function get_user_info($u) {
     $q->bindValue(1, $u);
     $result = $q->execute();
     $userinfo = $result->fetchArray(SQLITE3_ASSOC);
-    $db->close();
 
     return $userinfo;
 }
@@ -125,7 +126,6 @@ function do_db_auth($u, $p) {
     $q->bindValue(1, $u);
     $result = $q->execute();
     $userinfo = $result->fetchArray(SQLITE3_ASSOC);
-    $db->close();
 
     if ($userinfo and $userinfo['password'] and (crypt($p, $userinfo['password']) === $userinfo['password'])) {
         return TRUE;
@@ -149,7 +149,6 @@ function add_user($username, $isadmin = FALSE, $password = '') {
     $q->bindValue(2, $password, SQLITE3_TEXT);
     $q->bindValue(3, (int)(bool) $isadmin, SQLITE3_INTEGER);
     $ret = $q->execute();
-    $db->close();
 
     if ($isadmin) {
         writelog("Added user $username as admin.");
@@ -187,7 +186,6 @@ function update_user($id, $isadmin, $password) {
         writelog("Updating settings for $username. Admin: ".(int)(bool)$isadmin);
     }
     $ret = $q->execute();
-    $db->close();
 
     return $ret;
 }
@@ -205,7 +203,6 @@ function delete_user($id) {
         $q = $db->prepare('DELETE FROM users WHERE id = ?');
         $q->bindValue(1, $id, SQLITE3_INTEGER);
         $ret = $q->execute();
-        $db->close();
 
         writelog("Deleted user " . $userinfo['emailaddress'] . ".");
         return $ret;
@@ -241,6 +238,8 @@ function jtable_respond($records, $method = 'multiple', $msg = 'Undefined errorm
         $jTableResult['RecordCount'] = count($records);
     }
 
+    $db = get_db();
+    $db->close();
     header('Content-Type: application/json');
     print json_encode($jTableResult);
     exit(0);
@@ -290,7 +289,6 @@ function clearlogs() {
 
     $db = get_db();
     $q = $db->query('DELETE FROM logs;');
-    $db->close();
     writelog("Logtable truncated.");
 }
 
@@ -368,7 +366,6 @@ function writelog($line, $user=False) {
         $q->bindValue(':user', $user, SQLITE3_TEXT);
         $q->bindValue(':log', $line, SQLITE3_TEXT);
         $q->execute();
-        $db->close();
     } catch (Exception $e) {
         return jtable_respond(null, 'error', $e->getMessage());
     }

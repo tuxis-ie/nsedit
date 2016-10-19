@@ -112,7 +112,6 @@ function add_db_zone($zonename, $accountname) {
     $q->bindValue(1, $zonename, SQLITE3_TEXT);
     $q->bindValue(2, $accountname, SQLITE3_TEXT);
     $q->execute();
-    $db->close();
 }
 
 function delete_db_zone($zonename) {
@@ -123,7 +122,6 @@ function delete_db_zone($zonename) {
     $q = $db->prepare("DELETE FROM zones WHERE zone = ?");
     $q->bindValue(1, $zonename, SQLITE3_TEXT);
     $q->execute();
-    $db->close();
 }
 
 function get_zone_account($zonename, $default) {
@@ -135,7 +133,6 @@ function get_zone_account($zonename, $default) {
     $q->bindValue(1, $zonename, SQLITE3_TEXT);
     $result = $q->execute();
     $zoneinfo = $result->fetchArray(SQLITE3_ASSOC);
-    $db->close();
     if (isset($zoneinfo['emailaddress']) && $zoneinfo['emailaddress'] != null ) {
         return $zoneinfo['emailaddress'];
     }
@@ -165,7 +162,9 @@ case "listslaves":
     foreach ($api->listzones($q) as $sresult) {
         $zone = new Zone();
         $zone->parse($sresult);
-        $zone->setAccount(get_zone_account($zone->name, 'admin'));
+        if ($zone->account == '') {
+            $zone->setAccount(get_zone_account($zone->name, 'admin'));
+        }
 
         if (!check_account($zone))
             continue;
