@@ -272,7 +272,7 @@ case "create":
             $zone->importData($_POST['zone']);
         }
         if (isset($defaults['soa_edit_api'])) {
-            $zone->setSoaEditApi($defaults['soa_edit_api']);
+            $zone->setSoaEditApi($defaults['soa_edit_api'], True);
         }
         if (isset($defaults['soa_edit'])) {
             $zone->setSoaEdit($defaults['soa_edit']);
@@ -334,6 +334,8 @@ case "create":
 case "update":
     $zone = new Zone();
     $zone->parse($api->loadzone($_POST['id']));
+    if ($zone->setSoaEditApi($defaults['soa_edit_api']) != False)
+        writelog("Set SOA-EDIT-API to ".$defaults['soa_edit_api']." for ",$zone->name);
     $zoneaccount = isset($_POST['account']) ? $_POST['account'] : $zone->account;
 
     if ($zone->account !== $zoneaccount) {
@@ -360,6 +362,8 @@ case "update":
 case "createrecord":
     $zone = new Zone();
     $zone->parse($api->loadzone($_GET['zoneid']));
+    if ($zone->setSoaEditApi($defaults['soa_edit_api']) != False)
+        writelog("Set SOA-EDIT-API to ".$defaults['soa_edit_api']." for ",$zone->name);
 
     $name = isset($_POST['name']) ? $_POST['name'] : '';
     $type = $_POST['type'];
@@ -404,6 +408,8 @@ case "createrecord":
 case "editrecord":
     $zone = new Zone();
     $zone->parse($api->loadzone($_GET['zoneid']));
+    if ($zone->setSoaEditApi($defaults['soa_edit_api']) != False)
+        writelog("Set SOA-EDIT-API to ".$defaults['soa_edit_api']." for ",$zone->name);
 
     $old_record = decode_record_id(isset($_POST['id']) ? $_POST['id'] : '');
 
@@ -421,6 +427,8 @@ case "editrecord":
 case "deleterecord":
     $zone = new Zone();
     $zone->parse($api->loadzone($_GET['zoneid']));
+    if ($zone->setSoaEditApi($defaults['soa_edit_api']) != False)
+        writelog("Set SOA-EDIT-API to ".$defaults['soa_edit_api']." for ",$zone->name);
 
     $old_record = decode_record_id(isset($_POST['id']) ? $_POST['id'] : '');
     $rrset = $zone->getRRSet($old_record['name'], $old_record['type']);
@@ -451,6 +459,8 @@ case "clone":
 
     $srczone = new Zone();
     $srczone->parse($api->loadzone($src));
+    if ($srczone->setSoaEditApi($defaults['soa_edit_api']) != False)
+        writelog("Set SOA-EDIT-API to ".$defaults['soa_edit_api']." for ",$srczone->name);
 
     $srczone->setId('');
     $srczone->setName($name);
