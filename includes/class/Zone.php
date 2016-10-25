@@ -182,7 +182,7 @@ class Zone {
         $ret['kind'] = $this->kind;
         $ret['name'] = $this->name;
         $ret['soa_edit'] = $this->soa_edit;
-        $ret['soa_edit_api'] = $this->soa_edit_api;
+        $ret['soa_edit_api'] = ($this->soa_edit_api == "") ? $defaults['soa_edit_api'] : $this->soa_edit_api;
         if ($this->zone) {
             $ret['zone'] = $this->zone;
             return $ret;
