@@ -616,6 +616,8 @@ $(document).ready(function () {
                                             'SRV': 'SRV',
                                             'SSHFP': 'SSHFP',
                                             'TLSA': 'TLSA',
+                                            'DNAME': 'DNAME',
+                                            'DS': 'DS'
                                         };
                                     }
                                     return {
@@ -623,6 +625,8 @@ $(document).ready(function () {
                                         'AAAA': 'AAAA',
                                         'CERT': 'CERT',
                                         'CNAME': 'CNAME',
+                                        'DNAME': 'DNAME',
+                                        'DS': 'DS',
                                         'LOC': 'LOC',
                                         'MX': 'MX',
                                         'NAPTR': 'NAPTR',
