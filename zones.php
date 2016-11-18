@@ -388,7 +388,7 @@ case "createrecord":
         if (!string_ends_with($name, $zone->name)) {
             jtable_respond(null, 'error', "Name $name not in zone ".$zone->name);
         }
-    } else if (!string_ends_with($name, $zone->name)) {
+    } else if (!string_ends_with($name.'.', $zone->name)) {
         $name = $name . '.' . $zone->name;
     }
 
