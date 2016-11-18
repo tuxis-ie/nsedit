@@ -390,6 +390,8 @@ case "createrecord":
         }
     } else if (!string_ends_with($name.'.', $zone->name)) {
         $name = $name . '.' . $zone->name;
+    } else {
+        $name = $name.'.';
     }
 
     if (!_valid_label($name)) {
