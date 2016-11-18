@@ -12,10 +12,12 @@ if (!is_csrf_safe()) {
     jtable_respond(null, 'error', "Authentication required");
 }
 
+
+$quoteus = array('TXT', 'SPF');
+
 /* This function is taken from:
 http://pageconfig.com/post/how-to-validate-ascii-text-in-php and got fixed by
 #powerdns */
-
 function is_ascii($string) {
     return ( bool ) ! preg_match( '/[\\x00-\\x08\\x0b\\x0c\\x0e-\\x1f\\x80-\\xff]/' , $string );
 }
@@ -138,6 +140,16 @@ function get_zone_account($zonename, $default) {
     }
 
     return $default;
+}
+
+function quote_content($content) {
+    # empty TXT records are ok, otherwise require surrounding quotes: "..."
+    if (strlen($content) == 1 || substr($content, 0, 1) !== '"' || substr($content, -1) !== '"') {
+        # fix quoting: first escape all \, then all ", then surround with quotes.
+        $content = '"'.str_replace('"', '\\"', str_replace('\\', '\\\\', $content)).'"';
+    }
+
+    return $content;
 }
 
 function check_account($zone) {
@@ -390,12 +402,8 @@ case "createrecord":
         jtable_respond(null, 'error', "Please only use ASCII-characters in your fields");
     }
 
-    if ($type === 'TXT') {
-        # empty TXT records are ok, otherwise require surrounding quotes: "..."
-        if (strlen($content) == 1 || substr($content, 0, 1) !== '"' || substr($content, -1) !== '"') {
-            # fix quoting: first escape all \, then all ", then surround with quotes.
-            $content = '"'.str_replace('"', '\\"', str_replace('\\', '\\\\', $content)).'"';
-        }
+    if (array_search($type, $quoteus) !== FALSE) {
+        $content = quote_content($content);
     }
 
     $record = $zone->addRecord($name, $type, $content, $_POST['disabled'], $_POST['ttl'], $_POST['setptr']);
@@ -415,11 +423,17 @@ case "editrecord":
 
     $rrset = $zone->getRRSet($old_record['name'], $old_record['type']);
     $rrset->deleteRecord($old_record['content']);
-    $zone->addRecord($_POST['name'], $_POST['type'], $_POST['content'], $_POST['disabled'], $_POST['ttl'], $_POST['setptr']);
+
+    $content = $_POST['content'];
+    if (array_search($type, $quoteus) !== FALSE) {
+        $content = quote_content($content);
+    }
+
+    $zone->addRecord($_POST['name'], $_POST['type'], $content, $_POST['disabled'], $_POST['ttl'], $_POST['setptr']);
 
     $api->savezone($zone->export());
 
-    $record = $zone->getRecord($_POST['name'], $_POST['type'], $_POST['content']);
+    $record = $zone->getRecord($_POST['name'], $_POST['type'], $content);
     writelog("Updated record ".$_POST['id']." to ".$record['id']);
     jtable_respond($record, 'single');
     break;
