@@ -527,6 +527,7 @@ case "getformnameservers":
     break;
 case "formzonelist":
     $zones = $api->listzones();
+    usort($zones, "zone_compare");
     $ret = array();
     foreach ($zones as $zone) {
         if ($zone['kind'] == 'Slave')
