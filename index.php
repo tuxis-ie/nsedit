@@ -1177,6 +1177,18 @@ $(document).ready(function () {
             entry: $('#searchlogs-entry').val()
         });
     });
+    <?php } else { ?>
+    $('#AboutMe').hide();
+    $('#aboutme').click(function () {
+        $('#MasterZones').hide();
+        $('#SlaveZones').hide();
+        $('#AboutMe').show();
+    });
+    $('#zoneadmin').click(function () {
+        $('#AboutMe').hide();
+        $('#MasterZones').show();
+        $('#SlaveZones').show();
+    });
 
     <?php } ?>
     $('#MasterZones').jtable('load');
