@@ -1,6 +1,7 @@
 <?php
 
 include_once('config.inc.php');
+include_once('database.inc.php');
 
 $blocklogin = FALSE;
 
@@ -59,13 +60,12 @@ if (function_exists('openssl_random_pseudo_bytes') === FALSE) {
 
 $defaults['defaulttype'] = ucfirst(strtolower($defaults['defaulttype']));
 
-if (isset($authdb) && !file_exists($authdb) && class_exists('SQLite3')) {
-    is_dir(dirname($authdb)) || mkdir(dirname($authdb));
-    $db = new SQLite3($authdb, SQLITE3_OPEN_CREATE|SQLITE3_OPEN_READWRITE);
-    $createsql = file_get_contents('includes/scheme.sql');
-    $db->exec($createsql);
-    $salt = bin2hex(openssl_random_pseudo_bytes(16));
-    $db->exec("INSERT INTO users (emailaddress, password, isadmin) VALUES ('admin', '".crypt("admin", '$6$'.$salt)."', 1)");
+if(class_exists('SQLite3')) {
+    if (isset($authdb) && !file_exists($authdb)) {
+        init_db();
+    } else {
+        open_db();
+    }
 }
 
 function string_starts_with($string, $prefix)
@@ -82,17 +82,6 @@ function string_ends_with($string, $suffix)
     }
 
     return (substr($string, -$length) === $suffix);
-}
-
-function get_db() {
-    global $authdb, $db;
-
-    if (!isset($db)) {
-        $db = new SQLite3($authdb, SQLITE3_OPEN_READWRITE);
-        $db->exec('PRAGMA foreign_keys = 1');
-    }
-
-    return $db;
 }
 
 function get_all_users() {
@@ -379,13 +368,6 @@ function writelog($line, $user=False) {
 
     try {
         $db = get_db();
-        $q = $db->prepare('CREATE TABLE IF NOT EXISTS logs (
-            id INTEGER PRIMARY KEY,
-            user TEXT NOT NULL,
-            log TEXT NOT NULL,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);');
-        $ret = $q->execute();
-
         $q = $db->prepare('INSERT INTO logs (user, log) VALUES (:user, :log)');
         $q->bindValue(':user', $user, SQLITE3_TEXT);
         $q->bindValue(':log', $line, SQLITE3_TEXT);
