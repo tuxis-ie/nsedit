@@ -20,7 +20,7 @@ function init_db() {
 }
 
 function open_db() {
-    global $authdb, $db;
+    global $authdb, $db, $db_version;
 
     if (!isset($db)) {
         $db = new SQLite3($authdb, SQLITE3_OPEN_READWRITE);
