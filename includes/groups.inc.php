@@ -17,7 +17,6 @@ function get_group_info($name) {
     $q->bindValue(1, $name);
     $result = $q->execute();
     $groupinfo = $result->fetchArray(SQLITE3_ASSOC);
-    $db->close();
 
     return $groupinfo;
 }
@@ -28,7 +27,6 @@ function get_group_name($id) {
     $q->bindValue(1, $id, SQLITE3_INTEGER);
     $r = $q->execute();
     $ret = $r->fetchArray(SQLITE3_NUM);
-    $db->close();
 
     return $ret[0];
 }
@@ -43,7 +41,6 @@ function add_group($name, $desc) {
     $q->bindValue(1, $name, SQLITE3_TEXT);
     $q->bindValue(2, $desc, SQLITE3_TEXT);
     $ret = $q->execute();
-    $db->close();
 
     writelog("Added group $name ($desc).");
     return $ret;
@@ -65,7 +62,6 @@ function update_group($id, $name, $desc) {
     $q->bindValue(3, $id, SQLITE3_INTEGER);
     writelog("Updating group $oldname to: $name ($desc) ");
     $ret = $q->execute();
-    $db->close();
 
     return $ret;
 }
@@ -83,7 +79,6 @@ function delete_group($id) {
         $q = $db->prepare('DELETE FROM groups WHERE id = ?');
         $q->bindValue(1, $id, SQLITE3_INTEGER);
         $ret = $q->execute();
-        $db->close();
 
         writelog("Deleted group " . $groupinfo['name'] . ".");
         return $ret;
@@ -166,7 +161,6 @@ function remove_group_member($id) {
     $q = $db->prepare('DELETE FROM groupmembers WHERE id=?');
     $q->bindValue(1, $id, SQLITE3_INTEGER);
     $ret = $q->execute();
-    $db->close();
 
     if($ret) {
         writelog("Removed user $user from group $group.");

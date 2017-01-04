@@ -110,7 +110,6 @@ function get_usernames_filtered($term, $num = 10) {
     while ($row = $r->fetchArray(SQLITE3_NUM)) {
         array_push($ret, $row[0]);
     }
-    $db->close();
 
     return $ret;
 }

@@ -51,8 +51,7 @@ function get_db() {
     global $authdb, $db;
 
     if (!isset($db)) {
-        $db = new SQLite3($authdb, SQLITE3_OPEN_READWRITE);
-        $db->exec('PRAGMA foreign_keys = 1');
+        open_db();
     }
 
     return $db;
