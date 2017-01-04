@@ -619,6 +619,8 @@ $(document).ready(function () {
                                             'SRV': 'SRV',
                                             'SSHFP': 'SSHFP',
                                             'TLSA': 'TLSA',
+                                            'DNAME': 'DNAME',
+                                            'DS': 'DS'
                                         };
                                     }
                                     return {
@@ -626,6 +628,8 @@ $(document).ready(function () {
                                         'AAAA': 'AAAA',
                                         'CERT': 'CERT',
                                         'CNAME': 'CNAME',
+                                        'DNAME': 'DNAME',
+                                        'DS': 'DS',
                                         'LOC': 'LOC',
                                         'MX': 'MX',
                                         'NAPTR': 'NAPTR',
@@ -1329,6 +1333,18 @@ $(document).ready(function () {
             user: $('#searchlogs-user').val(),
             entry: $('#searchlogs-entry').val()
         });
+    });
+    <?php } else { ?>
+    $('#AboutMe').hide();
+    $('#aboutme').click(function () {
+        $('#MasterZones').hide();
+        $('#SlaveZones').hide();
+        $('#AboutMe').show();
+    });
+    $('#zoneadmin').click(function () {
+        $('#AboutMe').hide();
+        $('#MasterZones').show();
+        $('#SlaveZones').show();
     });
 
     <?php } ?>

@@ -26,10 +26,10 @@ class Zone {
         $this->setAccount($data['account']);
         $this->setSerial($data['serial']);
         $this->url = $data['url'];
-        if (isset($data['soa_edit']))
+        if (isset($data['soa_edit']) && $data['soa_edit'] != "")
             $this->setSoaEdit($data['soa_edit']);
-        if (isset($data['soa_edit_api']))
-            $this->setSoaEditApi($data['soa_edit_api']);
+        if (isset($data['soa_edit_api']) && $data['soa_edit_api'] != "")
+            $this->setSoaEditApi($data['soa_edit_api'], True);
 
         foreach ($data['masters'] as $master) {
             $this->addMaster($master);
@@ -76,7 +76,12 @@ class Zone {
         $this->soa_edit = $soaedit;
     }
 
-    public function setSoaEditApi($soaeditapi) {
+    public function setSoaEditApi($soaeditapi, $overwrite=False) {
+        if (isset($this->soa_edit_api) and $this->soa_edit_api != "") {
+            if ($overwrite === False) {
+                return False;
+            }
+        }
         $this->soa_edit_api = $soaeditapi;
     }
     public function setName($name) {
@@ -181,8 +186,12 @@ class Zone {
         $ret['nameservers'] = $this->nameservers;
         $ret['kind'] = $this->kind;
         $ret['name'] = $this->name;
-        $ret['soa_edit'] = $this->soa_edit;
-        $ret['soa_edit_api'] = $this->soa_edit_api;
+        if (isset($this->soa_edit) && $this->soa_edit != "") {
+            $ret['soa_edit'] = $this->soa_edit;
+        }
+        if (isset($this->soa_edit_api) && $this->soa_edit_api != "") {
+            $ret['soa_edit_api'] = $this->soa_edit_api;
+        }
         if ($this->zone) {
             $ret['zone'] = $this->zone;
             return $ret;
