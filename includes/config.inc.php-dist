@@ -10,6 +10,12 @@ $logging = TRUE;
 $allowclearlogs = TRUE;  # Allow clearing of log entries
 $allowrotatelogs = FALSE;# Allow rotation to text file on server
 
+$restrictediting = TRUE; # Restrict editing of record types
+$restrictedtypes = array( 
+    'SOA' => 1,
+    'NS' => 1
+);
+
 # Log directory - if allowrotatelogs is set, this is where the logs will
 # be written. It must be writeable by the web server user.
 $logsdirectory = "../etc";

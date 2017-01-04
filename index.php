@@ -796,6 +796,75 @@ $(document).ready(function () {
                 inputClass: 'serial',
                 listClass: 'serial'
             },
+            permissions: {
+                title: 'Permissions',
+                width: '10%',
+                create: false,
+                edit: false,
+                display: function(data) {
+                    var $img = $('<img class="list" src="img/list.png" title="Permissions" />');
+                    $img.click(function () {
+                        $('#SlaveZones').jtable('openChildTable',
+                            $img.closest('tr'), {
+                                title: 'Permissions for ' + data.record.name,
+                                openChildAsAccordion: true,
+                                actions: {
+                                    listAction: 'permissions.php?action=list&zoneid=' + data.record.id,
+                                    createAction: 'permissions.php?action=add&zoneid=' + data.record.id,
+                                    deleteAction: 'permissions.php?action=remove&zoneid=' + data.record.id
+                                },
+                                fields: {
+                                    id: {
+                                        key: true,
+                                        type: 'hidden'
+                                    },
+                                    type: {
+                                        title: 'Type',
+                                        inputClass: "permissionstype",
+                                        options: {
+                                            'user': 'User',
+                                            'group': 'Group'
+                                        },
+                                        create: true,
+                                        edit: false
+                                    },
+                                    value: {
+                                        title: 'Name',
+                                        inputClass: "usergrouplist",
+                                        display: displayContent('value')
+                                    },
+                                    permissions: {
+                                        title: 'Permissions',
+                                        options: {
+                                            '1' : 'View Only',
+<?php if($restrictediting) { ?>
+                                            '3' : 'Update normal records',
+                                            '7' : 'Update all records',
+<?php } else { ?>
+                                            '7' : 'Update',
+<?php } ?>
+                                            '15' : 'Admin'
+                                        }
+                                    }
+                                },
+                                formCreated: function(event, dat) {
+                                    $( ".usergrouplist" ).autocomplete({
+                                        source: "users.php?action=autocomplete&zoneid=" + data.record.id + "&type=" + $( ".permissionstype" ).val()
+                                    });
+                                    $( ".permissionstype" ).change(function() {
+                                      $( ".usergrouplist" ).val("");
+                                      $( ".usergrouplist" ).autocomplete({
+                                          source: "users.php?action=autocomplete&type=" + $( ".permissionstype" ).val()
+                                      });
+                                    });
+                                }
+                            }, function (data) {
+                                data.childTable.jtable('load');
+                            })
+                    });
+                    return $img;
+                }
+            },
             exportzone: {
                 title: '',
                 width: '1%',
