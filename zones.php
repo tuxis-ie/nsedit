@@ -153,7 +153,7 @@ function quote_content($content) {
 }
 
 function check_account($zone) {
-    return is_adminuser() or ($zone->account === get_sess_user());
+    return is_adminuser() or ($zone->account === get_sess_user()) or check_permissions($zone->id,PERM_VIEW);
 }
 
 if (isset($_GET['action'])) {
@@ -200,6 +200,7 @@ case "listrecords":
     $zone->parse($zonedata);
     $records = $zone->rrsets2records();
 
+//    if(permissions($zone->id))
     if(!empty($_POST['label'])) {
         $records=array_filter($records,
             function ($val) {

@@ -82,7 +82,7 @@ function set_permissions($userid,$groupid,$zone,$permissions) {
         writelog("Added '$permissionmap[$permissions]' permissions for $who from zone $zone.");
         return $db->lastInsertRowID();
     } else {
-        writelog("Failed to add permissions to zone $zone for $who.");
+        writelog("Failed to add permissions to zone $zone ($zoneid) for $who.");
         return null;
     }
 }
@@ -192,8 +192,25 @@ function permissions($zone,$userid) {
         return $perm;
     } else {
         $perm=0;
+        $zoneid=get_zone_id($zone);
+        $db = get_db();
 
+        $q = $db->prepare('SELECT p.permissions FROM groupmembers gm LEFT JOIN permissions p ON p."group"=gm."group" WHERE zone=? AND p."group">0 AND gm.user=?');
+        $q->bindValue(1, $zoneid, SQLITE3_INTEGER);
+        $q->bindValue(2, $userid, SQLITE3_INTEGER);
+        $r = $q->execute();
+
+        while ($row = $r->fetchArray(SQLITE3_NUM)) {
+            $perm=$perm|$row[0];
+        }
+        return $perm;
     }
 }
+
+// Utility function - check a permission for current user
+function check_permissions($zone,$permmask) {
+    return (bool) (permissions($zone,get_user_id(get_sess_user()))&$permmask);    
+}
+
 
 ?>
