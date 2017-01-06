@@ -31,40 +31,6 @@ define('PERM_UPDATE',0x02);
 define('PERM_UPDATESPECIAL',0x04);
 define('PERM_ADMIN',0x08);
 
-
-// move to misc?
-function get_zone_id($zone) {
-    $db = get_db();
-
-    $q = $db->prepare('SELECT id FROM zones WHERE zone=?');
-    $q->bindValue(1, $zone, SQLITE3_TEXT);
-    $r = $q->execute();
-    $ret = $r->fetchArray(SQLITE3_NUM);
-
-    if($ret) {
-        return $ret[0];
-    } else {
-        return null;
-    }
-
-}
-
-// move to misc?
-function get_user_name($userid) {
-    $db = get_db();
-
-    $q = $db->prepare('SELECT emailAddress FROM users WHERE id = ?');
-    $q->bindValue(1, $userid, SQLITE3_INTEGER);
-    $r = $q->execute();
-    $ret = $r->fetchArray(SQLITE3_NUM);
-
-    if($ret) {
-        return $ret[0];
-    } else {
-        return null;
-    }
-}
-
 // Interface function - Return an array of permissions for the zone
 function get_zone_permissions($zone) {
     $db = get_db();

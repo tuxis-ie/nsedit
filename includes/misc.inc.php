@@ -475,7 +475,53 @@ if (!function_exists('hash_pbkdf2')) {
     }
 }
 
+// get user id from name
+function get_user_id($user) {
+    $info=get_user_info($user);
+    if($info) {
+        return $info['id'];
+    } else {
+        return null;
+    }
+}
+
+// get zone id from name
+function get_zone_id($zone) {
+    $db = get_db();
+
+    $q = $db->prepare('SELECT id FROM zones WHERE zone=?');
+    $q->bindValue(1, $zone, SQLITE3_TEXT);
+    $r = $q->execute();
+    $ret = $r->fetchArray(SQLITE3_NUM);
+
+    if($ret) {
+        return $ret[0];
+    } else {
+        return null;
+    }
+
+}
+
+// get user name from id
+function get_user_name($userid) {
+    $db = get_db();
+
+    $q = $db->prepare('SELECT emailAddress FROM users WHERE id = ?');
+    $q->bindValue(1, $userid, SQLITE3_INTEGER);
+    $r = $q->execute();
+    $ret = $r->fetchArray(SQLITE3_NUM);
+
+    if($ret) {
+        return $ret[0];
+    } else {
+        return null;
+    }
+}
+
+
 // Include functions for group management
 include_once('groups.inc.php');
+// Include functions for permissions management
+include_once('permissions.inc.php');
 
 ?>

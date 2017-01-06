@@ -3,7 +3,6 @@
 include_once('includes/config.inc.php');
 include_once('includes/session.inc.php');
 include_once('includes/misc.inc.php');
-include_once('includes/permissions.inc.php');
 
 if (!is_csrf_safe()) {
     header('Status: 403');
