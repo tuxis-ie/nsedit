@@ -114,6 +114,21 @@ function get_usernames_filtered($term, $num = 10) {
     return $ret;
 }
 
+function get_groups_filtered($term, $num = 10) {
+    $db = get_db();
+    $q = $db->prepare("SELECT name FROM groups WHERE name LIKE ? ORDER BY name LIMIT 0, ?");
+    $q->bindValue(1, "%" . $term . "%", SQLITE3_TEXT);
+    $q->bindValue(2, $num, SQLITE3_INTEGER);
+    $r = $q->execute();
+
+    $ret = array();
+    while ($row = $r->fetchArray(SQLITE3_NUM)) {
+        array_push($ret, $row[0]);
+    }
+
+    return $ret;
+}
+
 function get_user_info($u) {
     $db = get_db();
     $q = $db->prepare('SELECT * FROM users WHERE emailaddress = ?');

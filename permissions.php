@@ -3,6 +3,7 @@
 include_once('includes/config.inc.php');
 include_once('includes/session.inc.php');
 include_once('includes/misc.inc.php');
+include_once('includes/permissions.inc.php');
 
 if (!is_csrf_safe()) {
     header('Status: 403');
@@ -10,7 +11,7 @@ if (!is_csrf_safe()) {
     jtable_respond(null, 'error', "Authentication required");
 }
 
-$zoneid = isset($_GET['zoneid']) ? intval($_GET['zoneid']) : '';
+$zoneid = isset($_GET['zoneid']) ? $_GET['zoneid'] : '';
 
 if (!is_adminuser()) {
     header('Status: 403');
@@ -30,27 +31,45 @@ case "list":
         $permissions = get_zone_permissions($zoneid);
         jtable_respond($permissions);
     } else {
-        jtable_respond(null, 'error', 'Could not list zone permissions');
+        jtable_respond(null, 'error', 'Zone id required');
     }
     break;
 
 case "add":
     $type = isset($_POST['type']) ? $_POST['type'] : '';
     $value = isset($_POST['value']) ? $_POST['value'] : '';
-    $permissons = isset($_POST['permissions']) ? $_POST['permissions'] : '';
+    $permissions = isset($_POST['permissions']) ? $_POST['permissions'] : '';
+    $zone = isset($_GET['zoneid']) ? $_GET['zoneid'] : '';
 
     if ($zoneid != '') {
-        if (user_exists($user)) {
-            if(is_group_member($groupid,$user)) {
-                jtable_respond(null, 'error', "User already a member of the group");
-            } elseif(!is_null($id=add_group_member($groupid,$user))) {
-                $entry = array('id' => $id,'user' => $user);
-                jtable_respond($entry, 'single');
+        if($type == 'user') {
+            if (user_exists($value)) {
+                $userid=get_user_id($value);
+                if(!is_null(user_permissions($zone,$userid))) {
+                    jtable_respond(null, 'error', "User already has permissions set for this zone");
+                } elseif(!is_null($id=set_permissions($userid,null,$zone,$permissions))) {
+                    $entry = array('id' => $id, 'type' => 'user', 'value' => $value, 'permissions' => $permissions);
+                    jtable_respond($entry, 'single');
+                } else {
+                    jtable_respond(null, 'error', "Failed to set permissions");
+                }
             } else {
-                jtable_respond(null, 'error', "Failed to add user to group");
+                jtable_respond(null, 'error', "User doesn't exist");
             }
         } else {
-            jtable_respond(null, 'error', "User doesn't exist");
+            if (group_exists($value)) {
+                $groupid=get_group_id($value);
+                if(!is_null(group_permissions($zone,$groupid))) {
+                    jtable_respond(null, 'error', "Group already has permissions set for this zone");
+                } elseif(!is_null($id=set_permissions(null,$groupid,$zone,$permissions))) {
+                    $entry = array('id' => $id, 'type' => 'group', 'value' => $value, 'permissions' => $permissions);
+                    jtable_respond($entry, 'single');
+                } else {
+                    jtable_respond(null, 'error', "Failed to set permissions");
+                }
+            } else {
+                jtable_respond(null, 'error', "Group doesn't exist");
+            }
         }
     } else {
         jtable_respond(null, 'error', 'Zone not specified');
@@ -58,23 +77,43 @@ case "add":
     break;
 
 case "remove":
+    $id = isset($_POST['id']) ? $_POST['id'] : '';
 
     if ($id != '') {
-        if(remove_group_member($id)) {
+        if(remove_permissions($id)) {
             jtable_respond(null, 'delete');
         } else {
-            jtable_respond(null, 'error', "Failed to delete user from group");
+            jtable_respond(null, 'error', "Failed to remove permissions");
         }
     } else {
         jtable_respond(null, 'error', 'ID not specified');
     }
     break;
 
+case "update":
+    $id = isset($_POST['id']) ? $_POST['id'] : '';
+    $permissions = isset($_POST['permissions']) ? intval($_POST['permissions']) : 0;
+    if ($id != '') {
+        if(update_permissions($id,$permissions)) {
+            $result = array('id' => $id, 'permissions' => $permissions);
+            jtable_respond($result, 'single');
+        } else {
+            jtable_respond(null, 'error', 'Failed to set permissions');
+        }
+    } else {
+        jtable_respond(null, 'error', 'ID not specified');
+    }
+
 case "autocomplete":
-    $term = isset($_GET['type']) ? $_GET['type'] : '';
+    $type = isset($_GET['type']) ? $_GET['type'] : '';
     $term = isset($_GET['term']) ? $_GET['term'] : '';
-    $users=get_usernames_filtered($term);
-    print json_encode($users);
+    if($type == 'user') {
+        $users=get_usernames_filtered($term);
+        print json_encode($users);
+    } else {
+        $groups=get_groups_filtered($term);
+        print json_encode($groups);
+    }
     break;
 
 default:

@@ -371,7 +371,7 @@ $(document).ready(function () {
             },
             <?php if (is_adminuser()) { ?>
             account: {
-                title: 'Account',
+                title: 'Owner',
                 width: '8%',
                 display: displayContent('account'),
                 options: function(data) {
@@ -547,7 +547,7 @@ $(document).ready(function () {
             },
             <?php if (is_adminuser()) { ?>
             account: {
-                title: 'Account',
+                title: 'Owner',
                 width: '8%',
                 display: displayContent('account'),
                 options: function(data) {
@@ -851,6 +851,7 @@ $(document).ready(function () {
                                     permissions: {
                                         title: 'Permissions',
                                         options: {
+                                            '0' : 'No permissions',
                                             '1' : 'View Only',
 <?php if($restrictediting) { ?>
                                             '3' : 'Update normal records',
@@ -906,7 +907,7 @@ $(document).ready(function () {
             },
             <?php if (is_adminuser()) { ?>
             account: {
-                title: 'Account',
+                title: 'Owner',
                 options: function(data) {
                     return 'users.php?action=listoptions&e='+$epoch;
                 },
@@ -975,7 +976,7 @@ $(document).ready(function () {
                 inputClass: 'destname'
             },
             account: {
-                title: 'Account',
+                title: 'Owner',
                 options: function(data) {
                     return 'users.php?action=listoptions&e='+$epoch;
                 },

@@ -28,7 +28,11 @@ function get_group_name($id) {
     $r = $q->execute();
     $ret = $r->fetchArray(SQLITE3_NUM);
 
-    return $ret[0];
+    if($ret) {
+        return $ret[0];
+    } else {
+        return null;
+    }
 }
 
 function group_exists($name) {
@@ -110,6 +114,15 @@ function get_group_members($id) {
 // move to misc?
 function get_user_id($user) {
     $info=get_user_info($user);
+    if($info) {
+        return $info['id'];
+    } else {
+        return null;
+    }
+}
+
+function get_group_id($group) {
+    $info=get_group_info($group);
     if($info) {
         return $info['id'];
     } else {
