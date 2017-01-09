@@ -31,6 +31,9 @@ define('PERM_UPDATE',0x02);
 define('PERM_UPDATESPECIAL',0x04);
 define('PERM_ADMIN',0x08);
 
+define('PERM_ALL',0xffff);
+
+
 // Interface function - Return an array of permissions for the zone
 function get_zone_permissions($zone) {
     $db = get_db();
@@ -184,8 +187,27 @@ function group_permissions($zone,$groupid) {
     }
 }
 
+// utility function - get the owner of the domain. Move to misc?
+function zone_owner($zone) {
+    $db = get_db();
+
+    $q = $db->prepare('SELECT owner FROM zones WHERE zones.zone=?');
+    $q->bindValue(1,$zone,SQLITE3_TEXT);
+    $r = $q->execute();
+    if($r) {
+        $ret = $r->fetchArray(SQLITE3_NUM);
+        return $ret[0];
+    } else {
+        return null;
+    }
+}
+
 // Utility function - Return the calculated permissions for this user/zone
 function permissions($zone,$userid) {
+    if(is_adminuser() || ($userid == zone_owner($zone))) {
+        return PERM_ALL;
+    }
+
     $perm=user_permissions($zone,$userid);
 
     if(!is_null($perm)) {

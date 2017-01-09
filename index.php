@@ -808,6 +808,7 @@ $(document).ready(function () {
                     return $img;
                 }
             },
+           <?php if (is_adminuser()) { ?>
             permissions: {
                 title: 'Permissions',
                 width: '10%',
@@ -881,6 +882,7 @@ $(document).ready(function () {
                     return $img;
                 }
             },
+            <?php } ?>
             exportzone: {
                 title: '',
                 width: '1%',
