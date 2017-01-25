@@ -427,6 +427,7 @@ case "editrecord":
     $rrset->deleteRecord($old_record['content']);
 
     $content = $_POST['content'];
+    $type = $_POST['type'];
     if (array_search($type, $quoteus) !== FALSE) {
         $content = quote_content($content);
     }
