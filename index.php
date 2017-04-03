@@ -146,6 +146,7 @@ if ($blocklogin === TRUE) {
             <option value="SRV">SRV</option>
             <option value="SSHFP">SSHFP</option>
             <option value="TLSA">TLSA</option>
+            <option value="CAA">CAA</option>
             <option value="TXT">TXT</option>
         </select><br></td></tr>
         <tr><td>Content:</td><td><input type="text" id ="searchzone-content"></td></tr>
@@ -616,6 +617,7 @@ $(document).ready(function () {
                                             'SRV': 'SRV',
                                             'SSHFP': 'SSHFP',
                                             'TLSA': 'TLSA',
+                                            'CAA': 'CAA',
                                             'DNAME': 'DNAME',
                                             'DS': 'DS'
                                         };
@@ -637,6 +639,7 @@ $(document).ready(function () {
                                         'SRV': 'SRV',
                                         'SSHFP': 'SSHFP',
                                         'TLSA': 'TLSA',
+                                        'CAA': 'CAA',
                                         'TXT': 'TXT',
                                     };
                                 },
