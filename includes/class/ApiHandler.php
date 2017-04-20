@@ -91,6 +91,7 @@ class ApiHandler {
                 break;
         }
 
+        $this->url = str_replace($this->apiurl, '', $this->url);
         curl_setopt($this->curlh, CURLOPT_URL, $this->baseurl().$this->url);
 
         //print "Here we go:\n";
