@@ -136,6 +136,7 @@ if ($blocklogin === TRUE) {
             <option value="AAAA">AAAA</option>
             <option value="CERT">CERT</option>
             <option value="CNAME">CNAME</option>
+            <option value="ALIAS">ALIAS</option>
             <option value="LOC">LOC</option>
             <option value="MX">MX</option>
             <option value="NAPTR">NAPTR</option>
@@ -614,6 +615,7 @@ $(document).ready(function () {
                                             'AAAA': 'AAAA',
                                             'CERT': 'CERT',
                                             'CNAME': 'CNAME',
+                                            'ALIAS': 'ALIAS',
                                             'LOC': 'LOC',
                                             'NAPTR': 'NAPTR',
                                             'SPF': 'SPF',
@@ -631,6 +633,7 @@ $(document).ready(function () {
                                         'CERT': 'CERT',
                                         'CNAME': 'CNAME',
                                         'DNAME': 'DNAME',
+                                        'ALIAS': 'ALIAS',
                                         'DS': 'DS',
                                         'LOC': 'LOC',
                                         'MX': 'MX',
