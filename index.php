@@ -20,7 +20,7 @@ if (!is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "lo
 
 if (is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "changepwform") {
     if (get_sess_user() == $_POST['username']) {
-        if (!update_user(get_sess_user(), is_adminuser(), $_POST['password'])) {
+        if (!update_user(get_sess_userid(), is_adminuser(), $_POST['password'])) {
             $errormsg = "Unable to update password!\n";
         }
     } else {
@@ -208,6 +208,7 @@ if ($blocklogin === TRUE) {
     </div>
     <?php } ?>
 
+    <?php if (has_local_auth()) { ?>
     <div id="AboutMe">
         <div class="tables">
             <p>Hi <?php echo get_sess_user(); ?>. You can change your password here.</p>
@@ -232,9 +233,11 @@ if ($blocklogin === TRUE) {
                     </tr>
                 </table>
                 <input type="hidden" name="formname" value="changepwform">
+                <input type="hidden" name="id" value="<?php echo get_sess_userid(); ?>">
             </form>
         </div>
     </div>
+    <?php } ?>
 </div>
 <script type="text/javascript">
 window.csrf_token = '<?php echo CSRF_TOKEN ?>';
