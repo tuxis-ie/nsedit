@@ -35,10 +35,18 @@ $templates[] = array(
     'name' => 'Tuxis',
     'owner' => 'username', # Set to 'public' to make it available to all users
     'records' => array(
-        array(
-            'name'      => '',
-            'type'      => 'MX',
-            'content'   => '200 mx2.tuxis.nl')
+    array(
+        'name'      => '',
+        'type'      => 'MX',
+        'content'   => '200 mx2.tuxis.nl'),
+    array(
+        'name'      => '',
+        'type'      => 'A',
+        'content'   => '1.2.3.4'),
+    array(
+        'name'      => 'www',
+        'type'      => 'CNAME',
+        'content'   => '[zonename]')
     )
 );
 */
