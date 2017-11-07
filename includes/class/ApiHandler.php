@@ -93,12 +93,6 @@ class ApiHandler {
 
         curl_setopt($this->curlh, CURLOPT_URL, $this->baseurl().$this->url);
 
-        //print "Here we go:\n";
-        //print "Request: ".$this->method.' '.$this->baseurl().$this->url."\n";
-        //if ($this->content != '') {
-        //    print "Content: ".$this->content."\n";
-        //}
-
         $return = curl_exec($this->curlh);
         $code = curl_getinfo($this->curlh, CURLINFO_HTTP_CODE);
         $json = json_decode($return, 1);
@@ -116,12 +110,11 @@ class ApiHandler {
     }
 
     public function call() {
-        if (substr($this->url, 0, 1) == '/') {
-            $this->apiurl();
-        } else {
-            $this->apiurl = '/';
+        if (substr($this->url, 0, 1) != '/') {
+            $this->url = '/'.$this->url;
         }
-
+        $this->apiurl();
+        $this->url = str_replace($this->apiurl, '', $this->url);
         $this->go();
     }
 }

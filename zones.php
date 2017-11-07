@@ -340,6 +340,7 @@ case "create":
 
             foreach ($template['records'] as $record) {
                 $name = $record['name'] != '' ? join(Array($record['name'],'.',$zonename)) : $zonename;
+                $record['content'] = str_replace("[zonename]", $zonename, $record['content']);
                 $zone->addRecord($name, $record['type'], $record['content']);
             }
 

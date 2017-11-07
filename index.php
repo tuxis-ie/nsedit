@@ -20,7 +20,7 @@ if (!is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "lo
 
 if (is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "changepwform") {
     if (get_sess_user() == $_POST['username']) {
-        if (!update_user(get_sess_user(), is_adminuser(), $_POST['password'])) {
+        if (!update_user(get_sess_userid(), is_adminuser(), $_POST['password'])) {
             $errormsg = "Unable to update password!\n";
         }
     } else {
@@ -138,6 +138,7 @@ if ($blocklogin === TRUE) {
             <option value="AAAA">AAAA</option>
             <option value="CERT">CERT</option>
             <option value="CNAME">CNAME</option>
+            <option value="ALIAS">ALIAS</option>
             <option value="LOC">LOC</option>
             <option value="MX">MX</option>
             <option value="NAPTR">NAPTR</option>
@@ -148,6 +149,7 @@ if ($blocklogin === TRUE) {
             <option value="SRV">SRV</option>
             <option value="SSHFP">SSHFP</option>
             <option value="TLSA">TLSA</option>
+            <option value="CAA">CAA</option>
             <option value="TXT">TXT</option>
         </select><br></td></tr>
         <tr><td>Content:</td><td><input type="text" id ="searchzone-content"></td></tr>
@@ -210,6 +212,7 @@ if ($blocklogin === TRUE) {
     </div>
     <?php } ?>
 
+    <?php if (has_local_auth()) { ?>
     <div id="AboutMe">
         <div class="tables">
             <p>Hi <?php echo get_sess_user(); ?>. You can change your password here.</p>
@@ -234,9 +237,11 @@ if ($blocklogin === TRUE) {
                     </tr>
                 </table>
                 <input type="hidden" name="formname" value="changepwform">
+                <input type="hidden" name="id" value="<?php echo get_sess_userid(); ?>">
             </form>
         </div>
     </div>
+    <?php } ?>
 </div>
 <script type="text/javascript">
 window.csrf_token = '<?php echo CSRF_TOKEN ?>';
@@ -781,12 +786,14 @@ $(document).ready(function () {
                                                 'AAAA': 'AAAA',
                                                 'CERT': 'CERT',
                                                 'CNAME': 'CNAME',
+                                                'ALIAS': 'ALIAS',
                                                 'LOC': 'LOC',
                                                 'NAPTR': 'NAPTR',
                                                 'SPF': 'SPF',
                                                 'SRV': 'SRV',
                                                 'SSHFP': 'SSHFP',
                                                 'TLSA': 'TLSA',
+                                                'CAA': 'CAA',
                                                 'DNAME': 'DNAME',
                                                 'DS': 'DS'
                                             };
@@ -797,6 +804,7 @@ $(document).ready(function () {
                                             'CERT': 'CERT',
                                             'CNAME': 'CNAME',
                                             'DNAME': 'DNAME',
+                                            'ALIAS': 'ALIAS',
                                             'DS': 'DS',
                                             'LOC': 'LOC',
                                             'MX': 'MX',
@@ -808,6 +816,7 @@ $(document).ready(function () {
                                             'SRV': 'SRV',
                                             'SSHFP': 'SSHFP',
                                             'TLSA': 'TLSA',
+                                            'CAA': 'CAA',
                                             'TXT': 'TXT',
                                         };
                                     },

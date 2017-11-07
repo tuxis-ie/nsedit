@@ -36,7 +36,7 @@ if (isset($defaults['primaryns'])) {
 }
 
 if (!isset($logo) or empty($logo)) {
-    $logo = 'http://www.tuxis.nl/uploads/images/nsedit.png';
+    $logo = 'https://www.tuxis.nl/uploads/images/nsedit.png';
 }
 
 
