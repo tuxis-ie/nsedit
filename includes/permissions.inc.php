@@ -85,7 +85,7 @@ function set_permissions($userid,$groupid,$zone,$permissions) {
         writelog("Added '$permissionmap[$permissions]' permissions for $who from zone $zone.");
         return $db->lastInsertRowID();
     } else {
-        writelog("Failed to add permissions to zone $zone ($zoneid) for $who.");
+        writelog("Failed to add permissions to zone $zone for $who.");
         return null;
     }
 }
@@ -209,7 +209,6 @@ function permissions($zone,$userid) {
     }
 
     $perm=user_permissions($zone,$userid);
-
     if(!is_null($perm)) {
         return $perm;
     } else {

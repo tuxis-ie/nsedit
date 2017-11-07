@@ -469,6 +469,75 @@ $(document).ready(function () {
                     return $img;
                 }
             },
+           <?php if (is_adminuser()) { ?>
+            permissions: {
+                title: 'Permissions',
+                width: '10%',
+                create: false,
+                edit: false,
+                display: function(data) {
+                    var $img = $('<img class="list" src="img/list.png" title="Permissions" />');
+                    $img.click(function () {
+                        $('#SlaveZones').jtable('openChildTable',
+                            $img.closest('tr'), {
+                                title: 'Permissions for ' + data.record.name,
+                                openChildAsAccordion: true,
+                                actions: {
+                                    listAction: 'permissions.php?action=list&zoneid=' + data.record.id,
+                                    createAction: 'permissions.php?action=add&zoneid=' + data.record.id,
+                                    updateAction: 'permissions.php?action=update&zoneid=' + data.record.id,
+                                    deleteAction: 'permissions.php?action=remove&zoneid=' + data.record.id
+                                },
+                                fields: {
+                                    id: {
+                                        key: true,
+                                        type: 'hidden'
+                                    },
+                                    type: {
+                                        title: 'Type',
+                                        inputClass: "permissionstype",
+                                        options: {
+                                            'user': 'User',
+                                            'group': 'Group'
+                                        },
+                                        create: true,
+                                        edit: false
+                                    },
+                                    value: {
+                                        title: 'Name',
+                                        inputClass: "usergrouplist",
+                                        display: displayContent('value'),
+                                        create: true,
+                                        edit: false
+                                    },
+                                    permissions: {
+                                        title: 'Permissions',
+                                        options: {
+                                            '0' : 'No permissions',
+                                            '1' : 'View Only',
+                                            '15' : 'Admin'
+                                        }
+                                    }
+                                },
+                                formCreated: function(event, dat) {
+                                    $( ".usergrouplist" ).autocomplete({
+                                        source: "permissions.php?action=autocomplete&type=" + $( ".permissionstype" ).val()
+                                    });
+                                    $( ".permissionstype" ).change(function() {
+                                      $( ".usergrouplist" ).val("");
+                                      $( ".usergrouplist" ).autocomplete({
+                                          source: "permissions.php?action=autocomplete&type=" + $( ".permissionstype" ).val()
+                                      });
+                                    });
+                                }
+                            }, function (data) {
+                                data.childTable.jtable('load');
+                            })
+                    });
+                    return $img;
+                }
+            },
+            <?php } ?>
             exportzone: {
                 title: '',
                 width: '1%',
@@ -817,7 +886,7 @@ $(document).ready(function () {
                 display: function(data) {
                     var $img = $('<img class="list" src="img/list.png" title="Permissions" />');
                     $img.click(function () {
-                        $('#SlaveZones').jtable('openChildTable',
+                        $('#MasterZones').jtable('openChildTable',
                             $img.closest('tr'), {
                                 title: 'Permissions for ' + data.record.name,
                                 openChildAsAccordion: true,
