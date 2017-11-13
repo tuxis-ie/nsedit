@@ -97,7 +97,7 @@ function record_compare_content($a, $b) {
     return 0;
 }
 
-function add_db_zone($zonename, $accountname) {
+function add_db_zone($zonename, $accountname, $createuser = false) {
     if (valid_user($accountname) === false) {
         jtable_respond(null, 'error', "$accountname is not a valid username");
     }
@@ -105,7 +105,7 @@ function add_db_zone($zonename, $accountname) {
         jtable_respond(null, 'error', "$zonename is not a valid zonename");
     }
 
-    if (is_apiuser() && !user_exists($accountname)) {
+    if ((is_apiuser() || $createuser) && !user_exists($accountname)) {
         add_user($accountname);
     }
 
@@ -172,6 +172,10 @@ case "listslaves":
         $zone->parse($sresult);
         if ($zone->account == '') {
             $zone->setAccount(get_zone_account($zone->name, 'admin'));
+        }
+
+        if(is_null(get_zone_id($zone->name))) {
+            add_db_zone($zone->name, $zone->account, true);
         }
 
         if (!check_permissions($zone->id,PERM_VIEW))
