@@ -19,7 +19,7 @@ Features
 User support
 ============
 Multiple users are supported. A user can be an admin or a normal user. You can
-configure wheter or not a normal user is allowed to add new zones.
+configure whether or not a normal user is allowed to add new zones.
 
 WeFact Login support
 ====================
