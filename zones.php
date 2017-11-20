@@ -483,6 +483,8 @@ case "clone":
     $srczone->setId('');
     $srczone->setName($name);
     $srczone->setSerial('');
+    $srczone->setKind($_POST['kind']);
+
     $zone = $api->savezone($srczone->export());
 
     $srczone->parse($zone);
