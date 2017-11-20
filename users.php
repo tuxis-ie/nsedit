@@ -12,7 +12,7 @@ if (!is_csrf_safe()) {
 
 if (!is_adminuser()) {
     header('Status: 403');
-    jtable_respond(null, 'error', "You need adminprivileges to get here");
+    jtable_respond(null, 'error', "You need admin privileges to get here");
 }
 
 if (!isset($_GET['action'])) {
