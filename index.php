@@ -1055,6 +1055,13 @@ $(document).ready(function () {
                 title: 'Domain',
                 inputClass: 'destname'
             },
+            copypermissions: {
+                title: 'Copy Permissions',
+                type: 'checkbox',
+                values: {'0': 'No', '1': 'Yes'},
+                defaultValue: 1,
+                inputClass: 'copypermissions'
+            },
             account: {
                 title: 'Owner',
                 options: function(data) {

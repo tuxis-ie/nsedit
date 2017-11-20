@@ -90,6 +90,22 @@ function set_permissions($userid,$groupid,$zone,$permissions) {
     }
 }
 
+// Interface function - Copy permissions from one zone to another - used for cloning, so assumes no existing permissions on the domain
+
+function copy_permissions($srczone,$dstzone) {
+    $db = get_db();
+
+    $q = $db->prepare('SELECT p.user,p."group",p.permissions FROM permissions p, zones z WHERE p.zone=z.id AND z.zone=?');
+    $q->bindValue(1, $srczone, SQLITE3_TEXT);
+    $result = $q->execute();
+
+    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+        set_permissions($row['user'],$row['group'],$dstzone,$row['permissions']);
+    }
+
+    return null;
+}
+
 // Interface function - Update permissions for a zone
 function update_permissions($id,$permissions) {
     global $permissionmap;

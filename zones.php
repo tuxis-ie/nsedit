@@ -522,6 +522,7 @@ case "export":
 case "clone":
     $name = $_POST['destname'];
     $src  = $_POST['sourcename'];
+    $copypermissions  = $_POST['copypermissions'];
 
     if (!is_adminuser() and $allowzoneadd !== true) {
         jtable_respond(null, 'error', "You are not allowed to add zones");
@@ -565,6 +566,10 @@ case "clone":
     }
 
     $zone = $api->savezone($srczone->export());
+
+    if($copypermissions==1) {
+        copy_permissions($src,$name);
+    }
 
     writelog("Cloned zone $src into $name");
     jtable_respond($zone, 'single');
