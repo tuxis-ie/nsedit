@@ -483,6 +483,8 @@ case "clone":
     $srczone->setId('');
     $srczone->setName($name);
     $srczone->setSerial('');
+    $srczone->setKind($_POST['kind']);
+
     $zone = $api->savezone($srczone->export());
 
     $srczone->parse($zone);
@@ -492,6 +494,15 @@ case "clone":
         $newname = preg_replace('/'.$src.'$/', $name, $newname);
         $rrset->setName($newname);
     }
+
+    if (is_adminuser() && isset($_POST['account'])) {
+        add_db_zone($name, $_POST['account']);
+        $srczone->setAccount($_POST['account']);
+    } else {
+        add_db_zone($name, get_sess_user());
+        $srczone->setAccount(get_sess_user());
+    }
+
     $zone = $api->savezone($srczone->export());
 
     writelog("Cloned zone $src into $name");
