@@ -1012,7 +1012,7 @@ $(document).ready(function () {
                 type: 'checkbox',
                 values: {'0': 'No', '1': 'Yes'},
                 defaultValue: 1,
-                inputClass: 'overwrite_namerserver'
+                inputClass: 'overwrite_nameserver'
             },
             nameserver: {
                 title: 'Nameservers',

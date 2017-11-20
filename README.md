@@ -64,7 +64,7 @@ Other methods of installation (Unsupported)
 
 Configuring PowerDNS
 ====================
-Minimal cofiguration of PowerDNS for supporting nsedit has to include 3 directives:
+Minimal configuration of PowerDNS for supporting nsedit has to include 3 directives:
 ```
 webserver=yes
 api=yes
