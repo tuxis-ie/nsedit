@@ -8,7 +8,7 @@ $apisslverify  = FALSE;  # Verify SSL Certificate if using https for apiproto
 $allowzoneadd  = FALSE;  # Allow normal users to add zones
 $logging = TRUE;
 $allowclearlogs = TRUE;  # Allow clearing of log entries
-$allowrotatelogs = FALSE;# Allow rotation to text file on serveri
+$allowrotatelogs = FALSE;# Allow rotation to text file on server
 $notifyafterupdate = TRUE;# send notify to slaves after zone update
 
 # Log directory - if allowrotatelogs is set, this is where the logs will
