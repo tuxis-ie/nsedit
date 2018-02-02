@@ -84,6 +84,14 @@ class PdnsAPI {
 
         return $this->loadzone($zone['id']);
     }
+    public function notifyzone($zoneid) {
+	$api = clone $this->http;
+	$api->method = 'PUT';
+	$api->url = "/servers/localhost/zones/$zoneid/notify";
+	$api->call();
+
+	return $api->json;
+    }
 
     public function deletezone($zoneid) {
         $api = clone $this->http;
