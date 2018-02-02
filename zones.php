@@ -328,7 +328,7 @@ case "create":
                     $rrset->delete();
                 }
             }
-	    $api->savezone($zone->export());
+            $api->savezone($zone->export());
 	    $api->notifyzone($_GET['zoneid']) if $notifyafterupdate;
 
             foreach ($template['records'] as $record) {
