@@ -304,7 +304,7 @@ case "create":
     }
 
     $api->savezone($zone->export());
-    $api->notifyzone($_GET['zoneid']) if $notifyafterupdate;
+    if ($notifyafterupdate) $api->notifyzone($_GET['zoneid']);
 
     $zone = new Zone();
     $zone->parse($api->loadzone($zonename));
@@ -328,8 +328,8 @@ case "create":
                     $rrset->delete();
                 }
             }
-            $api->savezone($zone->export());
-	    $api->notifyzone($_GET['zoneid']) if $notifyafterupdate;
+	    $api->savezone($zone->export());
+	    if ($notifyafterupdate) $api->notifyzone($_GET['zoneid']);
 
             foreach ($template['records'] as $record) {
                 $name = $record['name'] != '' ? join(Array($record['name'],'.',$zonename)) : $zonename;
@@ -342,7 +342,7 @@ case "create":
     }
 
     $zone = $api->savezone($zone->export());
-    $api->notifyzone($_GET['zoneid']) if $notifyafterupdate;
+    if ($notifyafterupdate) $api->notifyzone($_GET['zoneid']);
     writelog("Created zone ".$zone['name']);
     jtable_respond($zone, 'single');
     break;
@@ -373,7 +373,7 @@ case "update":
 
     writelog("Updated zone ".$zone->name);
     jtable_respond($api->savezone($zone->export()), 'single');
-    $api->notifyzone($_GET['zoneid']) if $notifyafterupdate;
+    if ($notifyafterupdate) $api->notifyzone($_GET['zoneid']);
     break;
 
 case "createrecord":
@@ -415,7 +415,7 @@ case "createrecord":
 
     $record = $zone->addRecord($name, $type, $content, $_POST['disabled'], $_POST['ttl'], $_POST['setptr']);
     $api->savezone($zone->export());
-    $api->notifyzone($_GET['zoneid']) if $notifyafterupdate;
+    if ($notifyafterupdate) $api->notifyzone($_GET['zoneid']);
 
     writelog("Created record: ".$record['id']);
     jtable_respond($record, 'single');
@@ -441,7 +441,7 @@ case "editrecord":
     $zone->addRecord($_POST['name'], $_POST['type'], $content, $_POST['disabled'], $_POST['ttl'], $_POST['setptr']);
 
     $api->savezone($zone->export());
-    $api->notifyzone($_GET['zoneid']) if $notifyafterupdate;
+    if ($notifyafterupdate) $api->notifyzone($_GET['zoneid']);
 
     $record = $zone->getRecord($_POST['name'], $_POST['type'], $content);
     writelog("Updated record ".$_POST['id']." to ".$record['id']);
@@ -459,7 +459,7 @@ case "deleterecord":
     $rrset->deleteRecord($old_record['content']);
 
     $api->savezone($zone->export());
-    $api->notifyzone($_GET['zoneid']) if $notifyafterupdate;
+    if ($notifyafterupdate) $api->notifyzone($_GET['zoneid']);
 
     writelog("Deleted record ".$_POST['id']);
     jtable_respond(null, 'delete');
@@ -493,7 +493,7 @@ case "clone":
     $srczone->setKind($_POST['kind']);
 
     $zone = $api->savezone($srczone->export());
-    $api->notifyzone($_GET['zoneid']) if $notifyafterupdate;
+    if ($notifyafterupdate) $api->notifyzone($_GET['zoneid']);
 
     $srczone->parse($zone);
 
@@ -512,7 +512,7 @@ case "clone":
     }
 
     $zone = $api->savezone($srczone->export());
-    $api->notifyzone($_GET['zoneid']) if $notifyafterupdate;
+    if ($notifyafterupdate) $api->notifyzone($_GET['zoneid']);
 
     writelog("Cloned zone $src into $name");
     jtable_respond($zone, 'single');
