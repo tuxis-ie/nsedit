@@ -322,7 +322,7 @@ case "create":
             if ($template['name'] !== $_POST['template']) continue;
 
             foreach ($template['records'] as $record) {
-                $rrset = $zone->getRRSet($record['label'], $record['type']);
+                $rrset = $zone->getRRSet($record['name'], $record['type']);
                 if ($rrset) {
                     $rrset->delete();
                 }
