@@ -9,6 +9,7 @@ $allowzoneadd  = FALSE;  # Allow normal users to add zones
 $logging = TRUE;
 $allowclearlogs = TRUE;  # Allow clearing of log entries
 $allowrotatelogs = FALSE;# Allow rotation to text file on server
+$notifyafterupdate = TRUE;# send notify to slaves after zone update
 
 # Log directory - if allowrotatelogs is set, this is where the logs will
 # be written. It must be writeable by the web server user.
