@@ -50,7 +50,7 @@ Installing
 
 * Copy ```includes/config.inc.php-dist``` to ```includes/config.inc.php``` and edit config.inc.php to your needs.
 
-* By default, nsedit writes its user database to ../etc/pdns.users.sqlite3. Be sure that your webserver can create that directory and write to it.
+* By default, nsedit writes its user database to ../etc/pdns.users.sqlite3. Be sure that your webserver can create that directory and write to it. Make sure the Webserver doesn't serve this file/folder to the public!
 
 * Visit http(s)://<url>/nsedit/ and login with admin/admin (Don't forget to update your password!)
 
