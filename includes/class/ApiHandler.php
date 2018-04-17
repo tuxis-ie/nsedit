@@ -29,11 +29,12 @@ class ApiHandler {
     private function apiurl() {
         $tmp = new ApiHandler();
 
-        $tmp->url = '/api';
+        $tmp->url = '/api/v1/servers/localhost';
         $tmp->go();
         
-        if ($tmp->json[0]['version'] <= 1) {
-            $this->apiurl = $tmp->json[0]['url'];
+        $v = intval(substr($tmp->json["version"],0,1));
+        if ($v == 4) {
+            $this->apiurl = $tmp->json["url"];
         } else {
             throw new Exception("Unsupported API version");
         }
