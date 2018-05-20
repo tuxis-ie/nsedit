@@ -1,0 +1,9 @@
+parameters:
+    git_dir: .
+    bin_dir: vendor/bin
+    tasks:
+      composer:
+        no_check_lock: true
+      phplint:
+      phpcsfixer2:
+        config: '.php_cs'

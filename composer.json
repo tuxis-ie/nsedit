@@ -1,0 +1,10 @@
+{
+    "name":"tuxis-ie/nsedit",
+    "license": "GPL-2.0-only",
+    "description": "DNS Editor working with PowerDNS's new API",
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.11",
+        "phpro/grumphp": "^0.14.0",
+        "jakub-onderka/php-parallel-lint": "^1.0"
+    }
+}

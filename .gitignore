@@ -1,3 +1,6 @@
 includes/config.inc.php
 nsedit.sublime*
 etc
+composer.lock
+vendor
+.php_cs.cache
