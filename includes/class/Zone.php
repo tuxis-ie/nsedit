@@ -1,7 +1,9 @@
 <?php
 
-class Zone {
-    public function __construct() {
+class Zone
+{
+    public function __construct()
+    {
         $this->id = '';
         $this->name = '';
         $this->kind = '';
@@ -12,13 +14,14 @@ class Zone {
         $this->soa_edit_api = '';
         $this->keyinfo = '';
         $this->account = '';
-        $this->zone = FALSE;
-        $this->nameservers = Array();
-        $this->rrsets = Array();
-        $this->masters = Array();
+        $this->zone = false;
+        $this->nameservers = [];
+        $this->rrsets = [];
+        $this->masters = [];
     }
 
-    public function parse($data) {
+    public function parse($data)
+    {
         $this->setId($data['id']);
         $this->setName($data['name']);
         $this->setKind($data['kind']);
@@ -26,10 +29,12 @@ class Zone {
         $this->setAccount($data['account']);
         $this->setSerial($data['serial']);
         $this->url = $data['url'];
-        if (isset($data['soa_edit']) && $data['soa_edit'] != "")
+        if (isset($data['soa_edit']) && $data['soa_edit'] != '') {
             $this->setSoaEdit($data['soa_edit']);
-        if (isset($data['soa_edit_api']) && $data['soa_edit_api'] != "")
-            $this->setSoaEditApi($data['soa_edit_api'], True);
+        }
+        if (isset($data['soa_edit_api']) && $data['soa_edit_api'] != '') {
+            $this->setSoaEditApi($data['soa_edit_api'], true);
+        }
 
         foreach ($data['masters'] as $master) {
             $this->addMaster($master);
@@ -50,82 +55,96 @@ class Zone {
         }
     }
 
-    public function importData($data) {
+    public function importData($data)
+    {
         $this->zone = $data;
     }
 
-    public function setKeyinfo($info) {
+    public function setKeyinfo($info)
+    {
         $this->keyinfo = $info;
     }
 
-    public function addNameserver($nameserver) {
+    public function addNameserver($nameserver)
+    {
         foreach ($this->nameservers as $ns) {
             if ($nameserver == $ns) {
-                throw new Exception("We already have this as a nameserver");
+                throw new Exception('We already have this as a nameserver');
             }
         }
         array_push($this->nameservers, $nameserver);
-
     }
 
-    public function setSerial($serial) {
+    public function setSerial($serial)
+    {
         $this->serial = $serial;
     }
 
-    public function setSoaEdit($soaedit) {
+    public function setSoaEdit($soaedit)
+    {
         $this->soa_edit = $soaedit;
     }
 
-    public function setSoaEditApi($soaeditapi, $overwrite=False) {
-        if (isset($this->soa_edit_api) and $this->soa_edit_api != "") {
-            if ($overwrite === False) {
-                return False;
+    public function setSoaEditApi($soaeditapi, $overwrite=false)
+    {
+        if (isset($this->soa_edit_api) and $this->soa_edit_api != '') {
+            if ($overwrite === false) {
+                return false;
             }
         }
         $this->soa_edit_api = $soaeditapi;
     }
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
     }
 
-    public function setKind($kind) {
+    public function setKind($kind)
+    {
         $this->kind = $kind;
     }
 
-    public function setAccount($account) {
+    public function setAccount($account)
+    {
         $this->account = $account;
     }
 
-    public function setDnssec($dnssec) {
+    public function setDnssec($dnssec)
+    {
         $this->dnssec = $dnssec;
     }
 
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
     }
 
-    public function addMaster($ip) {
+    public function addMaster($ip)
+    {
         foreach ($this->masters as $master) {
             if ($ip == $master) {
-                throw new Exception("We already have this as a master");
+                throw new Exception('We already have this as a master');
             }
         }
         array_push($this->masters, $ip);
     }
 
-    public function eraseMasters() {
-        $this->masters = Array();
+    public function eraseMasters()
+    {
+        $this->masters = [];
     }
 
-    public function addRRSet($name, $type, $content, $disabled = FALSE, $ttl = 3600, $setptr = FALSE) {
-        if ($this->getRRSet($name, $type) !== FALSE) {
-            throw new Exception("This rrset already exists.");
+    public function addRRSet($name, $type, $content, $disabled = false, $ttl = 3600, $setptr = false)
+    {
+        if ($this->getRRSet($name, $type) !== false) {
+            throw new Exception('This rrset already exists.');
         }
         $rrset = new RRSet($name, $type, $content, $disabled, $ttl, $setptr);
         array_push($this->rrsets, $rrset);
     }
 
-    public function addRecord($name, $type, $content, $disabled = FALSE, $ttl = 3600, $setptr = FALSE) {
+    public function addRecord($name, $type, $content, $disabled = false, $ttl = 3600, $setptr = false)
+    {
         $rrset = $this->getRRSet($name, $type);
 
         if ($rrset) {
@@ -138,7 +157,8 @@ class Zone {
         return $this->getRecord($name, $type, $content);
     }
 
-    public function getRecord($name, $type, $content) {
+    public function getRecord($name, $type, $content)
+    {
         $rrset = $this->getRRSet($name, $type);
         foreach ($rrset->exportRecords() as $record) {
             if ($record['content'] == $content) {
@@ -150,21 +170,22 @@ class Zone {
                 return $record;
             }
         }
-
     }
 
-    public function getRRSet($name, $type) {
+    public function getRRSet($name, $type)
+    {
         foreach ($this->rrsets as $rrset) {
             if ($rrset->name == $name and $rrset->type == $type) {
                 return $rrset;
             }
         }
 
-        return FALSE;
+        return false;
     }
 
-    public function rrsets2records() {
-        $ret = Array();
+    public function rrsets2records()
+    {
+        $ret = [];
 
         foreach ($this->rrsets as $rrset) {
             foreach ($rrset->exportRecords() as $record) {
@@ -180,16 +201,17 @@ class Zone {
         return $ret;
     }
 
-    public function export() {
-        $ret = Array();
+    public function export()
+    {
+        $ret = [];
         $ret['account'] = $this->account;
         $ret['nameservers'] = $this->nameservers;
         $ret['kind'] = $this->kind;
         $ret['name'] = $this->name;
-        if (isset($this->soa_edit) && $this->soa_edit != "") {
+        if (isset($this->soa_edit) && $this->soa_edit != '') {
             $ret['soa_edit'] = $this->soa_edit;
         }
-        if (isset($this->soa_edit_api) && $this->soa_edit_api != "") {
+        if (isset($this->soa_edit_api) && $this->soa_edit_api != '') {
             $ret['soa_edit_api'] = $this->soa_edit_api;
         }
         if ($this->zone) {
@@ -206,12 +228,13 @@ class Zone {
         $ret['rrsets'] = $this->exportRRSets();
         $ret['serial'] = $this->serial;
         $ret['url'] = $this->url;
-        
+
         return $ret;
     }
 
-    private function exportRRSets() {
-        $ret = Array();
+    private function exportRRSets()
+    {
+        $ret = [];
         foreach ($this->rrsets as $rrset) {
             array_push($ret, $rrset->export());
         }
@@ -220,36 +243,42 @@ class Zone {
     }
 }
 
-class RRSet {
-    public function __construct($name = '', $type = '', $content = '', $disabled = FALSE, $ttl = 3600, $setptr = FALSE) {
+class RRSet
+{
+    public function __construct($name = '', $type = '', $content = '', $disabled = false, $ttl = 3600, $setptr = false)
+    {
         $this->name = $name;
         $this->type = $type;
         $this->ttl  = $ttl;
         $this->changetype = 'REPLACE';
-        $this->records = Array();
-        $this->comments = Array();
+        $this->records = [];
+        $this->comments = [];
 
         if (isset($content) and $content != '') {
             $this->addRecord($content, $disabled, $setptr);
         }
     }
 
-    public function delete() {
+    public function delete()
+    {
         $this->changetype = 'DELETE';
     }
 
-    public function setTtl($ttl) {
+    public function setTtl($ttl)
+    {
         $this->ttl = $ttl;
     }
 
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
     }
 
-    public function addRecord($content, $disabled = FALSE, $setptr = FALSE) {
+    public function addRecord($content, $disabled = false, $setptr = false)
+    {
         foreach ($this->records as $record) {
             if ($record->content == $content) {
-                throw new Exception($this->name."/".$this->type." has duplicate records.");
+                throw new Exception($this->name . '/' . $this->type . ' has duplicate records.');
             }
         }
 
@@ -257,20 +286,23 @@ class RRSet {
         array_push($this->records, $record);
     }
 
-    public function deleteRecord($content) {
+    public function deleteRecord($content)
+    {
         foreach ($this->records as $idx => $record) {
             if ($record->content == $content) {
                 unset($this->records[$idx]);
             }
         }
     }
-    public function addComment($content, $account, $modified_at = FALSE) {
+    public function addComment($content, $account, $modified_at = false)
+    {
         $comment = new Comment($content, $account, $modified_at);
         array_push($this->comments, $comment);
     }
 
-    public function export() {
-        $ret = Array();
+    public function export()
+    {
+        $ret = [];
         $ret['comments'] = $this->exportComments();
         $ret['name'] = $this->name;
         $ret['records'] = $this->exportRecords();
@@ -282,11 +314,12 @@ class RRSet {
         return $ret;
     }
 
-    public function exportRecords() {
-        $ret = Array();
+    public function exportRecords()
+    {
+        $ret = [];
         foreach ($this->records as $record) {
-            if ($this->type != "A" and $this->type != "AAAA") {
-                $record->setptr = FALSE;
+            if ($this->type != 'A' and $this->type != 'AAAA') {
+                $record->setptr = false;
             }
             array_push($ret, $record->export());
         }
@@ -294,45 +327,51 @@ class RRSet {
         return $ret;
     }
 
-    public function exportComments() {
-        $ret = Array();
+    public function exportComments()
+    {
+        $ret = [];
         foreach ($this->comments as $comment) {
             array_push($ret, $comment->export());
         }
-        
+
         return $ret;
     }
-
 }
 
-class Record {
-    public function __construct($content, $disabled = FALSE, $setptr = FALSE) {
+class Record
+{
+    public function __construct($content, $disabled = false, $setptr = false)
+    {
         $this->content = $content;
         $this->disabled = $disabled;
         $this->setptr = $setptr;
     }
 
-    public function export() {
+    public function export()
+    {
         $ret;
 
         $ret['content'] = $this->content;
         $ret['disabled'] = ( bool ) $this->disabled;
         if ($this->setptr) {
-            $ret['set-ptr'] = ( bool ) TRUE;
+            $ret['set-ptr'] = ( bool ) true;
         }
 
         return $ret;
     }
 }
 
-class Comment {
-    public function __construct($content, $account, $modified_at) {
+class Comment
+{
+    public function __construct($content, $account, $modified_at)
+    {
         $this->content = $content;
         $this->account = $account;
         $this->modified_at = $modified_at;
     }
 
-    public function export() {
+    public function export()
+    {
         $ret;
 
         $ret['content'] = $this->content;
@@ -340,5 +379,3 @@ class Comment {
         $ret['modified_at'] = $this->modified_at;
     }
 }
-
-?>

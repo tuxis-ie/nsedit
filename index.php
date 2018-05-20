@@ -1,30 +1,30 @@
 <?php
 
-include_once('includes/config.inc.php');
-include_once('includes/session.inc.php');
-include_once('includes/misc.inc.php');
+include_once 'includes/config.inc.php';
+include_once 'includes/session.inc.php';
+include_once 'includes/misc.inc.php';
 
 global $errormsg, $blocklogin;
 
 if (isset($_GET['logout']) or isset($_POST['logout'])) {
     logout();
-    header("Location: index.php");
+    header('Location: index.php');
     exit(0);
 }
 
-if (!is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "loginform") {
+if (!is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === 'loginform') {
     if (!try_login()) {
         $errormsg = "Error while trying to authenticate you\n";
     }
 }
 
-if (is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "changepwform") {
+if (is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === 'changepwform') {
     if (get_sess_user() == $_POST['username']) {
         if (!update_user(get_sess_userid(), is_adminuser(), $_POST['password'])) {
             $errormsg = "Unable to update password!\n";
         }
     } else {
-        $errormsg = "You can only update your own password!".$_POST['username'];
+        $errormsg = 'You can only update your own password!' . $_POST['username'];
     }
 }
 
@@ -36,9 +36,11 @@ if (is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "cha
     <link href="jquery-ui/themes/base/all.css" rel="stylesheet" type="text/css"/>
     <link href="jtable/lib/themes/metro/blue/jtable.min.css" rel="stylesheet" type="text/css"/>
     <link href="css/base.css" rel="stylesheet" type="text/css"/>
-    <?php if ($menutype === 'horizontal') { ?>
+    <?php if ($menutype === 'horizontal') {
+    ?>
     <link href="css/horizontal-menu.css" rel="stylesheet" type="text/css"/>
-    <?php } ?>
+    <?php
+} ?>
     <script src="jquery-ui/external/jquery/jquery.js" type="text/javascript"></script>
     <script src="jquery-ui/ui/core.js" type="text/javascript"></script>
     <script src="jquery-ui/ui/widget.js" type="text/javascript"></script>
@@ -54,7 +56,7 @@ if (is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "cha
 
 <?php
 if (!is_logged_in()) {
-?>
+        ?>
 <body onload="document.getElementById('username').focus()">
 <div class="loginblock">
     <div class="logo">
@@ -63,8 +65,7 @@ if (!is_logged_in()) {
     <div class="login">
         <?php if (isset($errormsg)) {
             echo '<span style="color: red">' . $errormsg . '</span><br />';
-        }
-        ?>
+        } ?>
         <form action="index.php" method="post">
             <table>
                 <tr>
@@ -77,17 +78,18 @@ if (!is_logged_in()) {
                 </tr>
                 <?php
                 if (isset($secret) && $secret) {
-                ?>
+                    ?>
                 <tr>
                     <td class="label">Remember me:</td>
                     <td><input type="checkbox" name="autologin" value="1"></td>
                 </tr>
                 <?php
-                }
-                ?>
+                } ?>
                 <tr>
                     <td></td>
-                    <td><input type="submit" name="submit" value="Log me in!" <?php if ($blocklogin === TRUE) { echo "disabled"; }; ?>></td>
+                    <td><input type="submit" name="submit" value="Log me in!" <?php if ($blocklogin === true) {
+                    echo 'disabled';
+                } ?>></td>
                 </tr>
             </table>
             <input type="hidden" name="formname" value="loginform">
@@ -99,13 +101,12 @@ if (!is_logged_in()) {
 
 <?php
 exit(0);
-}
+    }
 
-if ($blocklogin === TRUE) {
-
-       echo "<h2>There is an error in your config!</h2>";
-       echo "<a href=\"index.php\">Refresh</a>";
-       exit(0);
+if ($blocklogin === true) {
+    echo '<h2>There is an error in your config!</h2>';
+    echo '<a href="index.php">Refresh</a>';
+    exit(0);
 }
 
 ?>
@@ -115,8 +116,10 @@ if ($blocklogin === TRUE) {
     </div>
     <div id="clearlogs" style="display: none;">
         Are you sure you want to clear the current logs? Maybe download them
-        first<?php if($allowrotatelogs) { ?>, or use "Rotate logs" to save
-        them on the server<?php } ?>?
+        first<?php if ($allowrotatelogs) {
+    ?>, or use "Rotate logs" to save
+        them on the server<?php
+} ?>?
     </div>
     <div id="rotatelogs" style="display: none;">
         Are you sure you want to rotate the current logs?
@@ -153,7 +156,9 @@ if ($blocklogin === TRUE) {
         <tr><td>Content:</td><td><input type="text" id ="searchzone-content"></td></tr>
         </table>
     </div>
-    <div id="menu" class="jtable-main-container <?php if ($menutype === 'horizontal') { ?>horizontal<?php } ?>">
+    <div id="menu" class="jtable-main-container <?php if ($menutype === 'horizontal') {
+        ?>horizontal<?php
+    } ?>">
         <div class="jtable-title menu-title">
             <div class="jtable-title-text">
                 NSEdit!
@@ -161,10 +166,12 @@ if ($blocklogin === TRUE) {
         </div>
         <ul>
             <li><a href="#" id="zoneadmin">Zones</a></li>
-            <?php if (is_adminuser()) { ?>
+            <?php if (is_adminuser()) {
+        ?>
                 <li><a href="#" id="useradmin">Users</a></li>
                 <li><a href="#" id="logadmin">Logs</a></li>
-            <?php } ?>
+            <?php
+    } ?>
             <li><a href="#" id="aboutme">About me</a></li>
             <li><a href="index.php?logout=1">Logout</a></li>
         </ul>
@@ -174,10 +181,12 @@ if ($blocklogin === TRUE) {
     }
     ?>
     <div id="zones">
-        <?php if (is_adminuser() or $allowzoneadd === TRUE) { ?>
+        <?php if (is_adminuser() or $allowzoneadd === true) {
+        ?>
         <div style="display: none;" id="ImportZone"></div>
         <div style="display: none;" id="CloneZone"></div>
-        <?php } ?>
+        <?php
+    } ?>
         <div class="tables" id="MasterZones">
             <div class="searchbar" id="searchbar">
                 <input type="text" id="domsearch" name="domsearch" placeholder="Search...."/>
@@ -185,31 +194,37 @@ if ($blocklogin === TRUE) {
         </div>
         <div class="tables" id="SlaveZones"></div>
     </div>
-    <?php if (is_adminuser()) { ?>
+    <?php if (is_adminuser()) {
+        ?>
     <div id="users">
         <div class="tables" id="Users"></div>
     </div>
     <div id="logs">
         <div class="tables" id="Logs"></div>
-        <?php if($allowrotatelogs) { ?>
+        <?php if ($allowrotatelogs) {
+            ?>
         <br>Log entries being viewed:
         <select id="logfile">
         <option value="">(Current logs)</option>
         <?php
             $logfiles=listrotatedlogs();
-            if($logfiles !== FALSE) {
+            if ($logfiles !== false) {
                 foreach ($logfiles as $filename) {
-                    echo '<option value="' . $filename . '">' . str_replace(".json","",$filename) . "</option>\n";
+                    echo '<option value="' . $filename . '">' . str_replace('.json', '', $filename) . "</option>\n";
                 }
-            }
-        ?></select>
-        <?php } else { ?>
+            } ?></select>
+        <?php
+        } else {
+            ?>
         <input type="hidden" id="logfile" value="">
-        <?php } ?>
+        <?php
+        } ?>
     </div>
-    <?php } ?>
+    <?php
+    } ?>
 
-    <?php if (has_local_auth()) { ?>
+    <?php if (has_local_auth()) {
+        ?>
     <div id="AboutMe">
         <div class="tables">
             <p>Hi <?php echo get_sess_user(); ?>. You can change your password here.</p>
@@ -238,7 +253,8 @@ if ($blocklogin === TRUE) {
             </form>
         </div>
     </div>
-    <?php } ?>
+    <?php
+    } ?>
 </div>
 <script type="text/javascript">
 window.csrf_token = '<?php echo CSRF_TOKEN ?>';
@@ -345,10 +361,12 @@ $(document).ready(function () {
         actions: {
             listAction: 'zones.php?action=listslaves',
             updateAction: 'zones.php?action=update',
-            <?php if (is_adminuser() or $allowzoneadd === TRUE) { ?>
+            <?php if (is_adminuser() or $allowzoneadd === true) {
+        ?>
             createAction: 'zones.php?action=create',
             deleteAction: 'zones.php?action=delete',
-            <?php } ?>
+            <?php
+    } ?>
         },
         fields: {
             id: {
@@ -371,7 +389,8 @@ $(document).ready(function () {
                 display: displayDnssecIcon,
                 listClass: 'dnssec'
             },
-            <?php if (is_adminuser()) { ?>
+            <?php if (is_adminuser()) {
+        ?>
             account: {
                 title: 'Account',
                 width: '8%',
@@ -383,7 +402,8 @@ $(document).ready(function () {
                 inputClass: 'account',
                 listClass: 'account'
             },
-            <?php } ?>
+            <?php
+    } ?>
             kind: {
                 create: true,
                 type: 'hidden',
@@ -496,7 +516,8 @@ $(document).ready(function () {
             hoverAnimationDuration: 60,
             hoverAnimationEasing: undefined,
             items: [
-                <?php if (is_adminuser() or $allowzoneadd === TRUE) { ?>
+                <?php if (is_adminuser() or $allowzoneadd === true) {
+        ?>
                 {
                     icon: 'jtable/lib/themes/metro/add.png',
                     text: 'Import a new zone',
@@ -511,7 +532,8 @@ $(document).ready(function () {
                         $('#CloneZone').jtable('showCreateForm');
                     }
                 },
-                <?php } ?>
+                <?php
+    } ?>
                 ],
         },
         sorting: false,
@@ -715,13 +737,17 @@ $(document).ready(function () {
         openChildAsAccordion: true,
         actions: {
             listAction: 'zones.php?action=list',
-            <?php if (is_adminuser() or $allowzoneadd === TRUE) { ?>
+            <?php if (is_adminuser() or $allowzoneadd === true) {
+        ?>
             createAction: 'zones.php?action=create',
             deleteAction: 'zones.php?action=delete',
-            <?php } ?>
-            <?php if (is_adminuser()) { ?>
+            <?php
+    } ?>
+            <?php if (is_adminuser()) {
+        ?>
             updateAction: 'zones.php?action=update'
-            <?php } ?>
+            <?php
+    } ?>
         },
         fields: {
             id: {
@@ -744,7 +770,8 @@ $(document).ready(function () {
                 display: displayDnssecIcon,
                 listClass: 'dnssec'
             },
-            <?php if (is_adminuser()) { ?>
+            <?php if (is_adminuser()) {
+        ?>
             account: {
                 title: 'Account',
                 width: '8%',
@@ -756,7 +783,8 @@ $(document).ready(function () {
                 inputClass: 'account',
                 listClass: 'account'
             },
-            <?php } ?>
+            <?php
+    } ?>
             kind: {
                 title: 'Type',
                 width: '20%',
@@ -782,7 +810,9 @@ $(document).ready(function () {
                 edit: false,
                 input: function(data) {
                     var $template = data.form.find('#Edit-template');
-                    var ns_form = '<?php foreach($defaults['ns'] as $ns) echo '<input type="text" name="nameserver[]" value="'.$ns.'" /><br />'; ?>';
+                    var ns_form = '<?php foreach ($defaults['ns'] as $ns) {
+        echo '<input type="text" name="nameserver[]" value="' . $ns . '" /><br />';
+    } ?>';
                     var $elem = $('<div id="nameservers">' + ns_form + '</div>');
                     $template.change(function() {
                         $.get('zones.php?action=getformnameservers&template='+$template.val(), function(getdata) {
@@ -830,7 +860,8 @@ $(document).ready(function () {
                 title: 'Domain',
                 inputClass: 'domain'
             },
-            <?php if (is_adminuser()) { ?>
+            <?php if (is_adminuser()) {
+        ?>
             account: {
                 title: 'Account',
                 options: function(data) {
@@ -839,7 +870,8 @@ $(document).ready(function () {
                 defaultValue: 'admin',
                 inputClass: 'account'
             },
-            <?php } ?>
+            <?php
+    } ?>
             kind: {
                 title: 'Type',
                 options: {'Native': 'Native', 'Master': 'Master'},
@@ -865,7 +897,9 @@ $(document).ready(function () {
                 list: false,
                 edit: false,
                 input: function(data) {
-                    var ns_form = '<?php foreach($defaults['ns'] as $ns) echo '<input type="text" name="nameserver[]" value="'.$ns.'" /><br />'; ?>';
+                    var ns_form = '<?php foreach ($defaults['ns'] as $ns) {
+        echo '<input type="text" name="nameserver[]" value="' . $ns . '" /><br />';
+    } ?>';
                     var $elem = $('<div id="nameservers">' + ns_form + '</div>');
                     return $elem;
                 },
@@ -952,7 +986,8 @@ $(document).ready(function () {
         stimer = setTimeout(searchDoms, 400);
     });
 
-    <?php if (is_adminuser()) { ?>
+    <?php if (is_adminuser()) {
+        ?>
     $('#logs').hide();
     $('#Users').hide();
     $('#AboutMe').hide();
@@ -1083,7 +1118,8 @@ $(document).ready(function () {
                         });
                     }
                 },
-                <?php if($allowrotatelogs === TRUE) { ?>
+                <?php if ($allowrotatelogs === true) {
+            ?>
                 {
                     text: 'Rotate logs',
                     click: function() {
@@ -1106,8 +1142,10 @@ $(document).ready(function () {
                         });
                     }
                 },
-                <?php } ?>
-                <?php if($allowclearlogs === TRUE) { ?>
+                <?php
+        } ?>
+                <?php if ($allowclearlogs === true) {
+            ?>
                 {
                     icon: 'img/delete_inverted.png',
                     text: 'Clear logs',
@@ -1131,7 +1169,8 @@ $(document).ready(function () {
                         });
                     }
                 },
-                <?php } ?>
+                <?php
+        } ?>
                 {
                     icon: 'img/export.png',
                     text: 'Download logs',
@@ -1186,7 +1225,9 @@ $(document).ready(function () {
             entry: $('#searchlogs-entry').val()
         });
     });
-    <?php } else { ?>
+    <?php
+    } else {
+        ?>
     $('#AboutMe').hide();
     $('#aboutme').click(function () {
         $('#MasterZones').hide();
@@ -1199,7 +1240,8 @@ $(document).ready(function () {
         $('#SlaveZones').show();
     });
 
-    <?php } ?>
+    <?php
+    } ?>
     $('#MasterZones').jtable('load');
     $('#SlaveZones').jtable('load');
 });

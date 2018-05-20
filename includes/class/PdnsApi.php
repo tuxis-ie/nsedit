@@ -1,20 +1,23 @@
 <?php
 
-include_once('ApiHandler.php');
+include_once 'ApiHandler.php';
 
-class PdnsAPI {
-    public function __construct() {
+class PdnsAPI
+{
+    public function __construct()
+    {
         $this->http = new ApiHandler();
     }
 
-    public function listzones($q = FALSE) {
+    public function listzones($q = false)
+    {
         $api = clone $this->http;
         $api->method = 'GET';
         if ($q) {
-            $api->url = "/servers/localhost/search-data?q=*".$q."*&max=25";
+            $api->url = '/servers/localhost/search-data?q=*' . $q . '*&max=25';
             $api->call();
-            $ret = Array();
-            $seen = Array();
+            $ret = [];
+            $seen = [];
 
             foreach ($api->json as $result) {
                 if (isset($seen[$result['zone_id']])) {
@@ -28,13 +31,14 @@ class PdnsAPI {
 
             return $ret;
         }
-        $api->url = "/servers/localhost/zones";
+        $api->url = '/servers/localhost/zones';
         $api->call();
 
         return $api->json;
     }
 
-    public function loadzone($zoneid) {
+    public function loadzone($zoneid)
+    {
         $api = clone $this->http;
         $api->method = 'GET';
         $api->url = "/servers/localhost/zones/$zoneid";
@@ -43,7 +47,8 @@ class PdnsAPI {
         return $api->json;
     }
 
-    public function exportzone($zoneid) {
+    public function exportzone($zoneid)
+    {
         $api = clone $this->http;
         $api->method = 'GET';
         $api->url = "/servers/localhost/zones/$zoneid/export";
@@ -52,7 +57,8 @@ class PdnsAPI {
         return $api->json;
     }
 
-    public function savezone($zone) {
+    public function savezone($zone)
+    {
         $api = clone $this->http;
         // We have to split up RRSets and Zoneinfo.
         // First, update the zone
@@ -78,14 +84,15 @@ class PdnsAPI {
         // Then, update the rrsets
         if (count($zone['rrsets']) > 0) {
             $api->method = 'PATCH';
-            $api->content = json_encode(Array('rrsets' => $zone['rrsets']));
+            $api->content = json_encode(['rrsets' => $zone['rrsets']]);
             $api->call();
         }
 
         return $this->loadzone($zone['id']);
     }
 
-    public function deletezone($zoneid) {
+    public function deletezone($zoneid)
+    {
         $api = clone $this->http;
         $api->method = 'DELETE';
         $api->url = "/servers/localhost/zones/$zoneid";
@@ -94,8 +101,9 @@ class PdnsAPI {
         return $api->json;
     }
 
-    public function getzonekeys($zoneid) {
-        $ret = array();
+    public function getzonekeys($zoneid)
+    {
+        $ret = [];
         $api = clone $this->http;
         $api->method = 'GET';
         $api->url = "/servers/localhost/zones/$zoneid/cryptokeys";
@@ -103,14 +111,15 @@ class PdnsAPI {
         $api->call();
 
         foreach ($api->json as $key) {
-            if (!isset($key['active']))
+            if (!isset($key['active'])) {
                 continue;
+            }
 
-            $key['dstxt'] = $zoneid . ' IN DNSKEY '.$key['dnskey']."\n\n";
+            $key['dstxt'] = $zoneid . ' IN DNSKEY ' . $key['dnskey'] . "\n\n";
 
             if (isset($key['ds'])) {
                 foreach ($key['ds'] as $ds) {
-                    $key['dstxt'] .= $zoneid . ' IN DS '.$ds."\n";
+                    $key['dstxt'] .= $zoneid . ' IN DS ' . $ds . "\n";
                 }
                 unset($key['ds']);
             }
@@ -119,7 +128,4 @@ class PdnsAPI {
 
         return $ret;
     }
-
 }
-
-?>
