@@ -11,7 +11,7 @@ class PdnsAPI {
         $api = clone $this->http;
         $api->method = 'GET';
         if ($q) {
-            $api->url = "/servers/localhost/search-data?q=*".$q."*&max=25";
+            $api->url = "/search-data?q=*".$q."*&max=25";
             $api->call();
             $ret = Array();
             $seen = Array();
@@ -28,7 +28,7 @@ class PdnsAPI {
 
             return $ret;
         }
-        $api->url = "/servers/localhost/zones";
+        $api->url = "/zones";
         $api->call();
 
         return $api->json;
@@ -37,7 +37,7 @@ class PdnsAPI {
     public function loadzone($zoneid) {
         $api = clone $this->http;
         $api->method = 'GET';
-        $api->url = "/servers/localhost/zones/$zoneid";
+        $api->url = "/zones/$zoneid";
         $api->call();
 
         return $api->json;
@@ -46,7 +46,7 @@ class PdnsAPI {
     public function exportzone($zoneid) {
         $api = clone $this->http;
         $api->method = 'GET';
-        $api->url = "/servers/localhost/zones/$zoneid/export";
+        $api->url = "/zones/$zoneid/export";
         $api->call();
 
         return $api->json;
@@ -64,7 +64,7 @@ class PdnsAPI {
 
         if (!isset($zone['serial']) or gettype($zone['serial']) != 'integer') {
             $api->method = 'POST';
-            $api->url = '/servers/localhost/zones';
+            $api->url = '/localhost/zones';
             $api->content = json_encode($zonedata);
             $api->call();
 
@@ -88,7 +88,7 @@ class PdnsAPI {
     public function deletezone($zoneid) {
         $api = clone $this->http;
         $api->method = 'DELETE';
-        $api->url = "/servers/localhost/zones/$zoneid";
+        $api->url = "/zones/$zoneid";
         $api->call();
 
         return $api->json;
@@ -98,7 +98,7 @@ class PdnsAPI {
         $ret = array();
         $api = clone $this->http;
         $api->method = 'GET';
-        $api->url = "/servers/localhost/zones/$zoneid/cryptokeys";
+        $api->url = "/zones/$zoneid/cryptokeys";
 
         $api->call();
 
