@@ -1,6 +1,7 @@
 <?php
 
-include('config.inc.php');
+include_once('config.inc.php');
+include_once('database.inc.php');
 
 $blocklogin = FALSE;
 
@@ -59,13 +60,12 @@ if (function_exists('openssl_random_pseudo_bytes') === FALSE) {
 
 $defaults['defaulttype'] = ucfirst(strtolower($defaults['defaulttype']));
 
-if (isset($authdb) && !file_exists($authdb) && class_exists('SQLite3')) {
-    is_dir(dirname($authdb)) || mkdir(dirname($authdb));
-    $db = new SQLite3($authdb, SQLITE3_OPEN_CREATE|SQLITE3_OPEN_READWRITE);
-    $createsql = file_get_contents('includes/scheme.sql');
-    $db->exec($createsql);
-    $salt = bin2hex(openssl_random_pseudo_bytes(16));
-    $db->exec("INSERT INTO users (emailaddress, password, isadmin) VALUES ('admin', '".crypt("admin", '$6$'.$salt)."', 1)");
+if(class_exists('SQLite3')) {
+    if (isset($authdb) && !file_exists($authdb)) {
+        init_db();
+    } else {
+        open_db();
+    }
 }
 
 function string_starts_with($string, $prefix)
@@ -84,23 +84,46 @@ function string_ends_with($string, $suffix)
     return (substr($string, -$length) === $suffix);
 }
 
-function get_db() {
-    global $authdb, $db;
-
-    if (!isset($db)) {
-        $db = new SQLite3($authdb, SQLITE3_OPEN_READWRITE);
-        $db->exec('PRAGMA foreign_keys = 1');
-    }
-
-    return $db;
-}
-
 function get_all_users() {
     $db = get_db();
     $r = $db->query('SELECT id, emailaddress, isadmin FROM users ORDER BY emailaddress');
     $ret = array();
     while ($row = $r->fetchArray(SQLITE3_ASSOC)) {
         array_push($ret, $row);
+    }
+
+    return $ret;
+}
+
+/* Fetches a list of usernames from the DB for autocomplete.
+ * Restricts list by $term which can appear anywhere in the username
+ * Restricts results to $num responses
+ */
+function get_usernames_filtered($term, $num = 10) {
+    $db = get_db();
+    $q = $db->prepare("SELECT emailaddress FROM users WHERE emailaddress LIKE ? ORDER BY emailaddress LIMIT 0, ?");
+    $q->bindValue(1, "%" . $term . "%", SQLITE3_TEXT);
+    $q->bindValue(2, $num, SQLITE3_INTEGER);
+    $r = $q->execute();
+
+    $ret = array();
+    while ($row = $r->fetchArray(SQLITE3_NUM)) {
+        array_push($ret, $row[0]);
+    }
+
+    return $ret;
+}
+
+function get_groups_filtered($term, $num = 10) {
+    $db = get_db();
+    $q = $db->prepare("SELECT name FROM groups WHERE name LIKE ? ORDER BY name LIMIT 0, ?");
+    $q->bindValue(1, "%" . $term . "%", SQLITE3_TEXT);
+    $q->bindValue(2, $num, SQLITE3_INTEGER);
+    $r = $q->execute();
+
+    $ret = array();
+    while ($row = $r->fetchArray(SQLITE3_NUM)) {
+        array_push($ret, $row[0]);
     }
 
     return $ret;
@@ -216,6 +239,10 @@ function valid_user($name) {
 }
 
 function jtable_respond($records, $method = 'multiple', $msg = 'Undefined errormessage') {
+    if($records == null) {
+      $records=array();
+    }
+
     $jTableResult = array();
     if ($method == 'error') {
         $jTableResult['Result'] = "ERROR";
@@ -355,13 +382,6 @@ function writelog($line, $user=False) {
 
     try {
         $db = get_db();
-        $q = $db->prepare('CREATE TABLE IF NOT EXISTS logs (
-            id INTEGER PRIMARY KEY,
-            user TEXT NOT NULL,
-            log TEXT NOT NULL,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);');
-        $ret = $q->execute();
-
         $q = $db->prepare('INSERT INTO logs (user, log) VALUES (:user, :log)');
         $q->bindValue(':user', $user, SQLITE3_TEXT);
         $q->bindValue(':log', $line, SQLITE3_TEXT);
@@ -454,5 +474,54 @@ if (!function_exists('hash_pbkdf2')) {
         return $derivedKey;
     }
 }
+
+// get user id from name
+function get_user_id($user) {
+    $info=get_user_info($user);
+    if($info) {
+        return $info['id'];
+    } else {
+        return null;
+    }
+}
+
+// get zone id from name
+function get_zone_id($zone) {
+    $db = get_db();
+
+    $q = $db->prepare('SELECT id FROM zones WHERE zone=?');
+    $q->bindValue(1, $zone, SQLITE3_TEXT);
+    $r = $q->execute();
+    $ret = $r->fetchArray(SQLITE3_NUM);
+
+    if($ret) {
+        return $ret[0];
+    } else {
+        return null;
+    }
+
+}
+
+// get user name from id
+function get_user_name($userid) {
+    $db = get_db();
+
+    $q = $db->prepare('SELECT emailAddress FROM users WHERE id = ?');
+    $q->bindValue(1, $userid, SQLITE3_INTEGER);
+    $r = $q->execute();
+    $ret = $r->fetchArray(SQLITE3_NUM);
+
+    if($ret) {
+        return $ret[0];
+    } else {
+        return null;
+    }
+}
+
+
+// Include functions for group management
+include_once('groups.inc.php');
+// Include functions for permissions management
+include_once('permissions.inc.php');
 
 ?>

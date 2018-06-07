@@ -48,6 +48,8 @@ if (is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "cha
     <script src="jquery-ui/ui/button.js" type="text/javascript"></script>
     <script src="jquery-ui/ui/resizable.js" type="text/javascript"></script>
     <script src="jquery-ui/ui/dialog.js" type="text/javascript"></script>
+    <script src="jquery-ui/ui/menu.js" type="text/javascript"></script>
+    <script src="jquery-ui/ui/autocomplete.js" type="text/javascript"></script>
     <script src="jtable/lib/jquery.jtable.min.js" type="text/javascript"></script>
     <script src="js/addclear/addclear.js" type="text/javascript"></script>
 </head>
@@ -162,7 +164,7 @@ if ($blocklogin === TRUE) {
         <ul>
             <li><a href="#" id="zoneadmin">Zones</a></li>
             <?php if (is_adminuser()) { ?>
-                <li><a href="#" id="useradmin">Users</a></li>
+                <li><a href="#" id="useradmin">Users/Groups</a></li>
                 <li><a href="#" id="logadmin">Logs</a></li>
             <?php } ?>
             <li><a href="#" id="aboutme">About me</a></li>
@@ -188,6 +190,7 @@ if ($blocklogin === TRUE) {
     <?php if (is_adminuser()) { ?>
     <div id="users">
         <div class="tables" id="Users"></div>
+        <div class="tables" id="Groups"></div>
     </div>
     <div id="logs">
         <div class="tables" id="Logs"></div>
@@ -373,7 +376,7 @@ $(document).ready(function () {
             },
             <?php if (is_adminuser()) { ?>
             account: {
-                title: 'Account',
+                title: 'Owner',
                 width: '8%',
                 display: displayContent('account'),
                 options: function(data) {
@@ -471,6 +474,75 @@ $(document).ready(function () {
                     return $img;
                 }
             },
+           <?php if (is_adminuser()) { ?>
+            permissions: {
+                title: 'Permissions',
+                width: '10%',
+                create: false,
+                edit: false,
+                display: function(data) {
+                    var $img = $('<img class="list" src="img/list.png" title="Permissions" />');
+                    $img.click(function () {
+                        $('#SlaveZones').jtable('openChildTable',
+                            $img.closest('tr'), {
+                                title: 'Permissions for ' + data.record.name,
+                                openChildAsAccordion: true,
+                                actions: {
+                                    listAction: 'permissions.php?action=list&zoneid=' + data.record.id,
+                                    createAction: 'permissions.php?action=add&zoneid=' + data.record.id,
+                                    updateAction: 'permissions.php?action=update&zoneid=' + data.record.id,
+                                    deleteAction: 'permissions.php?action=remove&zoneid=' + data.record.id
+                                },
+                                fields: {
+                                    id: {
+                                        key: true,
+                                        type: 'hidden'
+                                    },
+                                    type: {
+                                        title: 'Type',
+                                        inputClass: "permissionstype",
+                                        options: {
+                                            'user': 'User',
+                                            'group': 'Group'
+                                        },
+                                        create: true,
+                                        edit: false
+                                    },
+                                    value: {
+                                        title: 'Name',
+                                        inputClass: "usergrouplist",
+                                        display: displayContent('value'),
+                                        create: true,
+                                        edit: false
+                                    },
+                                    permissions: {
+                                        title: 'Permissions',
+                                        options: {
+                                            '0' : 'No permissions',
+                                            '1' : 'View Only',
+                                            '15' : 'Admin'
+                                        }
+                                    }
+                                },
+                                formCreated: function(event, dat) {
+                                    $( ".usergrouplist" ).autocomplete({
+                                        source: "permissions.php?action=autocomplete&type=" + $( ".permissionstype" ).val()
+                                    });
+                                    $( ".permissionstype" ).change(function() {
+                                      $( ".usergrouplist" ).val("");
+                                      $( ".usergrouplist" ).autocomplete({
+                                          source: "permissions.php?action=autocomplete&type=" + $( ".permissionstype" ).val()
+                                      });
+                                    });
+                                }
+                            }, function (data) {
+                                data.childTable.jtable('load');
+                            })
+                    });
+                    return $img;
+                }
+            },
+            <?php } ?>
             exportzone: {
                 title: '',
                 width: '1%',
@@ -515,203 +587,6 @@ $(document).ready(function () {
                 ],
         },
         sorting: false,
-        selecting: true,
-        selectOnRowClick: true,
-        selectionChanged: function (data) {
-            var $selectedRows = $('#MasterZones').jtable('selectedRows');
-            $selectedRows.each(function () {
-                var zone = $(this).data('record');
-                $('#MasterZones').jtable('openChildTable',
-                    $(this).closest('tr'), {
-                        title: 'Records in ' + zone.name,
-                        messages: {
-                            addNewRecord: 'Add to ' + zone.name,
-                            noDataAvailable: 'No records for ' + zone.name
-                        },
-                        toolbar: {
-                            items: [
-                                {
-                                    text: 'Search zone',
-                                    click: function() {
-                                        $("#searchzone").dialog({
-                                            modal: true,
-                                            title: "Search zone for ...",
-                                            width: 'auto',
-                                            buttons: {
-                                                Search: function() {
-                                                    $( this ).dialog( 'close' );
-                                                    opentable.find('.jtable-title-text').text(opentableTitle + " (filtered)");
-                                                    opentable.jtable('load', {
-                                                        label: $('#searchzone-label').val(),
-                                                        type: $('#searchzone-type').val(),
-                                                        content: $('#searchzone-content').val()
-                                                    });
-                                                },
-                                                Reset: function() {
-                                                    $('#searchzone-label').val('');
-                                                    $('#searchzone-type').val('');
-                                                    $('#searchzone-content').val('');
-                                                    $( this ).dialog( 'close' );
-                                                    opentable.find('.jtable-title-text').text(opentableTitle);
-                                                    opentable.jtable('load');
-                                                    return false;
-                                                }
-                                            }
-                                        });
-                                    }
-                                }
-                            ],
-                        },
-                        paging: true,
-                        sorting: true,
-                        pageSize: 20,
-                        openChildAsAccordion: true,
-                        actions: {
-                            listAction: 'zones.php?action=listrecords&zoneid=' + zone.id,
-                            createAction: 'zones.php?action=createrecord&zoneid=' + zone.id,
-                            deleteAction: 'zones.php?action=deleterecord&zoneid=' + zone.id,
-                            updateAction: 'zones.php?action=editrecord&zoneid=' + zone.id
-                        },
-                        fields: {
-                            domid: {
-                                create: true,
-                                type: 'hidden',
-                                defaultValue: zone.id
-                            },
-                            id: {
-                                key: true,
-                                type: 'hidden',
-                                create: false,
-                                edit: false,
-                                list: false
-                            },
-                            domain: {
-                                create: true,
-                                type: 'hidden',
-                                defaultValue: zone.name
-                            },
-                            name: {
-                                title: 'Label',
-                                width: '7%',
-                                sorting: true,
-                                create: true,
-                                display: displayContent('name', zone.name),
-                                inputClass: 'name',
-                                listClass: 'name'
-                            },
-                            type: {
-                                title: 'Type',
-                                width: '2%',
-                                options: function() {
-                                    zonename = new String(zone.name);
-                                    if (zonename.match(/(\.in-addr|\.ip6)\.arpa/)) {
-                                        return {
-                                            'PTR': 'PTR',
-                                            'NS': 'NS',
-                                            'MX': 'MX',
-                                            'TXT': 'TXT',
-                                            'SOA': 'SOA',
-                                            'A': 'A',
-                                            'AAAA': 'AAAA',
-                                            'CERT': 'CERT',
-                                            'CNAME': 'CNAME',
-                                            'ALIAS': 'ALIAS',
-                                            'LOC': 'LOC',
-                                            'NAPTR': 'NAPTR',
-                                            'SPF': 'SPF',
-                                            'SRV': 'SRV',
-                                            'SSHFP': 'SSHFP',
-                                            'TLSA': 'TLSA',
-                                            'CAA': 'CAA',
-                                            'DNAME': 'DNAME',
-                                            'DS': 'DS'
-                                        };
-                                    }
-                                    return {
-                                        'A': 'A',
-                                        'AAAA': 'AAAA',
-                                        'CERT': 'CERT',
-                                        'CNAME': 'CNAME',
-                                        'DNAME': 'DNAME',
-                                        'ALIAS': 'ALIAS',
-                                        'DS': 'DS',
-                                        'LOC': 'LOC',
-                                        'MX': 'MX',
-                                        'NAPTR': 'NAPTR',
-                                        'NS': 'NS',
-                                        'PTR': 'PTR',
-                                        'SOA': 'SOA',
-                                        'SPF': 'SPF',
-                                        'SRV': 'SRV',
-                                        'SSHFP': 'SSHFP',
-                                        'TLSA': 'TLSA',
-                                        'CAA': 'CAA',
-                                        'TXT': 'TXT',
-                                    };
-                                },
-                                display: displayContent('type'),
-                                create: true,
-                                inputClass: 'type',
-                                listClass: 'type'
-                            },
-                            content: {
-                                title: 'Content',
-                                width: '30%',
-                                create: true,
-                                sorting: true,
-                                display: displayContent('content'),
-                                inputClass: 'content',
-                                listClass: 'content'
-                            },
-                            ttl: {
-                                title: 'TTL',
-                                width: '2%',
-                                create: true,
-                                sorting: false,
-                                display: displayContent('ttl'),
-                                defaultValue: '<?php echo $defaults['ttl']; ?>',
-                                inputClass: 'ttl',
-                                listClass: 'ttl'
-                            },
-                            setptr: {
-                                title: 'Set PTR Record',
-                                width: '2%',
-                                list: false,
-                                create: true,
-                                defaultValue: 'false',
-                                inputClass: 'setptr',
-                                listClass: 'setptr',
-                                options: function() {
-                                    return {
-                                        '0': 'No',
-                                        '1': 'Yes',
-                                    };
-                                },
-                            },
-                            disabled: {
-                                title: 'Disabled',
-                                width: '2%',
-                                create: true,
-                                sorting: false,
-                                display: displayContent('disabled'),
-                                defaultValue: '<?php echo $defaults['disabled'] ? 'No' : 'Yes'; ?>',
-                                inputClass: 'disabled',
-                                listClass: 'disabled',
-                                options: function() {
-                                    return {
-                                        '0': 'No',
-                                        '1': 'Yes',
-                                    };
-                                },
-                            },
-                        }
-                    }, function (data) {
-                        opentable=data.childTable;
-                        opentableTitle=opentable.find('.jtable-title-text').text();
-                        data.childTable.jtable('load');
-                    });
-            });
-        },
         openChildAsAccordion: true,
         actions: {
             listAction: 'zones.php?action=list',
@@ -746,7 +621,7 @@ $(document).ready(function () {
             },
             <?php if (is_adminuser()) { ?>
             account: {
-                title: 'Account',
+                title: 'Owner',
                 width: '8%',
                 display: displayContent('account'),
                 options: function(data) {
@@ -806,6 +681,286 @@ $(document).ready(function () {
                 inputClass: 'serial',
                 listClass: 'serial'
             },
+            records: {
+                title: 'Records',
+                width: '10%',
+                paging: true,
+                pageSize: 20,
+                create: false,
+                edit: false,
+                display: function(data) {
+                    var $img = $('<img class="list" src="img/list.png" title="Records" />');
+                    $img.click(function () {
+                    var zone = data.record;
+                    $('#MasterZones').jtable('openChildTable',
+                        $(this).closest('tr'), {
+                            title: 'Records in ' + zone.name,
+                            messages: {
+                                addNewRecord: 'Add to ' + zone.name,
+                                noDataAvailable: 'No records for ' + zone.name
+                            },
+                            toolbar: {
+                                items: [
+                                    {
+                                        text: 'Search zone',
+                                        click: function() {
+                                            $("#searchzone").dialog({
+                                                modal: true,
+                                                title: "Search zone for ...",
+                                                width: 'auto',
+                                                buttons: {
+                                                    Search: function() {
+                                                        $( this ).dialog( 'close' );
+                                                        opentable.find('.jtable-title-text').text(opentableTitle + " (filtered)");
+                                                        opentable.jtable('load', {
+                                                            label: $('#searchzone-label').val(),
+                                                            type: $('#searchzone-type').val(),
+                                                            content: $('#searchzone-content').val()
+                                                        });
+                                                    },
+                                                    Reset: function() {
+                                                        $('#searchzone-label').val('');
+                                                        $('#searchzone-type').val('');
+                                                        $('#searchzone-content').val('');
+                                                        $( this ).dialog( 'close' );
+                                                        opentable.find('.jtable-title-text').text(opentableTitle);
+                                                        opentable.jtable('load');
+                                                        return false;
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                ],
+                            },
+                            paging: true,
+                            sorting: true,
+                            pageSize: 20,
+                            openChildAsAccordion: true,
+                            actions: {
+                                listAction: 'zones.php?action=listrecords&zoneid=' + zone.id,
+                                createAction: 'zones.php?action=createrecord&zoneid=' + zone.id,
+                                deleteAction: 'zones.php?action=deleterecord&zoneid=' + zone.id,
+                                updateAction: 'zones.php?action=editrecord&zoneid=' + zone.id
+                            },
+                            fields: {
+                                domid: {
+                                    create: true,
+                                    type: 'hidden',
+                                    defaultValue: zone.id
+                                },
+                                id: {
+                                    key: true,
+                                    type: 'hidden',
+                                    create: false,
+                                    edit: false,
+                                    list: false
+                                },
+                                domain: {
+                                    create: true,
+                                    type: 'hidden',
+                                    defaultValue: zone.name
+                                },
+                                name: {
+                                    title: 'Label',
+                                    width: '7%',
+                                    sorting: true,
+                                    create: true,
+                                    display: displayContent('name', zone.name),
+                                    inputClass: 'name',
+                                    listClass: 'name'
+                                },
+                                type: {
+                                    title: 'Type',
+                                    width: '2%',
+                                    options: function() {
+                                        zonename = new String(zone.name);
+                                        if (zonename.match(/(\.in-addr|\.ip6)\.arpa/)) {
+                                            return {
+                                                'PTR': 'PTR',
+                                                'NS': 'NS',
+                                                'MX': 'MX',
+                                                'TXT': 'TXT',
+                                                'SOA': 'SOA',
+                                                'A': 'A',
+                                                'AAAA': 'AAAA',
+                                                'CERT': 'CERT',
+                                                'CNAME': 'CNAME',
+                                                'ALIAS': 'ALIAS',
+                                                'LOC': 'LOC',
+                                                'NAPTR': 'NAPTR',
+                                                'SPF': 'SPF',
+                                                'SRV': 'SRV',
+                                                'SSHFP': 'SSHFP',
+                                                'TLSA': 'TLSA',
+                                                'CAA': 'CAA',
+                                                'DNAME': 'DNAME',
+                                                'DS': 'DS'
+                                            };
+                                        }
+                                        return {
+                                            'A': 'A',
+                                            'AAAA': 'AAAA',
+                                            'CERT': 'CERT',
+                                            'CNAME': 'CNAME',
+                                            'DNAME': 'DNAME',
+                                            'ALIAS': 'ALIAS',
+                                            'DS': 'DS',
+                                            'LOC': 'LOC',
+                                            'MX': 'MX',
+                                            'NAPTR': 'NAPTR',
+                                            'NS': 'NS',
+                                            'PTR': 'PTR',
+                                            'SOA': 'SOA',
+                                            'SPF': 'SPF',
+                                            'SRV': 'SRV',
+                                            'SSHFP': 'SSHFP',
+                                            'TLSA': 'TLSA',
+                                            'CAA': 'CAA',
+                                            'TXT': 'TXT',
+                                        };
+                                    },
+                                    display: displayContent('type'),
+                                    create: true,
+                                    inputClass: 'type',
+                                    listClass: 'type'
+                                },
+                                content: {
+                                    title: 'Content',
+                                    width: '30%',
+                                    create: true,
+                                    sorting: true,
+                                    display: displayContent('content'),
+                                    inputClass: 'content',
+                                    listClass: 'content'
+                                },
+                                ttl: {
+                                    title: 'TTL',
+                                    width: '2%',
+                                    create: true,
+                                    sorting: false,
+                                    display: displayContent('ttl'),
+                                    defaultValue: '<?php echo $defaults['ttl']; ?>',
+                                    inputClass: 'ttl',
+                                    listClass: 'ttl'
+                                },
+                                setptr: {
+                                    title: 'Set PTR Record',
+                                    width: '2%',
+                                    list: false,
+                                    create: true,
+                                    defaultValue: 'false',
+                                    inputClass: 'setptr',
+                                    listClass: 'setptr',
+                                    options: function() {
+                                        return {
+                                            '0': 'No',
+                                            '1': 'Yes',
+                                        };
+                                    },
+                                },
+                                disabled: {
+                                    title: 'Disabled',
+                                    width: '2%',
+                                    create: true,
+                                    sorting: false,
+                                    display: displayContent('disabled'),
+                                    defaultValue: '<?php echo $defaults['disabled'] ? 'No' : 'Yes'; ?>',
+                                    inputClass: 'disabled',
+                                    listClass: 'disabled',
+                                    options: function() {
+                                        return {
+                                            '0': 'No',
+                                            '1': 'Yes',
+                                        };
+                                    },
+                                },
+                            }
+                        }, function (data) {
+                            opentable=data.childTable;
+                            opentableTitle=opentable.find('.jtable-title-text').text();
+                            data.childTable.jtable('load');
+                        });
+    
+                    });
+                    return $img;
+                }
+            },
+           <?php if (is_adminuser()) { ?>
+            permissions: {
+                title: 'Permissions',
+                width: '10%',
+                create: false,
+                edit: false,
+                display: function(data) {
+                    var $img = $('<img class="list" src="img/list.png" title="Permissions" />');
+                    $img.click(function () {
+                        $('#MasterZones').jtable('openChildTable',
+                            $img.closest('tr'), {
+                                title: 'Permissions for ' + data.record.name,
+                                openChildAsAccordion: true,
+                                actions: {
+                                    listAction: 'permissions.php?action=list&zoneid=' + data.record.id,
+                                    createAction: 'permissions.php?action=add&zoneid=' + data.record.id,
+                                    updateAction: 'permissions.php?action=update&zoneid=' + data.record.id,
+                                    deleteAction: 'permissions.php?action=remove&zoneid=' + data.record.id
+                                },
+                                fields: {
+                                    id: {
+                                        key: true,
+                                        type: 'hidden'
+                                    },
+                                    type: {
+                                        title: 'Type',
+                                        inputClass: "permissionstype",
+                                        options: {
+                                            'user': 'User',
+                                            'group': 'Group'
+                                        },
+                                        create: true,
+                                        edit: false
+                                    },
+                                    value: {
+                                        title: 'Name',
+                                        inputClass: "usergrouplist",
+                                        display: displayContent('value'),
+                                        create: true,
+                                        edit: false
+                                    },
+                                    permissions: {
+                                        title: 'Permissions',
+                                        options: {
+                                            '0' : 'No permissions',
+                                            '1' : 'View Only',
+<?php if($restrictediting) { ?>
+                                            '3' : 'Update normal records',
+                                            '7' : 'Update all records',
+<?php } else { ?>
+                                            '7' : 'Update',
+<?php } ?>
+                                            '15' : 'Admin'
+                                        }
+                                    }
+                                },
+                                formCreated: function(event, dat) {
+                                    $( ".usergrouplist" ).autocomplete({
+                                        source: "permissions.php?action=autocomplete&type=" + $( ".permissionstype" ).val()
+                                    });
+                                    $( ".permissionstype" ).change(function() {
+                                      $( ".usergrouplist" ).val("");
+                                      $( ".usergrouplist" ).autocomplete({
+                                          source: "permissions.php?action=autocomplete&type=" + $( ".permissionstype" ).val()
+                                      });
+                                    });
+                                }
+                            }, function (data) {
+                                data.childTable.jtable('load');
+                            })
+                    });
+                    return $img;
+                }
+            },
+            <?php } ?>
             exportzone: {
                 title: '',
                 width: '1%',
@@ -832,7 +987,7 @@ $(document).ready(function () {
             },
             <?php if (is_adminuser()) { ?>
             account: {
-                title: 'Account',
+                title: 'Owner',
                 options: function(data) {
                     return 'users.php?action=listoptions&e='+$epoch;
                 },
@@ -900,8 +1055,15 @@ $(document).ready(function () {
                 title: 'Domain',
                 inputClass: 'destname'
             },
+            copypermissions: {
+                title: 'Copy Permissions',
+                type: 'checkbox',
+                values: {'0': 'No', '1': 'Yes'},
+                defaultValue: 1,
+                inputClass: 'copypermissions'
+            },
             account: {
-                title: 'Account',
+                title: 'Owner',
                 options: function(data) {
                     return 'users.php?action=listoptions&e='+$epoch;
                 },
@@ -954,11 +1116,11 @@ $(document).ready(function () {
 
     <?php if (is_adminuser()) { ?>
     $('#logs').hide();
-    $('#Users').hide();
+    $('#users').hide();
     $('#AboutMe').hide();
     $('#aboutme').click(function () {
         $('#logs').hide();
-        $('#Users').hide();
+        $('#users').hide();
         $('#MasterZones').hide();
         $('#SlaveZones').hide();
         $('#AboutMe').show();
@@ -969,17 +1131,18 @@ $(document).ready(function () {
         $('#SlaveZones').hide();
         $('#AboutMe').hide();
         $('#Users').jtable('load');
-        $('#Users').show();
+        $('#Groups').jtable('load');
+        $('#users').show();
     });
     $('#zoneadmin').click(function () {
         $('#logs').hide();
-        $('#Users').hide();
+        $('#users').hide();
         $('#AboutMe').hide();
         $('#MasterZones').show();
         $('#SlaveZones').show();
     });
     $('#logadmin').click(function () {
-        $('#Users').hide();
+        $('#users').hide();
         $('#AboutMe').hide();
         $('#MasterZones').hide();
         $('#SlaveZones').hide();
@@ -1027,6 +1190,90 @@ $(document).ready(function () {
                 values: {'0': 'No', '1': 'Yes'},
                 inputClass: 'isadmin',
                 listClass: 'isadmin'
+            }
+        },
+        recordAdded: function() {
+            $epoch = getEpoch();
+            $("#MasterZones").jtable('reload');
+            $("#SlaveZones").jtable('reload');
+        }
+    });
+
+    $('#Groups').jtable({
+        title: 'Groups',
+        paging: true,
+        pageSize: 20,
+        sorting: false,
+        openChildAsAccordion: true,
+        actions: {
+            listAction: 'groups.php?action=list',
+            createAction: 'groups.php?action=create',
+            deleteAction: 'groups.php?action=delete',
+            updateAction: 'groups.php?action=update'
+        },
+        messages: {
+            addNewRecord: 'Add new group',
+            deleteConfirmation: 'This group will be deleted. Are you sure?'
+        },
+        fields: {
+            id: {
+                key: true,
+                type: 'hidden'
+            },
+            name: {
+                width: '25%',
+                title: 'Group name',
+                display: displayContent('name'),
+                edit: true
+            },
+            desc: {
+                width: '70%',
+                title: 'Description',
+                display: displayContent('desc')
+            },
+            members: {
+                width: '5%',
+                title: 'Members',
+                sorting: false,
+                edit: false,
+                create: false,
+                display: function (data) {
+                    var $img = $('<img class="list" src="img/list.png" title="Edit Members">');
+                    $img.click(function() {
+                        $('#Groups').jtable('openChildTable',
+                        $img.closest('tr'), {
+                            title: 'Members of ' + data.record.name,
+                            messages: {
+                                addNewRecord: 'Add group member',
+                                deleteConfirmation: 'This user will be removed from the group. Are you sure?'
+                            },
+                            actions: {
+                                listAction: 'groups.php?action=listmembers&groupid=' + data.record.id,
+                                createAction: 'groups.php?action=addmember&groupid=' + data.record.id,
+                                deleteAction: 'groups.php?action=removemember&groupid=' + data.record.id
+                            },
+                            fields: {
+                                id: {
+                                    key: true,
+                                    type: 'hidden'
+                                },
+                                user: {
+                                    title: 'Username',
+                                    inputClass: "userlist",
+                                    display: displayContent('user')
+                                }
+                            },
+                            formCreated: function(event, data) {
+                                $( ".userlist" ).autocomplete({
+                                    source: "users.php?action=autocomplete"
+                                });
+                            }
+                        }, function (data) { //opened handler
+                            data.childTable.jtable('load');
+                        });
+                    });
+                    return $img;
+                }
             }
         },
         recordAdded: function() {

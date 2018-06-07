@@ -97,7 +97,7 @@ function record_compare_content($a, $b) {
     return 0;
 }
 
-function add_db_zone($zonename, $accountname) {
+function add_db_zone($zonename, $accountname, $createuser = false) {
     if (valid_user($accountname) === false) {
         jtable_respond(null, 'error', "$accountname is not a valid username");
     }
@@ -105,7 +105,7 @@ function add_db_zone($zonename, $accountname) {
         jtable_respond(null, 'error', "$zonename is not a valid zonename");
     }
 
-    if (is_apiuser() && !user_exists($accountname)) {
+    if ((is_apiuser() || $createuser) && !user_exists($accountname)) {
         add_user($accountname);
     }
 
@@ -152,10 +152,6 @@ function quote_content($content) {
     return $content;
 }
 
-function check_account($zone) {
-    return is_adminuser() or ($zone->account === get_sess_user());
-}
-
 if (isset($_GET['action'])) {
     $action = $_GET['action'];
 } else {
@@ -178,7 +174,11 @@ case "listslaves":
             $zone->setAccount(get_zone_account($zone->name, 'admin'));
         }
 
-        if (!check_account($zone))
+        if(is_null(get_zone_id($zone->name))) {
+            add_db_zone($zone->name, $zone->account, true);
+        }
+
+        if (!check_permissions($zone->id,PERM_VIEW))
             continue;
 
         if ($action == "listslaves" and $zone->kind == "Slave") {
@@ -200,6 +200,10 @@ case "listrecords":
     $zone->parse($zonedata);
     $records = $zone->rrsets2records();
 
+    if (!check_permissions($zone->id,PERM_VIEW)) {
+        jtable_respond(null, 'error', "You are not permitted to list records for " . $zone->id);
+        break;
+    }
     if(!empty($_POST['label'])) {
         $records=array_filter($records,
             function ($val) {
@@ -248,6 +252,12 @@ case "listrecords":
 
 case "delete":
     $zone = $api->loadzone($_POST['id']);
+
+    if (!check_permissions($zone->id,PERM_ADMIN)) {
+        jtable_respond(null, 'error', "You are not permitted to delete " . $zone->id);
+        break;
+    }
+
     $api->deletezone($_POST['id']);
 
     delete_db_zone($zone['name']);
@@ -262,13 +272,16 @@ case "create":
 
     if (!is_adminuser() and $allowzoneadd !== true) {
         jtable_respond(null, 'error', "You are not allowed to add zones");
+        break;
     }
     if (!_valid_label($zonename)) {
         jtable_respond(null, 'error', "Please only use [a-z0-9_/.-]");
+        break;
     }
 
     if (!$zonename || !$zonekind) {
         jtable_respond(null, 'error', "Not enough data");
+        break;
     }
 
     $zone = new Zone();
@@ -351,10 +364,15 @@ case "update":
         writelog("Set SOA-EDIT-API to ".$defaults['soa_edit_api']." for ",$zone->name);
     $zoneaccount = isset($_POST['account']) ? $_POST['account'] : $zone->account;
 
+    if (!check_permissions($zone->id,PERM_ADMIN)) {
+        jtable_respond(null, 'error', "You are not permitted to update " . $zone->id);
+        break;
+    }
+
     if ($zone->account !== $zoneaccount) {
         if (!is_adminuser()) {
             header("Status: 403 Access denied");
-            jtable_respond(null, 'error', "Can't change account");
+            jtable_respond(null, 'error', "Can't change owner");
         } else {
             add_db_zone($zone->name, $zoneaccount);
             $zone->setAccount($zoneaccount);
@@ -381,6 +399,18 @@ case "createrecord":
     $name = isset($_POST['name']) ? $_POST['name'] : '';
     $type = $_POST['type'];
     $content = $_POST['content'];
+
+    if (!check_permissions($zone->id,PERM_UPDATE)) {
+        jtable_respond(null, 'error', "You are not permitted to create records in " . $zone->id);
+        break;
+    }
+
+    if($restrictediting && $restrictedtypes[$type]) {
+        if (!check_permissions($zone->id,PERM_UPDATESPECIAL)) {
+            jtable_respond(null, 'error', "You are not permitted to create $type records in " . $zone->id);
+            break;
+        }
+    }
 
     if ('' == $name) {
         $name = $zone->name;
@@ -425,6 +455,19 @@ case "editrecord":
     $old_record = decode_record_id(isset($_POST['id']) ? $_POST['id'] : '');
 
     $rrset = $zone->getRRSet($old_record['name'], $old_record['type']);
+
+    if (!check_permissions($zone->id,PERM_UPDATE)) {
+        jtable_respond(null, 'error', "You are not permitted to update records in " . $zone->id);
+        break;
+    }
+
+    if($restrictediting && $restrictedtypes[$old_record['type']]) {
+        if (!check_permissions($zone->id,PERM_UPDATESPECIAL)) {
+            jtable_respond(null, 'error', "You are not permitted to update " . $old_record['type'] . " records in " . $zone->id);
+            break;
+        }
+    }
+
     $rrset->deleteRecord($old_record['content']);
 
     $content = $_POST['content'];
@@ -450,6 +493,19 @@ case "deleterecord":
 
     $old_record = decode_record_id(isset($_POST['id']) ? $_POST['id'] : '');
     $rrset = $zone->getRRSet($old_record['name'], $old_record['type']);
+
+    if (!check_permissions($zone->id,PERM_UPDATE)) {
+        jtable_respond(null, 'error', "You are not permitted to delete records from " . $zone->id);
+        break;
+    }
+
+    if($restrictediting && $restrictedtypes[$old_record['type']]) {
+        if (!check_permissions($zone->id,PERM_UPDATESPECIAL)) {
+            jtable_respond(null, 'error', "You are not permitted to delete " . $old_record['type'] . " records from " . $zone->id);
+            break;
+        }
+    }
+
     $rrset->deleteRecord($old_record['content']);
 
     $api->savezone($zone->export());
@@ -466,6 +522,12 @@ case "export":
 case "clone":
     $name = $_POST['destname'];
     $src  = $_POST['sourcename'];
+    $copypermissions  = $_POST['copypermissions'];
+
+    if (!is_adminuser() and $allowzoneadd !== true) {
+        jtable_respond(null, 'error', "You are not allowed to add zones");
+        break;
+    }
 
     if (!string_ends_with($name, '.')) {
         $name = $name.".";
@@ -504,6 +566,10 @@ case "clone":
     }
 
     $zone = $api->savezone($srczone->export());
+
+    if($copypermissions==1) {
+        copy_permissions($src,$name);
+    }
 
     writelog("Cloned zone $src into $name");
     jtable_respond($zone, 'single');
