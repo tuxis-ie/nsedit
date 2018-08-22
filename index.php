@@ -4,6 +4,9 @@ include_once('includes/config.inc.php');
 include_once('includes/session.inc.php');
 include_once('includes/misc.inc.php');
 
+$testpath = str_replace(basename($_SERVER['REQUEST_URI']), $authdb, $_SERVER['REQUEST_URI']);
+$testurl = $_SERVER['REQUEST_SCHEME']."://".$_SERVER['HTTP_HOST'].$testpath;
+
 global $errormsg, $blocklogin;
 
 if (isset($_GET['logout']) or isset($_POST['logout'])) {
@@ -33,6 +36,24 @@ if (is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "cha
 <html>
 <head>
     <title>NSEdit!</title>
+    <script type="text/javascript">
+        var reader = new XMLHttpRequest();
+        var checkFor = "<?php echo $testurl; ?>";
+        reader.open('get', checkFor, true);
+        reader.onreadystatechange = checkReadyState;
+        function checkReadyState() {
+            if (reader.readyState === 4) {
+                //check to see whether request for the file failed or succeeded
+                if ((reader.status == 200) || (reader.status == 0)) {
+                    alert('Your authdb is downloadable. Please secure your install');
+                } else {
+                    return;
+                }
+            }
+
+        }
+        reader.send(null);
+    </script>
     <link href="jquery-ui/themes/base/all.css" rel="stylesheet" type="text/css"/>
     <link href="jtable/lib/themes/metro/blue/jtable.min.css" rel="stylesheet" type="text/css"/>
     <link href="css/base.css" rel="stylesheet" type="text/css"/>
