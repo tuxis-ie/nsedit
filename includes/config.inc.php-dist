@@ -39,7 +39,7 @@ $templates[] = array(
     array(
         'name'      => '',
         'type'      => 'MX',
-        'content'   => '200 mx2.tuxis.nl'),
+        'content'   => '200 mx2.tuxis.nl.'),
     array(
         'name'      => '',
         'type'      => 'A',
