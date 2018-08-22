@@ -59,13 +59,18 @@ if (function_exists('openssl_random_pseudo_bytes') === FALSE) {
 
 $defaults['defaulttype'] = ucfirst(strtolower($defaults['defaulttype']));
 
-if (isset($authdb) && !file_exists($authdb) && class_exists('SQLite3')) {
-    is_dir(dirname($authdb)) || mkdir(dirname($authdb));
-    $db = new SQLite3($authdb, SQLITE3_OPEN_CREATE|SQLITE3_OPEN_READWRITE);
-    $createsql = file_get_contents('includes/scheme.sql');
-    $db->exec($createsql);
-    $salt = bin2hex(openssl_random_pseudo_bytes(16));
-    $db->exec("INSERT INTO users (emailaddress, password, isadmin) VALUES ('admin', '".crypt("admin", '$6$'.$salt)."', 1)");
+try {
+    if (isset($authdb) && !file_exists($authdb) && class_exists('SQLite3')) {
+        is_dir(dirname($authdb)) || mkdir(dirname($authdb));
+        $db = new SQLite3($authdb, SQLITE3_OPEN_CREATE|SQLITE3_OPEN_READWRITE);
+        $createsql = file_get_contents('includes/scheme.sql');
+        $db->exec($createsql);
+        $salt = bin2hex(openssl_random_pseudo_bytes(16));
+        $db->exec("INSERT INTO users (emailaddress, password, isadmin) VALUES ('admin', '".crypt("admin", '$6$'.$salt)."', 1)");
+    }
+} catch (Exception $e) {
+    print("We have issues getting the authdb working: $e");
+    $blocklogin = TRUE;
 }
 
 function string_starts_with($string, $prefix)
