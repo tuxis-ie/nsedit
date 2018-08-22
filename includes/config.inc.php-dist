@@ -24,6 +24,7 @@ $logsdirectory = "../etc";
 #$adminapiips = array();
 #$adminapikey = 'thisshouldbequitealongstring,youknow';
 
+# Location of user-database. Make sure its writeable and not served by the webserver!
 $authdb  = "../etc/pdns.users.sqlite3";
 
 # Set a random generated secret to enable auto-login and long living csrf tokens
