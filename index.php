@@ -149,6 +149,7 @@ if ($blocklogin === TRUE) {
             <option value="TLSA">TLSA</option>
             <option value="CAA">CAA</option>
             <option value="TXT">TXT</option>
+            <option value="SMIMEA">SMIMEA</option>
         </select><br></td></tr>
         <tr><td>Content:</td><td><input type="text" id ="searchzone-content"></td></tr>
         </table>
@@ -624,7 +625,8 @@ $(document).ready(function () {
                                             'TLSA': 'TLSA',
                                             'CAA': 'CAA',
                                             'DNAME': 'DNAME',
-                                            'DS': 'DS'
+                                            'DS': 'DS',
+                                            'SMIMEA': 'SMIMEA'
                                         };
                                     }
                                     return {
@@ -647,6 +649,7 @@ $(document).ready(function () {
                                         'TLSA': 'TLSA',
                                         'CAA': 'CAA',
                                         'TXT': 'TXT',
+                                        'SMIMEA': 'SMIMEA'
                                     };
                                 },
                                 display: displayContent('type'),
