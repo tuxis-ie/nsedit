@@ -4,7 +4,7 @@ include_once('includes/config.inc.php');
 include_once('includes/session.inc.php');
 include_once('includes/misc.inc.php');
 
-$testpath = str_replace(basename($_SERVER['REQUEST_URI']), $authdb, $_SERVER['REQUEST_URI']);
+$testpath = !empty(basename($_SERVER['REQUEST_URI'])) ? str_replace(basename($_SERVER['REQUEST_URI']), $authdb, $_SERVER['REQUEST_URI']) : '/' . $authdb;
 $testurl = $_SERVER['REQUEST_SCHEME']."://".$_SERVER['HTTP_HOST'].$testpath;
 
 global $errormsg, $blocklogin;
