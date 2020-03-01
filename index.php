@@ -41,7 +41,7 @@ if (is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "cha
     ?>
     <script type="text/javascript">
         var reader = new XMLHttpRequest();
-        var checkFor = "<?php echo $testurl; ?>";
+        var checkFor = "<?php echo $testpath; ?>";
         reader.open('get', checkFor, true);
         reader.onreadystatechange = checkReadyState;
         function checkReadyState() {
