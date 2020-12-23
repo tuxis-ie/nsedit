@@ -330,6 +330,7 @@ case "create":
             $api->savezone($zone->export());
 
             foreach ($template['records'] as $record) {
+                if ($record['type'] == 'NS') continue;
                 $name = $record['name'] != '' ? join(Array($record['name'],'.',$zonename)) : $zonename;
                 $record['content'] = str_replace("[zonename]", $zonename, $record['content']);
                 $zone->addRecord($name, $record['type'], $record['content']);
