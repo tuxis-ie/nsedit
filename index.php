@@ -4,10 +4,13 @@ include_once('includes/config.inc.php');
 include_once('includes/session.inc.php');
 include_once('includes/misc.inc.php');
 
-$testpath = !empty(basename($_SERVER['REQUEST_URI'])) ? str_replace(basename($_SERVER['REQUEST_URI']), $authdb, $_SERVER['REQUEST_URI']) : '/' . $authdb;
-$testurl = $_SERVER['REQUEST_SCHEME']."://".$_SERVER['HTTP_HOST'].$testpath;
-
 global $errormsg, $blocklogin;
+
+$docroot = $_SERVER['DOCUMENT_ROOT'];
+if (preg_match("@$docroot@", $authdb) == 1) {
+    $blocklogin = TRUE;
+    $errormsg = "You authdb is in your document root and probably downloadable. Please move it to a safe location!";
+}
 
 if (isset($_GET['logout']) or isset($_POST['logout'])) {
     logout();
@@ -36,30 +39,6 @@ if (is_logged_in() and isset($_POST['formname']) and $_POST['formname'] === "cha
 <html>
 <head>
     <title>NSEdit!</title>
-    <?php
-      if (is_logged_in()) {
-    ?>
-    <script type="text/javascript">
-        var reader = new XMLHttpRequest();
-        var checkFor = "<?php echo $testpath; ?>";
-        reader.open('get', checkFor, true);
-        reader.onreadystatechange = checkReadyState;
-        function checkReadyState() {
-            if (reader.readyState === 4) {
-                //check to see whether request for the file failed or succeeded
-                if ((reader.status == 200) || (reader.status == 0)) {
-                    alert('Your authdb is downloadable. Please secure your install');
-                } else {
-                    return;
-                }
-            }
-
-        }
-        reader.send(null);
-    </script>
-    <?php
-      }
-    ?>
     <link href="jquery-ui/themes/base/all.css" rel="stylesheet" type="text/css"/>
     <link href="jtable/lib/themes/metro/blue/jtable.min.css" rel="stylesheet" type="text/css"/>
     <link href="css/base.css" rel="stylesheet" type="text/css"/>
