@@ -60,7 +60,7 @@ class ApiHandler {
     }
 
     private function baseurl() {
-        return $this->proto.'://'.$this->hostname.':'.$this->port.$this->apiurl;
+        return $this->proto.'://['.$this->hostname.']:'.$this->port.$this->apiurl;
     }
 
     private function go() {
