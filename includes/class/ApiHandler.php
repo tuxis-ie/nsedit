@@ -13,6 +13,8 @@ class ApiHandler {
     public $method;
     public $content;
     public $apiurl;
+    public $url;
+    public $json;
     
     public function __construct() {
         global $apiip, $apiport, $apipass, $apiproto, $apisslverify;
