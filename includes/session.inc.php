@@ -52,7 +52,7 @@ function _check_csrf_token($user) {
     }
 
     define('CSRF_TOKEN', $csrf_token);
-    header("X-CSRF-Token: ${csrf_token}");
+    header("X-CSRF-Token: {$csrf_token}");
 }
 
 function enc_secret($message) {
