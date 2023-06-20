@@ -236,6 +236,13 @@ class Zone {
 }
 
 class RRSet {
+    public $name;
+    public $type;
+    public $ttl;
+    public $changetype;
+    public $records;
+    public $comments;
+    
     public function __construct($name = '', $type = '', $content = '', $disabled = FALSE, $ttl = 3600, $setptr = FALSE) {
         $this->name = $name;
         $this->type = $type;
@@ -321,6 +328,10 @@ class RRSet {
 }
 
 class Record {
+    public $content;
+    public disabled;
+    public $setptr;
+    
     public function __construct($content, $disabled = FALSE, $setptr = FALSE) {
         $this->content = $content;
         $this->disabled = $disabled;
@@ -341,6 +352,10 @@ class Record {
 }
 
 class Comment {
+    public $content;
+    public $account;
+    public $modified_at;
+    
     public function __construct($content, $account, $modified_at) {
         $this->content = $content;
         $this->account = $account;
