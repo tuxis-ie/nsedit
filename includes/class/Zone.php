@@ -329,7 +329,7 @@ class RRSet {
 
 class Record {
     public $content;
-    public disabled;
+    public $disabled;
     public $setptr;
     
     public function __construct($content, $disabled = FALSE, $setptr = FALSE) {
