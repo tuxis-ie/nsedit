@@ -1,6 +1,21 @@
 <?php
 
 class Zone {
+    public $id;
+    public $name;
+    public $kind;
+    public $url;
+    public $serial;
+    public $dnssec;
+    public $soa_edit;
+    public $soa_edit_api;
+    public $keyinfo;
+    public $account;
+    public $zone;
+    public $nameservers;
+    public $rrsets;
+    public $masters;    
+    
     public function __construct() {
         $this->id = '';
         $this->name = '';
