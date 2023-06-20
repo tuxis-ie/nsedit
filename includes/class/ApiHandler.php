@@ -3,6 +3,19 @@
 include_once('includes/config.inc.php');
 
 class ApiHandler {
+    public $headers;
+    public $hostname;
+    public $port;
+    public $auth;
+    public $proto;
+    public $sslverify;
+    public $curlh;
+    public $method;
+    public $content;
+    public $apiurl;
+    public $url;
+    public $json;
+    
     public function __construct() {
         global $apiip, $apiport, $apipass, $apiproto, $apisslverify;
 

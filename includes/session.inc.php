@@ -52,7 +52,7 @@ function _check_csrf_token($user) {
     }
 
     define('CSRF_TOKEN', $csrf_token);
-    header("X-CSRF-Token: ${csrf_token}");
+    header("X-CSRF-Token: {$csrf_token}");
 }
 
 function enc_secret($message) {
@@ -122,13 +122,13 @@ function dec_secret($code) {
 
 function _unset_cookie($name) {
     $is_ssl = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off';
-    setcookie($name, null, -1, null, null, $is_ssl);
+    setcookie($name, "", -1, "", "", $is_ssl);
 }
 
 function _store_auto_login($value) {
     $is_ssl = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off';
     // set for 30 days
-    setcookie('NSEDIT_AUTOLOGIN', $value, time()+60*60*24*30, null, null, $is_ssl);
+    setcookie('NSEDIT_AUTOLOGIN', $value, time()+60*60*24*30, "", "", $is_ssl);
 }
 
 function try_login() {

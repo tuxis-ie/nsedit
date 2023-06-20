@@ -3,6 +3,9 @@
 include_once('ApiHandler.php');
 
 class PdnsAPI {
+    public $http;
+    
+    
     public function __construct() {
         $this->http = new ApiHandler();
     }
