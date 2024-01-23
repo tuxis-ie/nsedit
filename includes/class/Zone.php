@@ -368,6 +368,8 @@ class Comment {
         $ret['content'] = $this->content;
         $ret['account'] = $this->account;
         $ret['modified_at'] = $this->modified_at;
+
+        return $ret;
     }
 }
 
