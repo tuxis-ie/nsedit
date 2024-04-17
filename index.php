@@ -181,8 +181,10 @@ if ($blocklogin === TRUE) {
     }
     ?>
     <div id="zones">
-        <?php if (is_adminuser() or $allowzoneadd === TRUE) { ?>
+        <?php if ($allowzoneadd === TRUE) { ?>
         <div style="display: none;" id="ImportZone"></div>
+        <?php } ?>
+        <?php if (is_adminuser()) { ?>
         <div style="display: none;" id="CloneZone"></div>
         <?php } ?>
         <div class="tables" id="MasterZones">
@@ -503,7 +505,7 @@ $(document).ready(function () {
             hoverAnimationDuration: 60,
             hoverAnimationEasing: undefined,
             items: [
-                <?php if (is_adminuser() or $allowzoneadd === TRUE) { ?>
+                <?php if ($allowzoneadd === TRUE) { ?>
                 {
                     icon: 'jtable/lib/themes/metro/add.png',
                     text: 'Import a new zone',
@@ -511,6 +513,8 @@ $(document).ready(function () {
                         $('#ImportZone').jtable('showCreateForm');
                     }
                 },
+                <?php } ?>
+                <?php if (is_adminuser()) { ?>
                 {
                     icon: 'jtable/lib/themes/metro/add.png',
                     text: 'Clone a zone',
@@ -887,7 +891,6 @@ $(document).ready(function () {
         }
 
     });
-
     $('#CloneZone').jtable({
         title: 'Clone zone',
         actions: {
