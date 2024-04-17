@@ -546,6 +546,8 @@ case "formzonelist":
     usort($zones, "zone_compare");
     $ret = array();
     foreach ($zones as $zone) {
+        if (!check_account($zone))
+            continue;
         if ($zone['kind'] == 'Slave')
             continue;
         array_push($ret, array(
