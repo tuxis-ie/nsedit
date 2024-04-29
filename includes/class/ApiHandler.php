@@ -60,10 +60,10 @@ class ApiHandler {
     }
 
     private function baseurl() {
+        $ip = $this->hostname;
+
         if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-            $ip = sprintf('[%s]', $this->hostname); // curl needs brackets for IPv6
-        } else {
-            $ip = $this->hostname;
+            $ip = sprintf('[%s]', $ip); // curl needs brackets for IPv6
         }
 
         return $this->proto.'://'.$ip.':'.$this->port.$this->apiurl;
