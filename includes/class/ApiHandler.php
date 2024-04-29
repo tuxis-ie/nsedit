@@ -73,7 +73,13 @@ class ApiHandler {
     }
 
     private function baseurl() {
-        return $this->proto.'://'.$this->hostname.':'.$this->port.$this->apiurl;
+        $ip = $this->hostname;
+
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            $ip = sprintf('[%s]', $ip); // curl needs brackets for IPv6
+        }
+
+        return $this->proto.'://'.$ip.':'.$this->port.$this->apiurl;
     }
 
     private function go() {
