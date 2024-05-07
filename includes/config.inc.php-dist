@@ -27,6 +27,10 @@ $logsdirectory = "../etc";
 # Location of user-database. Make sure its writeable and not served by the webserver!
 $authdb  = "../etc/pdns.users.sqlite3";
 
+# Admin login and password at first start-up
+$default_admin_username = "admin";
+$default_admin_password = "admin";
+
 # Set a random generated secret to enable auto-login and long living csrf tokens
 // $secret = '...';
 

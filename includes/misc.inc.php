@@ -50,7 +50,7 @@ if (class_exists('SQLite3') === FALSE) {
     $errormsg = "You need PHP SQLite3 to run nsedit";
     $blocklogin = TRUE;
 }
- 
+
 if (function_exists('openssl_random_pseudo_bytes') === FALSE) {
     $errormsg = "You need PHP compiled with openssl to run nsedit";
     $blocklogin = TRUE;
@@ -66,7 +66,9 @@ try {
         $createsql = file_get_contents('includes/scheme.sql');
         $db->exec($createsql);
         $salt = bin2hex(openssl_random_pseudo_bytes(16));
-        $db->exec("INSERT INTO users (emailaddress, password, isadmin) VALUES ('admin', '".crypt("admin", '$6$'.$salt)."', 1)");
+        $default_admin_username = $default_admin_username ?? "admin";
+        $default_admin_password = $default_admin_password ?? "admin";
+        $db->exec("INSERT INTO users (emailaddress, password, isadmin) VALUES ('".$default_admin_username."', '".crypt($default_admin_password, '$6$'.$salt)."', 1)");
     }
 } catch (Exception $e) {
     print("We have issues getting the authdb working: $e");
@@ -187,7 +189,7 @@ function update_user($id, $isadmin, $password) {
     } else {
         $q = $db->prepare('UPDATE users SET isadmin = ? WHERE id = ?');
         $q->bindValue(1, (int)(bool)$isadmin, SQLITE3_INTEGER);
-        $q->bindValue(2, $id, SQLITE3_INTEGER); 
+        $q->bindValue(2, $id, SQLITE3_INTEGER);
         writelog("Updating settings for $username. Admin: ".(int)(bool)$isadmin);
     }
     $ret = $q->execute();
