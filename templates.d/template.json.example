@@ -1,0 +1,28 @@
+{
+    "name": "Example Template",
+    "owner": "public",
+    "records": [
+        {
+            "name": "",
+            "type": "NS",
+            "content": "ns1.example.com.",
+            "label": "ns1"
+        },
+        {
+            "name": "",
+            "type": "NS",
+            "content": "ns2.example.com.",
+            "label": "ns2"
+        },
+        {
+            "name": "example-txt",
+            "type": "TXT",
+            "content": "This is an example txt record"
+        },
+        {
+            "name": "localhost",
+            "type": "A",
+            "content": "127.0.0.1"
+        }
+    ]
+}
