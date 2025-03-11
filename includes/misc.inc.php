@@ -255,6 +255,27 @@ function jtable_respond($records, $method = 'multiple', $msg = 'Undefined errorm
 function user_template_list() {
     global $templates;
 
+    if (is_dir("templates.d")) {
+        if ($templdir=opendir("templates.d")) {
+            while ($entry = readdir($templdir)) {
+                if (!str_ends_with($entry, ".json")) {
+                    continue;
+                }
+                $f=file_get_contents("templates.d/$entry");
+                if ($f === false) {
+                    error_log("Error reading file templates.d/$entry", 0);
+                    continue;
+                }
+                $t = json_decode($f, true);
+                if ($t === null) {
+                    error_log("Error decoding templates.d/$entry", 0);
+                    continue;
+                }
+                array_push($templates, $t);
+            }
+        }
+    }
+
     $templatelist = array();
     foreach ($templates as $template) {
         if (is_adminuser()
