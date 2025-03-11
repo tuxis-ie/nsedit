@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:bookworm
 MAINTAINER Yury Evtikhov <yury@evtikhov.info>
 #
 # This Dockerfile is intended only for test/development use.
@@ -9,7 +9,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 # Update and Upgrade system
 RUN apt-get -y update && \
-    apt-get -y install curl git-core php5-cli php5-curl php5-json php5-sqlite && \
+    apt-get -y install curl git-core php8.2-cli php8.2-curl php8.2-sqlite3 && \
     rm -rf /var/lib/apt/lists/*
 RUN mkdir /app
 RUN git clone --recursive https://github.com/tuxis-ie/nsedit.git /app/nsedit
